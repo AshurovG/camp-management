@@ -1,4 +1,4 @@
-:root {
+#root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -6,22 +6,6 @@
   /* background-color: #F5DEB3; */
   /* background-color: #77A6F7; */
   background-color: #D3E3FC;
-}
-
-/* body {
-  margin: 0;
-  box-sizing: border-box;
-} */
-
-html,
-body {
-  font-family: 'Roboto', sans-serif;
-  margin: 0;
-  padding: 0;
-}
-
-* {
-  box-sizing: border-box;
 }
 
 h1,
@@ -34,5 +18,16 @@ p,
 blockquote,
 figure,
 pre {
+  margin: 0;
+}
+
+html,
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #D3E3FC;
+}
+
+* {
+  box-sizing: border-box;
   margin: 0;
 }

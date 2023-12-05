@@ -5,6 +5,8 @@ import Header from 'components/Header'
 import GroupsPage from 'pages/GroupsPage'
 import CalendarPage from 'pages/CalendarPage'
 import AccommodationPage from 'pages/AccommodationPage'
+import EventsPage from 'pages/EventsPage'
+import 'bootstrap/dist/css/bootstrap.css';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -18,6 +20,10 @@ function App() {
             <Route path='/' element={<GroupsPage/>}/>
             <Route path='/calendar' element={<CalendarPage/>}/>
             <Route path='/accommodation' element={<AccommodationPage/>}/>
+            <Route path="/events">
+              <Route path=":id" element={<EventsPage />} />
+            </Route>
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
       </HashRouter>
