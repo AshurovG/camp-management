@@ -1,6 +1,7 @@
 import React from 'react'
 import styles from './EventsPage.module.scss'
-import List from 'components/List'
+import CustomTable from 'components/CustomTable'
+import Button from 'components/Button'
 
 const events = [
   {
@@ -26,13 +27,32 @@ const events = [
   }
 ]
 
+const columns = [
+  {
+    key: 'title',
+    title: 'Название'
+  },
+  {
+    key: 'timeStart',
+    title: 'Время начала'
+  },
+  {
+    key: 'timeEnd',
+    title: 'Время окончания'
+  },
+  {
+    key: 'place',
+    title: 'Место проведения'
+  }
+]
+
 const EventsPage = () => {
   return (
     <div className={styles.events__page}>
       <div className={styles['events__page-wrapper']}>
         <h1 className={styles['events__page-title']}>Мероприятия на данный день</h1>
         <div className={styles['events__page-content']}>
-          <List events={events}/>
+          <CustomTable events={events} columns={columns}><Button >fsds</Button></CustomTable>
         </div>
       </div>
     </div>

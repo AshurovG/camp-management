@@ -7,7 +7,7 @@ import styles from './Button.module.scss'
 
 export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
     children: React.ReactNode;
-    className: string;
+    className?: string;
 };
 
 const Button: React.FC<ButtonProps> = ({
