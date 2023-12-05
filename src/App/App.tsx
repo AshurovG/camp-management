@@ -3,6 +3,8 @@ import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import styles from './App.module.scss'
 import Header from 'components/Header'
 import GroupsPage from 'pages/GroupsPage'
+import CalendarPage from 'pages/CalendarPage'
+import AccommodationPage from 'pages/AccommodationPage'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -10,10 +12,14 @@ function App() {
   return (
     <>
       <HashRouter>
-      <Header/>
-        <Routes>
-          <Route path='/' element={<GroupsPage/>}/>
-        </Routes>
+        <Header/>
+        <div className={styles.content}>
+          <Routes >
+            <Route path='/' element={<GroupsPage/>}/>
+            <Route path='/calendar' element={<CalendarPage/>}/>
+            <Route path='/accommodation' element={<AccommodationPage/>}/>
+          </Routes>
+        </div>
       </HashRouter>
     </>
   )

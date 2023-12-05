@@ -12,8 +12,8 @@ const Header: React.FC = () => {
 
                 <div className={styles.header__blocks}>
                     <Link className={styles.header__block} to='/'>Состав лагеря</Link>
-                    <Link className={styles.header__block} to='/'>Мероприятия</Link>
-                    <Link className={styles.header__block} to='/'>Проживание</Link>
+                    <Link className={styles.header__block} to='/calendar'>Мероприятия</Link>
+                    <Link className={styles.header__block} to='/accommodation'>Проживание</Link>
                 </div>
 
                 <div className={styles.header__icons}>

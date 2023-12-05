@@ -3,10 +3,36 @@
   line-height: 1.5;
   font-weight: 400;
   /* background-color: #FDA182; */
-  background-color: #F5DEB3;
+  /* background-color: #F5DEB3; */
+  /* background-color: #77A6F7; */
+  background-color: #D3E3FC;
 }
 
-body {
+/* body {
   margin: 0;
   box-sizing: border-box;
+} */
+
+html,
+body {
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+figure,
+pre {
+  margin: 0;
 }
