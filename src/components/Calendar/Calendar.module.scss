@@ -27,16 +27,26 @@
         }
 
         &-events {
-            display: flex;
-            flex-direction: column;
             padding: 20px;
-            gap: 10px;
             color: $text-brand;
+
+            &:last-child {
+                gap: 0;
+            }
         }
 
         &-event {
 
         }
+
+        &-btn {
+        
+        }
     }
 }
 
+
+.test {
+    color: red;
+    background-color: #000;
+}

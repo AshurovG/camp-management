@@ -1,6 +1,7 @@
 import React from 'react'
 import styles from './Calendar.module.scss'
 import { DayData, EventData } from '../../../types'
+import Button from 'react-bootstrap/Button';
   
 type CalendarProps = {
     days: DayData[];
@@ -25,7 +26,7 @@ const Calendar: React.FC<CalendarProps> = ({days}) => {
                                 Место проведения: {event.place}
                             </p>
                         ))}
-                        
+                        <Button className={styles['test']}>Посмотреть все</Button>  
                     </div>
                 </div>
                 
