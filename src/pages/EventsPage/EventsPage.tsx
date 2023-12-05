@@ -53,6 +53,7 @@ const columns = [
 const EventsPage = () => {
   const [isAddModalWindowOpened, setIsAddModalWindowOpened] = useState(false);
   const [isChangeModalWindowOpened, setIsChangeModalWindowOpened] = useState(false);
+  const [isDeleteModalWindowOpened, setIsDeleteModalWindowOpened] = useState(false)
   const [titleValue, setTitleValue] = useState('');
   const [timeStart, setTimeStart] = useState('');
   const [timeEnd, setTimeEnd] = useState('');
@@ -70,8 +71,8 @@ const EventsPage = () => {
     setIsChangeModalWindowOpened(true);
   }
 
-  const handleDeleteButtonClick = () => {
-    console.log('delete')
+  const handleConfirmDeleteButtonClick = () => {
+    console.log('confirm')
   }
 
   const handleAddButtonClick = () => {
@@ -93,7 +94,9 @@ const EventsPage = () => {
         <h1 className={styles['events__page-title']}>Мероприятия на данный день</h1>
         <div className={styles['events__page-content']}>
           <Button onClick={handleAddButtonClick} className={styles['events__page-add']}>Добавить новое</Button>
-          <CustomTable className={styles['events__page-table']} events={events} columns={columns} flag={2} handleChangeButtonClick={handleChangeButtonClick}></CustomTable>
+          <CustomTable className={styles['events__page-table']} events={events} 
+          columns={columns} flag={2} handleChangeButtonClick={handleChangeButtonClick} 
+          handleDeleteButtonClick={() => setIsDeleteModalWindowOpened(true)}></CustomTable>
         </div>
       </div>
 
@@ -128,6 +131,14 @@ const EventsPage = () => {
           {isAddModalWindowOpened && <Button className={styles.form__btn}>Сохранить</Button>}
           {isChangeModalWindowOpened && <Button className={styles.form__btn}>Изменить</Button>}
         </Form>
+      </ModalWindow>
+
+      <ModalWindow handleBackdropClick={() => setIsDeleteModalWindowOpened(false)} active={isDeleteModalWindowOpened} className={styles.modal}>
+        <h3 className={styles.modal__title}>Вы уверены, что хотите удалить данное мероприятние?</h3>
+        <div className={styles.modal__btns}>
+          <Button onClick={() => handleConfirmDeleteButtonClick()} className={styles.modal__btn}>Подтвердить</Button>
+          <Button onClick={() => setIsDeleteModalWindowOpened(false)} className={styles.modal__btn}>Закрыть</Button>
+        </div>
       </ModalWindow>
     </div>
   )
