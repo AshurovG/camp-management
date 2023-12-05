@@ -4,30 +4,25 @@
 th {
     background-color: inherit !important;
     color: $text-brand !important;
+    vertical-align: middle;
 }
 
 td {
     background-color: inherit !important;
+    vertical-align: middle;
 }
 
 tr {
     border: 1px solid #000 !important;
 }
 
-thead {
-    // position: sticky;
-    // top: 0;
-    // z-index: 1;
-  }
-
 .table {
+    padding: 20px;
+
     &__container {
         max-height: 400px;
         overflow-y: auto;
-        // border-radius: 10px;
     }
-
-    padding: 20px;
 
     &__head {
         padding: 20px;
@@ -38,10 +33,11 @@ thead {
         gap: 10px;
         align-items: center;
         justify-content: flex-end;
+        border: none !important;
+
         &-btn {
             width: 120px;
             font-size: 14px;
         }
-        border: none !important;
     }
 }

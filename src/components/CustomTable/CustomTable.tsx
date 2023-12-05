@@ -1,4 +1,5 @@
 import React from 'react'
+import cn from 'classnames';
 import styles from './CustomTable.module.scss'
 import Table from 'react-bootstrap/Table';
 
@@ -15,34 +16,30 @@ export type TableData = {
 };
 
 const CustomTable: React.FC<TableData> = ({columns, events, children, className}) => {
-  const handleDetailedButtonClick = (id: number) => {
-    console.log('button was clicked', id)
-  };
-
   return (
     <>
-    <div className={styles.table__container}>
-    <Table>
-        <thead>
-          <tr>
-            {columns.map((column, index) => (
-              <th key={index}>{column.title}</th>
-            ))}
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {events.map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              {columns.map((column, columnIndex) => (
-                <td key={columnIndex}>{row[column.key]}</td>
+      <div className={`${styles.table__container} ${className}`}>
+      <Table>
+          <thead>
+            <tr>
+              {columns.map((column, index) => (
+                <th key={index}>{column.title}</th>
               ))}
-              <td className={styles.table__action}>{children}</td>
+              <th></th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
-    </div>
+          </thead>
+          <tbody>
+            {events.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                {columns.map((column, columnIndex) => (
+                  <td key={columnIndex}>{row[column.key]}</td>
+                ))}
+                <td className={styles.table__action}>{children}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </div>
     </>
   );
 }

@@ -52,11 +52,17 @@ const EventsPage = () => {
       <div className={styles['events__page-wrapper']}>
         <h1 className={styles['events__page-title']}>Мероприятия на данный день</h1>
         <div className={styles['events__page-content']}>
-          <CustomTable events={events} columns={columns}><Button >fsds</Button></CustomTable>
+          <Button className={styles['events__page-add']}>Добавить новое</Button>
+          <CustomTable className={styles['events__page-table']} events={events} columns={columns}>
+            <div className={styles['events__page-action']}>
+              <Button className={styles['events__page-btn']}>Участники</Button>
+              <Button className={styles['events__page-btn']}>Изменить</Button>
+              <Button className={styles['events__page-btn']}>Удалить</Button>
+            </div>
+          </CustomTable>
         </div>
       </div>
     </div>
   )
 }
-
 export default EventsPage
