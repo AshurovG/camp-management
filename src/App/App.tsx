@@ -4,8 +4,10 @@ import styles from './App.module.scss'
 import Header from 'components/Header'
 import GroupsPage from 'pages/GroupsPage'
 import CalendarPage from 'pages/CalendarPage'
-import AccommodationPage from 'pages/AccommodationPage'
+import BuildingsPage from 'pages/BuildingsPage'
 import EventsPage from 'pages/EventsPage'
+import EventMembersPage from 'pages/EventMembersPage'
+import BuildingsDetailedPage from 'pages/BuildingsDetailedPage'
 import 'bootstrap/dist/css/bootstrap.css';
 
 function App() {
@@ -19,9 +21,15 @@ function App() {
           <Routes >
             <Route path='/' element={<GroupsPage/>}/>
             <Route path='/calendar' element={<CalendarPage/>}/>
-            <Route path='/accommodation' element={<AccommodationPage/>}/>
+            <Route path='/buildings' element={<BuildingsPage/>}/>
+            <Route path='/buildings'>
+              <Route path=':id' element={<BuildingsDetailedPage/>}></Route>
+            </Route>
             <Route path="/events">
               <Route path=":id" element={<EventsPage />} />
+            </Route>
+            <Route path="/events_members">
+              <Route path=":id" element={<EventMembersPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

@@ -1,5 +1,6 @@
 import React from 'react'
 import { useState, ChangeEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
 import styles from './EventsPage.module.scss'
 import CustomTable from 'components/CustomTable'
 import Button from 'components/Button'
@@ -51,6 +52,8 @@ const columns = [
 ]
 
 const EventsPage = () => {
+  const navigate = useNavigate();
+
   const [isAddModalWindowOpened, setIsAddModalWindowOpened] = useState(false);
   const [isChangeModalWindowOpened, setIsChangeModalWindowOpened] = useState(false);
   const [isDeleteModalWindowOpened, setIsDeleteModalWindowOpened] = useState(false)
@@ -59,8 +62,8 @@ const EventsPage = () => {
   const [timeEnd, setTimeEnd] = useState('');
   const [place, setPlace] = useState('');
 
-  const handleUsersButtonCLick = () => {
-    console.log('users')
+  const handleUsersButtonCLick = (event: EventData) => {
+    navigate(`/events_members/${event.id}`)
   }
 
   const handleChangeButtonClick = (event: EventData) => {
@@ -96,7 +99,7 @@ const EventsPage = () => {
           <Button onClick={handleAddButtonClick} className={styles['events__page-add']}>Добавить новое</Button>
           <CustomTable className={styles['events__page-table']} events={events} 
           columns={columns} flag={2} handleChangeButtonClick={handleChangeButtonClick} 
-          handleDeleteButtonClick={() => setIsDeleteModalWindowOpened(true)}></CustomTable>
+          handleDeleteButtonClick={() => setIsDeleteModalWindowOpened(true)} handleUsersButtonCLick={handleUsersButtonCLick}></CustomTable>
         </div>
       </div>
 

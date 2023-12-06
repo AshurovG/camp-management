@@ -8,12 +8,12 @@ const Header: React.FC = () => {
     return (
         <div className={styles.header}>
             <div className={styles.header__wrapper}>
-                <Link to='/' className={styles.header__logo}>Управление лагерями</Link>
+                <Link to='/' className={styles.header__logo}>Управление лагерем</Link>
 
                 <div className={styles.header__blocks}>
                     <Link className={styles.header__block} to='/'>Состав лагеря</Link>
                     <Link className={styles.header__block} to='/calendar'>Мероприятия</Link>
-                    <Link className={styles.header__block} to='/accommodation'>Проживание</Link>
+                    <Link className={styles.header__block} to='/buildings'>Проживание</Link>
                 </div>
 
                 <div className={styles.header__icons}>

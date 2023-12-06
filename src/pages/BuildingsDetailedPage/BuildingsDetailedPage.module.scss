@@ -1,13 +1,9 @@
 @import 'styles/variables.scss';
 @import 'styles/mixins.scss';
 
-.accommodation__page {
+.detailed__page {
     &-wrapper {
         max-width: 1240px;
         margin: 0 auto;
-    }
-
-    &-title {
-        font-size: 30px;
     }
 }

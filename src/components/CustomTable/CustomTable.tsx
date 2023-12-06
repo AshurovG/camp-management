@@ -16,7 +16,7 @@ export type TableData = {
   children?: React.ReactNode;
   flag: 0 | 1 | 2;
   className?: string;
-  handleUsersButtonCLick?: () => void;
+  handleUsersButtonCLick?: (event: EventData) => void;
   handleChangeButtonClick?: (event: EventData) => void;
   handleDeleteButtonClick?: () => void;
 };
@@ -42,7 +42,7 @@ const CustomTable: React.FC<TableData> = ({columns, events, children, flag,
                   <td key={columnIndex}>{row[column.key]}</td>
                 ))}
                 <td className={styles.table__action}>
-                  <Button onClick={handleUsersButtonCLick} className={styles['events__page-btn']}>Участники</Button>
+                  <Button onClick={() => handleUsersButtonCLick?.(row)} className={styles['events__page-btn']}>Участники</Button>
                   <Button onClick={() => handleChangeButtonClick?.(row)} className={styles['events__page-btn']}>Изменить</Button>
                   <Button onClick={handleDeleteButtonClick} className={styles['events__page-btn']}>Удалить</Button>
                 </td>
