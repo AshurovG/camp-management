@@ -29,7 +29,7 @@ const BuildingsPage = () => {
 
   const postBuilding = async () => {
     try {
-      const response = await axios('https://specializedcampbeta.roxmiv.com/api/buildings/post', {
+      const response = await axios('https://specializedcampbeta.roxmiv.com/api/buildings', {
         method: 'POST',
         data: {
           "name": titleValue
@@ -39,6 +39,31 @@ const BuildingsPage = () => {
       dispatch(setBuildingsAction([...buildings, response.data]))
     } catch(e) {
       throw(e)
+    }
+  }
+
+  const putBuilding = async (id: number, title: string) => {
+    try {
+      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/buildings/${id}`, {
+        method: 'PUT',
+        data: {
+          "name": title
+        }
+      })
+
+      dispatch(setBuildingsAction([...buildings, response.data]))
+    } catch(e) {
+      throw(e)
+    }
+  }
+
+  const deleteBuilding = async (id: number) => {
+    try {
+      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/buildings/${id}`, {
+        method: 'DELETE'
+      })
+    } catch(e) {
+      throw e
     }
   }
 

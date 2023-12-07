@@ -1,6 +1,101 @@
+@import 'styles/variables.scss';
+@import 'styles/mixins.scss';
+
 .groups__page {
     &-wrapper {
         max-width: 1240px;
         margin: 0 auto;
+    }
+
+    &-title {
+        font-size: 30px;
+        color: $text-brand;
+        margin-bottom: 30px;
+    }
+
+    &-action {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+}
+
+
+.dropdown {
+    width: 40%;
+    min-width: 290px;
+
+    &__toggle {
+        height: 60px;
+        width: 100%;
+        text-align-last: left;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-right: 1rem;
+        font-size: 18px;
+
+        &::after {
+            color: transparent;
+        }
+
+        &:focus {
+            box-shadow: none;
+        }
+
+        &:active {
+            box-shadow: none;
+        }
+    }
+
+    &__menu {
+        width: 100%;
+        text-align-last: left;
+        right: 0;
+        left: auto;
+
+        &-item {
+            &:active {
+                background-color: $brand !important;
+                color: red;
+            }
+        }
+    }
+
+    &__icon {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        right: 3%;
+    }
+}
+
+.modal {
+    &__title {
+        font-size: 24px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    &__btns {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    &__btn {
+        width: 150px;
+    }
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    &__item {
+        width: 350px;
+    }
+
+    &__btn {
+
     }
 }

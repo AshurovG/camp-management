@@ -88,7 +88,6 @@ const EventsPage = () => {
 
   const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log('form submited')
   }
 
   return (

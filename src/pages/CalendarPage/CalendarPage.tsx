@@ -206,6 +206,61 @@ const CalendarPage = () => {
     }
   }
 
+  const postEvent = async (event: EventsData) => {
+    try {
+      const response = await axios('https://specializedcampbeta.roxmiv.com/api/events', {
+        method: 'POST',
+        data: {
+          id: event.id,
+          title: event.title,
+          start_time: event.startTime,
+          end_time: event.endTime,
+          notification: event.notification,
+          is_need_screen: event.isNeedScreen,
+          is_need_computer: event.isNeedComputer,
+          is_need_whiteboard: event.isNeedWhiteboard
+        }
+      })
+
+      dispatch(setEventsAction([events, response.data]))
+    } catch(e) {
+      throw e
+    }
+  }
+
+  const putEvent = async (event: EventsData) => {
+    try {
+      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/events/${event.id}`, {
+        method: 'PUT',
+        data: {
+          title: event.title,
+          start_time: event.startTime,
+          end_time: event.endTime,
+          notification: event.notification,
+          is_need_screen: event.isNeedScreen,
+          is_need_computer: event.isNeedComputer,
+          is_need_whiteboard: event.isNeedWhiteboard
+        }
+      })
+
+      dispatch(setEventsAction([events, response.data]))
+    } catch(e) {
+      throw e
+    }
+  }
+
+  const deleteEvent = async (id: number) => {
+    try {
+      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/events/${id}`, {
+        method: 'DELETE',
+      })
+
+      // Нужно еще изменить глобальное состояние событий
+    } catch(e) {
+      throw e
+    }
+  }
+
   React.useEffect(() => {
     getEvents();
   }, [])
