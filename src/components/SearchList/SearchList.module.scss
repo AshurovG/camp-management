@@ -1,0 +1,25 @@
+@import 'styles/variables.scss';
+@import 'styles/mixins.scss';
+
+.list {
+    background-color: $brand;
+    width: 300px;
+    flex-direction: column;
+    display: flex;
+    border-radius: 10px;
+    align-items: flex-start;
+
+    &__options {
+        width: 100%;
+        padding: 5px !important;
+        color: $text-default;
+    }
+
+    &__option {
+        
+        &:hover {
+            background-color: $brand-hover;
+            cursor: pointer;
+        }
+    }
+}
