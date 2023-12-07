@@ -1,29 +1,29 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { useSelector } from "react-redux";
-import { RecGroupsData } from "../../types";
+import { EventsData } from "../../types";
 
 interface DataState {
-  groups: RecGroupsData[],
+  events: EventsData[],
 }
 
 const dataSlice = createSlice({
   name: "data",
   initialState: {
-    groups: []
+    events: []
   } as DataState,
   reducers: {
-    setGroups(state, action: PayloadAction<RecGroupsData[]>) {
-      state.groups = action.payload;
+    setEvents(state, action: PayloadAction<EventsData[]>) {
+      state.events = action.payload;
       console.log(action.payload)
     },
   },
 });
 
-export const useGroups = () =>
-  useSelector((state: { groupsData: DataState }) => state.groupsData.groups);
+export const useEvents = () =>
+  useSelector((state: { eventsData: DataState }) => state.eventsData.events);
 
 export const {
-    setGroups: setGroupsAction,
+  setEvents: setEventsAction,
 } = dataSlice.actions;
 
 export default dataSlice.reducer;

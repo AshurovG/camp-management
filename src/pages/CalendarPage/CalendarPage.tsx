@@ -1,7 +1,11 @@
 import React from 'react'
+import axios from 'axios'
 import styles from './CalendarPage.module.scss'
 import Calendar from 'components/Calendar'
 import { DayData, EventData } from '../../../types'
+import { EventsData, RecEventsData } from '../../../types'
+import { useDispatch } from 'react-redux'
+import { useEvents, setEventsAction } from 'slices/EventsSlice'
 
 const days = [
   {
@@ -175,6 +179,37 @@ const days = [
 ]
 
 const CalendarPage = () => {
+  const dispatch = useDispatch();
+  const events = useEvents();
+
+  const getEvents = async () => {
+    try {
+      const response = await axios('https://specializedcampbeta.roxmiv.com/api/events', {
+        method: 'GET'
+      })
+      const newArr = response.data.map((raw: RecEventsData) => {
+        return {
+          id: raw.id,
+          title: raw.title,
+          startTime: raw.start_time,
+          endTime: raw.end_time,
+          notification: raw.notification,
+          isNeedScreen: raw.is_need_screen,
+          isNeedComputer: raw.is_need_computer,
+          isNeedWhiteboard: raw.is_need_whiteboard
+        }
+      })
+      console.log(1111)
+      dispatch(setEventsAction(newArr))
+    } catch(e) {
+      throw e
+    }
+  }
+
+  React.useEffect(() => {
+    getEvents();
+  }, [])
+
   return (
     <div className={styles.events__page}>
         <div className={styles['events__page-wrapper']}>

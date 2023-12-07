@@ -6,6 +6,17 @@ export type EventData = {
     place: string;
 }
 
+export type EventsData = {
+    id: number,
+    title: string,
+    startTime: string,
+    endTime: string,
+    notification: boolean,
+    isNeedScreen: boolean,
+    isNeedComputer: boolean,
+    isNeedWhiteboard: boolean
+}
+
 export type DayData = {
     id: number;
     title: string;
@@ -49,4 +60,15 @@ export type RecBuildingDetailedData = {
 export type RecGroupsData = {
     id: number;
     name: string;
+}
+
+export type RecEventsData = {
+    id: number,
+    title: string,
+    start_time: string,
+    end_time: string,
+    notification: boolean,
+    is_need_screen: boolean,
+    is_need_computer: boolean,
+    is_need_whiteboard: boolean
 }
