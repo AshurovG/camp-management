@@ -45,3 +45,8 @@ export type RecBuildingDetailedData = {
     rooms: RecRoomData[];
     public_places: RecPublicPlacesData[];
 }
+
+export type RecGroupsData = {
+    id: number;
+    name: string;
+}

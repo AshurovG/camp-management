@@ -5,5 +5,17 @@
     &-wrapper {
         max-width: 1240px;
         margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    &-title {
+        font-size: 30px;
+        color: $text-brand;
+        margin-bottom: 20px;
+    }
+
+    &-item {
+        width: 40%;
     }
 }

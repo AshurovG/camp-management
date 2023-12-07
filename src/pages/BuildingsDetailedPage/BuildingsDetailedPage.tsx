@@ -4,7 +4,18 @@ import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useBuildingDetailed, setBuildingDetailedAction } from 'slices/BuildingsSlice';
 import styles from './BuildingsDetailedPage.module.scss'
+import CustomTable from 'components/CustomTable';
 
+let roomsColumns = [
+  {
+    key: 'number',
+    title: 'Номер комнаты'
+  },
+  {
+    key: 'capacity',
+    title: 'Вместимость'
+  }
+]
 
 const BuildingsDetailedPage = () => {
   const params = useParams();
@@ -25,7 +36,6 @@ const BuildingsDetailedPage = () => {
         rooms: response.data.rooms,
         publicPlaces: response.data.public_places
       }))
-
     } catch(e) {
       throw e
     }
@@ -38,7 +48,19 @@ const BuildingsDetailedPage = () => {
   return (
     <div className={styles.detailed__page}>
         <div className={styles['detailed__page-wrapper']}>
-            detailed
+            {buildingDetailed?.rooms.length !== 0 && <div className={styles['detailed__page-item']}>
+              <h1 className={styles['detailed__page-title']}>Список комнат</h1>
+                <CustomTable className={styles['events__page-table']} data={buildingDetailed?.rooms!} 
+                columns={roomsColumns} flag={2} 
+                 ></CustomTable>
+            </div>}
+
+            <div className={styles['detailed__page-item']}>
+              <h1 className={styles['detailed__page-title']}>Список различных помещений</h1>
+              <CustomTable className={styles['events__page-table']} data={buildingDetailed?.rooms!} 
+                columns={roomsColumns} flag={2} 
+              ></CustomTable>
+            </div>
         </div>
     </div>
   )

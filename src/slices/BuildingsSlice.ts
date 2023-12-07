@@ -11,7 +11,12 @@ const dataSlice = createSlice({
   name: "data",
   initialState: {
     buildings: [],
-    buildingDetailed: null
+    buildingDetailed: {
+      id: 0,
+      name: '',
+      rooms: [],
+      publicPlaces: []
+  }
   } as DataState,
   reducers: {
     setBuildings(state, action: PayloadAction<RecBuildingData[]>) {

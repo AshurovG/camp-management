@@ -97,7 +97,7 @@ const EventsPage = () => {
         <h1 className={styles['events__page-title']}>Мероприятия на данный день</h1>
         <div className={styles['events__page-content']}>
           <Button onClick={handleAddButtonClick} className={styles['events__page-add']}>Добавить новое</Button>
-          <CustomTable className={styles['events__page-table']} events={events} 
+          <CustomTable className={styles['events__page-table']} data={events} 
           columns={columns} flag={2} handleChangeButtonClick={handleChangeButtonClick} 
           handleDeleteButtonClick={() => setIsDeleteModalWindowOpened(true)} handleUsersButtonCLick={handleUsersButtonCLick}></CustomTable>
         </div>
