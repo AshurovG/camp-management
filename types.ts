@@ -37,6 +37,13 @@ export type UserData = {
     lastName: string;
 }
 
+export type DetailedGroupData= {
+    members: UserData[],
+    allMembers: UserData[],
+    childrenGroups: RecGroupsData[],
+    allChildrenGroups: RecGroupsData[]
+  }
+
 
 // API types
 

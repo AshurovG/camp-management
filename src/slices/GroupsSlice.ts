@@ -1,14 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { useSelector } from "react-redux";
-import { RecGroupsData, UserData } from "../../types";
+import { RecGroupsData, UserData, DetailedGroupData } from "../../types";
 
 interface DataState {
   groups: RecGroupsData[],
   users: UserData[],
-  allMembers: UserData[],
-  allSubgroups: RecGroupsData[],
   filteredUsers: UserData[],
   filteredGroups: RecGroupsData[],
+  detailedGroup: DetailedGroupData
   // addedMembers: number[],
   // addedSubgroups: number[]
 }
@@ -18,10 +17,14 @@ const dataSlice = createSlice({
   initialState: {
     groups: [],
     users: [],
-    allMembers: [],
-    allSubgroups: [],
     filteredUsers: [],
-    filteredGroups: []
+    filteredGroups: [],
+    detailedGroup: {
+      members: [],
+      allMembers: [],
+      childrenGroups: [],
+      allChildrenGroups: []
+    },
     // addedMembers: [],
     // addedSubgroups: []
   } as DataState,
@@ -34,12 +37,8 @@ const dataSlice = createSlice({
       state.users = action.payload;
     },
 
-    setAllMembers(state, action: PayloadAction<UserData[]>) {
-      state.allMembers = action.payload;
-    },
-
-    setAllSubgroups(state, action: PayloadAction<RecGroupsData[]>) {
-      state.allSubgroups = action.payload;
+    setDetailedGroup(state, action: PayloadAction<DetailedGroupData>) {
+      state.detailedGroup = action.payload;
     },
 
     setFilteredUsers(state, action: PayloadAction<UserData[]>) {
@@ -66,23 +65,21 @@ export const useGroups = () =>
 export const useUsers = () =>
   useSelector((state: { groupsData: DataState }) => state.groupsData.users);
 
-export const useAllMembers = () =>
-  useSelector((state: { groupsData: DataState }) => state.groupsData.allMembers);
-
-export const useAllSubgroups = () =>
-  useSelector((state: { groupsData: DataState }) => state.groupsData.allSubgroups);
-
 export const useFilteredUsers = () =>
   useSelector((state: { groupsData: DataState }) => state.groupsData.filteredUsers);
 
 export const useFilteredGroups = () =>
   useSelector((state: { groupsData: DataState }) => state.groupsData.filteredGroups);
 
+export const useDetailedGroup = () =>
+  useSelector((state: { groupsData: DataState }) => state.groupsData.detailedGroup);
+
+
+
 export const {
     setGroups: setGroupsAction,
     setUsers: setUsersAction,
-    setAllMembers: setAllMembersAction,
-    setAllSubgroups: setAllSubgroupsAction,
+    setDetailedGroup: setDetailedGroupAction,
     setFilteredUsers: setFilteredUsersAction,
     setFilteredGroups: setFilteredGroupsAction,
 } = dataSlice.actions;

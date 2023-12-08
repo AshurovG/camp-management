@@ -2,8 +2,8 @@ import React, { useState, ChangeEvent } from 'react';
 import axios from 'axios';
 import styles from './GroupsPage.module.scss'
 import { useDispatch } from 'react-redux';
-import { useGroups, useUsers, useAllMembers, useAllSubgroups, useFilteredUsers, useFilteredGroups,
-  setGroupsAction, setUsersAction, setAllMembersAction, setAllSubgroupsAction,
+import { useGroups, useUsers, useDetailedGroup, useFilteredUsers, useFilteredGroups,
+  setGroupsAction, setUsersAction, setDetailedGroupAction,
   setFilteredUsersAction, setFilteredGroupsAction } from 'slices/GroupsSlice';
 import AddButton from 'components/Icons/AddButton';
 import Button from 'components/Button';
@@ -22,8 +22,7 @@ const GroupsPage = () => {
   const dispatch = useDispatch();
   const groups = useGroups(); 
   const users = useUsers();
-  const allMembers = useAllMembers();
-  const allSubgroups = useAllSubgroups();
+  const detailedGroup = useDetailedGroup();
   const filteredUsers = useFilteredUsers();
   const filteredGroups = useFilteredGroups();
   const [groupValue, setGroupValue] = useState<RecGroupsData>()
@@ -33,18 +32,23 @@ const GroupsPage = () => {
   const [deletedMembers, setDeletedMembers] = useState<number[]>([])
   const [isAddModalWindowOpened, setIsAddModalWindowOpened] = useState(false)
   const [isEditModalWindowOpened, setIsEditModalWindowOpened] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isAllGroupsLoading, setIsAllGroupsLoading] = useState(true)
+  const [isDetailedGroupLoading, setIsDetailedGroupLoading] = useState(true)
+
   const [newGroupValue, setNewGroupValue] = useState('')
 
   const getGroups = async () => {
     try {
       const response = await axios(`https://specializedcampbeta.roxmiv.com/api/groups`)
       dispatch(setGroupsAction(response.data))
-      setGroupValue(response.data[0])
-      // getDetailedGroup(response.data[0].id);
+      if (!groupValue) {
+        setGroupValue(response.data[0])
+      }
     } catch(e) {
       throw e
     }
+
+    setIsAllGroupsLoading(false)
   }
 
   const getUsers = async () => {
@@ -81,11 +85,23 @@ const GroupsPage = () => {
           lastName: raw.last_name
         }
       })
-      dispatch(setAllMembersAction(newMembersArr))
-      dispatch(setAllSubgroupsAction(response.data.children_groups))
-      dispatch(setFilteredGroupsAction(filterGroups(groups, response.data.children_groups)))
-      dispatch(setFilteredUsersAction(filterUsers(users, newMembersArr)))
-      setIsLoading(false)
+
+      const newAllMembersArr = response.data.all_members.map((raw: RecUserData) => {
+        return {
+          id: raw.id,
+          firstName: raw.first_name,
+          lastName: raw.last_name
+        }
+      })
+      dispatch(setDetailedGroupAction({
+        members: newMembersArr,
+        allMembers: newAllMembersArr,
+        childrenGroups: response.data.children_groups,
+        allChildrenGroups: response.data.all_children_groups
+      }))
+      dispatch(setFilteredGroupsAction(filterGroups(groups, response.data.all_children_groups)))
+      dispatch(setFilteredUsersAction(filterUsers(users, newAllMembersArr)))
+      setIsDetailedGroupLoading(false)
       
     } catch(e) {
       throw e
@@ -100,9 +116,18 @@ const GroupsPage = () => {
           "name": newGroupValue
         }
       })
-      dispatch(setGroupsAction([...groups, response.data]))
+    // setFilteredGroupsAction([...filteredGroups, response.data])
+    setGroupValue(response.data)
+      
     } catch(e) {
       throw e
+    } finally {
+      setIsAllGroupsLoading(true)
+      await getGroups()
+      if (groupValue) {
+        setIsDetailedGroupLoading(true)
+        await getDetailedGroup(groupValue.id)
+      }
     }
   }
 
@@ -135,10 +160,48 @@ const GroupsPage = () => {
       await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${groupValue?.id}`, {
         method: 'DELETE'
       })
+      if (groups.length > 0) {
+        setGroupValue(groups[0])
+      }
       dispatch(setGroupsAction(groups.filter(group => group.id !== groupValue?.id)));
-      setGroupValue(groups[0])
+      
     } catch(e) {
       throw e
+    } finally {
+      if (groupValue) {
+        setIsDetailedGroupLoading(true)
+        await getDetailedGroup(groupValue.id)
+      }
+    }
+  }
+
+  const addMembersToGroup = async () => {
+    try {
+      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${groupValue?.id}/add_members`, {
+        method: 'PATCH' ,
+        data: addedMembers
+      })
+    } catch(e) {
+      throw e
+    }
+  }
+
+  const addSubGroupsToGroup = async () => {
+    try {
+      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${groupValue?.id}/add_children`, {
+        method: 'PATCH' ,
+        data: addedSubgroups
+      })
+
+      console.log(response.data)
+
+    } catch(e) {
+      throw e
+    } finally {
+      if (groupValue) {
+        setIsDetailedGroupLoading(true)
+        await getDetailedGroup(groupValue.id)
+      }
     }
   }
 
@@ -154,9 +217,13 @@ const GroupsPage = () => {
   }, [groupValue])
 
   const filterGroups = (groups: RecGroupsData[], subgroups: RecGroupsData[]) => {
-    return groups.filter((group: RecGroupsData) => {
+    let filteredArr =  groups.filter((group: RecGroupsData) => {
       return !subgroups.some((subgroup: RecGroupsData) => subgroup.id === group.id);
     });
+
+    return filteredArr.filter((group: RecGroupsData) => {
+      return group !== groupValue
+    })
   };
 
   const filterUsers = (users: UserData[], currentUsers: UserData[]) => {
@@ -165,9 +232,8 @@ const GroupsPage = () => {
     });
   };
 
-
   const handleGroupSelect = (eventKey: string | null) => {
-    setIsLoading(true)
+    setIsDetailedGroupLoading(true)
     if (eventKey !== null) {
       const selectedGroup = groups.find(group => group.id === parseInt(eventKey, 10));
       if (selectedGroup) {
@@ -196,7 +262,13 @@ const GroupsPage = () => {
   }
 
   const handleAddArrowClick = () => {
+    if (addedMembers.length !== 0) {
+      addMembersToGroup()
+    }
 
+    if (addedSubgroups.length !== 0) {
+      addSubGroupsToGroup() 
+    }
   }
 
   const handleSubgroupAdd = (id: number) => {
@@ -217,6 +289,8 @@ const GroupsPage = () => {
       setAddedMembers([...addedMembers, id]);
       console.log('added', id);
     }
+
+    console.log(addedMembers)
   };
 
   const handleSubgroupDelete = (id: number) => {
@@ -266,20 +340,8 @@ const GroupsPage = () => {
               <EditIcon onClick={handleEditButtonClick}/>
               <BasketIcon onClick={() => deleteGroup()}/>
              </div>
-
-             {/* {users.length !== 0 && groups.length !== 0 && allSubgroups.length !== 0 && allMembers.length !== 0 && <div className={styles['groups__page-detailed']}>
-                <SearchList members={users} subgroups={groups} onSubgroupClick={handleSubgroupAdd} onMemberClick={handleMemberAdd}
-                activeMembers={addedMembers} activeSubgroups={addedSubgroups}/>
-                <div className={styles['groups__page-detailed-btns']}>
-                  <Button><ArrowIcon/></Button>
-                  <Button className={styles['groups__page-detailed-reverse']}><ArrowIcon/></Button>
-                </div>
-                <SearchList members={allMembers} subgroups={allSubgroups} onSubgroupClick={handleSubgroupDelete} onMemberClick={handleMemberDelete}
-                activeMembers={deletedMembers} activeSubgroups={deletedSubgroups}/>
-             </div>} */}
-
             
-            {isLoading ? <div className={styles.loader__wrapper}>
+            {(isDetailedGroupLoading || isAllGroupsLoading) ? <div className={styles.loader__wrapper}>
                             <Loader className={styles.loader} size='l' />
                         </div>
             :
@@ -287,10 +349,10 @@ const GroupsPage = () => {
                 <SearchList members={filteredUsers} subgroups={filteredGroups} onSubgroupClick={handleSubgroupAdd} onMemberClick={handleMemberAdd}
                 activeMembers={addedMembers} activeSubgroups={addedSubgroups}/>
                 <div className={styles['groups__page-detailed-btns']}>
-                  <Button><ArrowIcon/></Button>
+                  <Button onClick={handleAddArrowClick}><ArrowIcon/></Button>
                   <Button className={styles['groups__page-detailed-reverse']}><ArrowIcon/></Button>
                 </div>
-                <SearchList members={allMembers} subgroups={allSubgroups} onSubgroupClick={handleSubgroupDelete} onMemberClick={handleMemberDelete}
+                <SearchList members={detailedGroup.members} subgroups={detailedGroup.childrenGroups} onSubgroupClick={handleSubgroupDelete} onMemberClick={handleMemberDelete}
                 activeMembers={deletedMembers} activeSubgroups={deletedSubgroups}/>
             </div>}
         </div>
