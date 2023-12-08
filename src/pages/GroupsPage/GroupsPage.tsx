@@ -24,6 +24,8 @@ const GroupsPage = () => {
   const users = useUsers();
   const allMembers = useAllMembers();
   const allSubgroups = useAllSubgroups();
+  const filteredUsers = useFilteredUsers();
+  const filteredGroups = useFilteredGroups();
   const [groupValue, setGroupValue] = useState<RecGroupsData>()
   const [addedSubgroups, setAddedSubgroups] = useState<number[]>([])
   const [addedMembers, setAddedMembers] = useState<number[]>([])
@@ -39,7 +41,7 @@ const GroupsPage = () => {
       const response = await axios(`https://specializedcampbeta.roxmiv.com/api/groups`)
       dispatch(setGroupsAction(response.data))
       setGroupValue(response.data[0])
-      getDetailedGroup(response.data[0].id);
+      // getDetailedGroup(response.data[0].id);
     } catch(e) {
       throw e
     }
@@ -81,6 +83,8 @@ const GroupsPage = () => {
       })
       dispatch(setAllMembersAction(newMembersArr))
       dispatch(setAllSubgroupsAction(response.data.children_groups))
+      dispatch(setFilteredGroupsAction(filterGroups(groups, response.data.children_groups)))
+      dispatch(setFilteredUsersAction(filterUsers(users, newMembersArr)))
       setIsLoading(false)
       
     } catch(e) {
@@ -149,8 +153,21 @@ const GroupsPage = () => {
     }
   }, [groupValue])
 
+  const filterGroups = (groups: RecGroupsData[], subgroups: RecGroupsData[]) => {
+    return groups.filter((group: RecGroupsData) => {
+      return !subgroups.some((subgroup: RecGroupsData) => subgroup.id === group.id);
+    });
+  };
+
+  const filterUsers = (users: UserData[], currentUsers: UserData[]) => {
+    return users.filter((user: UserData) => {
+      return !currentUsers.some((currentUser: UserData) => currentUser.id === user.id);
+    });
+  };
+
 
   const handleGroupSelect = (eventKey: string | null) => {
+    setIsLoading(true)
     if (eventKey !== null) {
       const selectedGroup = groups.find(group => group.id === parseInt(eventKey, 10));
       if (selectedGroup) {
@@ -267,7 +284,7 @@ const GroupsPage = () => {
                         </div>
             :
             <div className={styles['groups__page-detailed']}>
-                <SearchList members={users} subgroups={groups} onSubgroupClick={handleSubgroupAdd} onMemberClick={handleMemberAdd}
+                <SearchList members={filteredUsers} subgroups={filteredGroups} onSubgroupClick={handleSubgroupAdd} onMemberClick={handleMemberAdd}
                 activeMembers={addedMembers} activeSubgroups={addedSubgroups}/>
                 <div className={styles['groups__page-detailed-btns']}>
                   <Button><ArrowIcon/></Button>
