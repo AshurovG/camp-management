@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import styles from './App.module.scss'
 import Header from 'components/Header'
 import GroupsPage from 'pages/GroupsPage'
@@ -35,6 +37,7 @@ function App() {
           </Routes>
         </div>
       </HashRouter>
+      <ToastContainer autoClose={1000} pauseOnHover={false} />
     </>
   )
 }

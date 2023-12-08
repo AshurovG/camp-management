@@ -3,14 +3,24 @@
 
 .groups__page {
     &-wrapper {
-        max-width: 1240px;
+        max-width: 1000px;
         margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
     &-title {
         font-size: 30px;
         color: $text-brand;
-        margin-bottom: 30px;
+        margin-bottom: 40px;
+        text-align: center;
+    }
+
+    &-subtitle {
+        font-size: 24px;
+        margin-bottom: 15px;
+        color: $text-brand;
     }
 
     &-action {
@@ -23,7 +33,7 @@
     &-detailed {
         display: flex;
         align-items: center;
-        gap: 15px;
+        gap: 60px;
 
         &-btns {
             display: flex;
@@ -68,6 +78,8 @@
     &__menu {
         width: 100%;
         text-align-last: left;
+        max-height: 200px;
+        overflow: auto;
         right: 0;
         left: auto;
 

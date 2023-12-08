@@ -1,5 +1,5 @@
 #root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Nunito", sans-serif;
   line-height: 1.5;
   font-weight: 400;
   /* background-color: #FDA182; */
@@ -27,8 +27,6 @@ pre {
 html,
 body {
   font-family: 'Roboto', sans-serif;
-  /* background-color: #D3E3FC; */
-  /* background: #DEF2F1; */
   background: #FEFFFF;
 }
 

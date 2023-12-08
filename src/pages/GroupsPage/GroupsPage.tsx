@@ -1,6 +1,8 @@
 import React, { useState, ChangeEvent } from 'react';
 import axios from 'axios';
 import styles from './GroupsPage.module.scss'
+import { RecGroupsData, RecUserData, UserData } from '../../../types';
+import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { useGroups, useUsers, useDetailedGroup, useFilteredUsers, useFilteredGroups,
   setGroupsAction, setUsersAction, setDetailedGroupAction,
@@ -16,7 +18,7 @@ import ModalWindow from 'components/ModalWindow';
 import SearchList from 'components/SearchList';
 import Form from 'react-bootstrap/Form';
 import Loader from 'components/Loader';
-import { RecGroupsData, RecUserData, UserData } from '../../../types';
+
 
 const GroupsPage = () => {
   const dispatch = useDispatch();
@@ -34,6 +36,7 @@ const GroupsPage = () => {
   const [isEditModalWindowOpened, setIsEditModalWindowOpened] = useState(false)
   const [isAllGroupsLoading, setIsAllGroupsLoading] = useState(true)
   const [isDetailedGroupLoading, setIsDetailedGroupLoading] = useState(true)
+  const [isDeleteModalWindowOpened, setIsDeleteModalWindowOpened] = useState(false)
 
   const [newGroupValue, setNewGroupValue] = useState('')
 
@@ -116,8 +119,8 @@ const GroupsPage = () => {
           "name": newGroupValue
         }
       })
-    // setFilteredGroupsAction([...filteredGroups, response.data])
     setGroupValue(response.data)
+    toast.success("Группа успешно добавлена!");
       
     } catch(e) {
       throw e
@@ -150,6 +153,7 @@ const GroupsPage = () => {
       });
       setGroupValue(response.data)
       dispatch(setGroupsAction(updatedGroups))
+      toast.success("Группа успешно отредактирована!");
     } catch(e) {
       throw e
     }
@@ -160,8 +164,10 @@ const GroupsPage = () => {
       await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${groupValue?.id}`, {
         method: 'DELETE'
       })
-      if (groups.length > 0) {
+      if (groups.length > 0 && groupValue?.id !== groups[0].id) {
         setGroupValue(groups[0])
+      } else if (groups.length > 1 && groupValue?.id === groups[0].id) {
+        setGroupValue(groups[1])
       }
       dispatch(setGroupsAction(groups.filter(group => group.id !== groupValue?.id)));
       
@@ -369,7 +375,12 @@ const GroupsPage = () => {
   return (
     <div className={styles.groups__page}>
         <div className={styles['groups__page-wrapper']}>
-             <h1 className={styles['groups__page-title']}>Группы и участники</h1>
+        <h1 className={styles['groups__page-title']}>Состав лагеря</h1>
+          {(isDetailedGroupLoading || isAllGroupsLoading) ? <div className={styles.loader__wrapper}>
+              <Loader className={styles.loader} size='l' />
+          </div>
+            :<div>
+             <h4 className={styles['groups__page-subtitle']}>Выберите группу</h4>
              <div className={styles['groups__page-action']}>
               <Dropdown className={styles['dropdown']} onSelect={handleGroupSelect}>
                   <Dropdown.Toggle
@@ -391,25 +402,22 @@ const GroupsPage = () => {
               </Dropdown>
               <AddButton onClick={() => {setIsAddModalWindowOpened(true); clearData()}}/>
               <EditIcon onClick={handleEditButtonClick}/>
-              <BasketIcon onClick={() => {deleteGroup(); clearData()}}/>
-             </div>
-            
-            {(isDetailedGroupLoading || isAllGroupsLoading) ? <div className={styles.loader__wrapper}>
-                            <Loader className={styles.loader} size='l' />
-                        </div>
-            :
-            <div className={styles['groups__page-detailed']}>
-                <SearchList members={filteredUsers} subgroups={filteredGroups} onSubgroupClick={handleSubgroupAdd} onMemberClick={handleMemberAdd}
-                activeMembers={addedMembers} activeSubgroups={addedSubgroups}/>
-                <div className={styles['groups__page-detailed-btns']}>
-                  <Button onClick={handleAddArrowClick}><ArrowIcon/></Button>
-                  <Button onClick={handleDeleteArrowClick} className={styles['groups__page-detailed-reverse']}><ArrowIcon/></Button>
-                </div>
-                <SearchList members={detailedGroup.members} subgroups={detailedGroup.childrenGroups} onSubgroupClick={handleSubgroupDelete} onMemberClick={handleMemberDelete}
-                activeMembers={deletedMembers} activeSubgroups={deletedSubgroups}/>
-            </div>}
+              <BasketIcon onClick={() => setIsDeleteModalWindowOpened(true)}/>
+            </div>
+            <h4 className={styles['groups__page-subtitle']}>Здесь вы можете изменять состав группы</h4>
+            <div className={styles['groups__page-detailed']}>    
+              <SearchList members={filteredUsers} subgroups={filteredGroups} onSubgroupClick={handleSubgroupAdd} onMemberClick={handleMemberAdd}
+              activeMembers={addedMembers} activeSubgroups={addedSubgroups}/>
+              <div className={styles['groups__page-detailed-btns']}>
+                <Button onClick={handleAddArrowClick}><ArrowIcon/></Button>
+                <Button onClick={handleDeleteArrowClick} className={styles['groups__page-detailed-reverse']}><ArrowIcon/></Button>
+              </div>
+              <SearchList members={detailedGroup.members} subgroups={detailedGroup.childrenGroups} onSubgroupClick={handleSubgroupDelete} onMemberClick={handleMemberDelete}
+              activeMembers={deletedMembers} activeSubgroups={deletedSubgroups}/>
+            </div>
+          </div>}
         </div>
-        <ModalWindow handleBackdropClick={() => {setIsAddModalWindowOpened(false); setIsEditModalWindowOpened(false)}} className={styles.modal} active={isAddModalWindowOpened || isEditModalWindowOpened}>
+        <ModalWindow handleBackdropClick={() => {setIsAddModalWindowOpened(false); setIsEditModalWindowOpened(false); newGroupValue && setNewGroupValue('')}} className={styles.modal} active={isAddModalWindowOpened || isEditModalWindowOpened}>
           <h3 className={styles.modal__title}>Заполните данные</h3>
           <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleFormSubmit(event)}
           className={styles['form']}>
@@ -418,8 +426,16 @@ const GroupsPage = () => {
                 <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => setNewGroupValue(event.target.value)} value={newGroupValue} style={{height: '100%', borderColor: '#3D348B', fontSize: 18}} type="text" placeholder="Название*" />
               </Form.Group>
             </div>
-            <Button type='submit'>Сохранить</Button>
+            <Button disabled={newGroupValue ? false : true} type='submit'>Сохранить</Button>
           </Form>
+      </ModalWindow>
+
+      <ModalWindow handleBackdropClick={() => setIsDeleteModalWindowOpened(false)} active={isDeleteModalWindowOpened} className={styles.modal}>
+        <h3 className={styles.modal__title}>Вы уверены, что хотите удалить данное мероприятние?</h3>
+        <div className={styles.modal__btns}>
+          <Button onClick={() => {deleteGroup(); clearData(); setIsDeleteModalWindowOpened(false)}} className={styles.modal__btn}>Подтвердить</Button>
+          <Button onClick={() => setIsDeleteModalWindowOpened(false)} className={styles.modal__btn}>Закрыть</Button>
+        </div>
       </ModalWindow>
     </div>
   )
