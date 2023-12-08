@@ -17,6 +17,23 @@
         display: flex;
         align-items: center;
         gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    &-detailed {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+
+        &-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        &-reverse {
+            transform: rotate(180deg);
+        }
     }
 }
 
@@ -97,5 +114,28 @@
 
     &__btn {
 
+    }
+}
+
+
+.loader__wrapper {
+    width: 100%;
+    height: 170px;
+    margin-top: 113px;
+    display: flex;
+    justify-content: center;
+}
+
+.loader {
+    animation: rotate 1s infinite linear;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg) scale(1);
+    }
+
+    to {
+        transform: rotate((800deg));
     }
 }

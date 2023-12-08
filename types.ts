@@ -31,6 +31,12 @@ export type BuildingDetailedData = {
     publicPlaces: RecPublicPlacesData[];
 }
 
+export type UserData = {
+    id: number;
+    firstName: string;
+    lastName: string;
+}
+
 
 // API types
 
@@ -60,6 +66,12 @@ export type RecBuildingDetailedData = {
 export type RecGroupsData = {
     id: number;
     name: string;
+}
+
+export type RecUserData = {
+    id: number;
+    first_name: string;
+    last_name: string;
 }
 
 export type RecEventsData = {

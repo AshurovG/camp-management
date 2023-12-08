@@ -2,7 +2,6 @@ import * as React from 'react';
 import cn from 'classnames';
 import Text from '../Text/Text';
 import styles from './Button.module.scss'
-// import styles from './Button.module.scss'
 
 
 export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
