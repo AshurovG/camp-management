@@ -177,24 +177,58 @@ const GroupsPage = () => {
 
   const addMembersToGroup = async () => {
     try {
-      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${groupValue?.id}/add_members`, {
+      await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${groupValue?.id}/add_members`, {
         method: 'PATCH' ,
         data: addedMembers
       })
     } catch(e) {
       throw e
+    } finally {
+      if (groupValue) {
+        setIsDetailedGroupLoading(true)
+        await getDetailedGroup(groupValue.id)
+      }
     }
   }
 
   const addSubGroupsToGroup = async () => {
     try {
-      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${groupValue?.id}/add_children`, {
+      await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${groupValue?.id}/add_children`, {
         method: 'PATCH' ,
         data: addedSubgroups
       })
+    } catch(e) {
+      throw e
+    } finally {
+      if (groupValue) {
+        setIsDetailedGroupLoading(true)
+        await getDetailedGroup(groupValue.id)
+      }
+    }
+  }
 
-      console.log(response.data)
+  const deleteMembers = async () => {
+    try {
+      await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${groupValue?.id}/remove_members`, {
+        method: 'PATCH',
+        data: deletedMembers
+      })
+    } catch(e) {
+      throw e
+    } finally {
+      if (groupValue) {
+        setIsDetailedGroupLoading(true)
+        await getDetailedGroup(groupValue.id)
+      }
+    }
+  }
 
+  const deleteSubgroups = async () => {
+    try {
+      await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${groupValue?.id}/remove_children`, {
+        method: 'PATCH',
+        data: deletedSubgroups
+      })
     } catch(e) {
       throw e
     } finally {
@@ -232,6 +266,13 @@ const GroupsPage = () => {
     });
   };
 
+  const clearData = () => {
+    setAddedMembers([])
+    setDeletedMembers([])
+    setAddedSubgroups([])
+    setDeletedSubgroups([])
+  }
+
   const handleGroupSelect = (eventKey: string | null) => {
     setIsDetailedGroupLoading(true)
     if (eventKey !== null) {
@@ -262,12 +303,24 @@ const GroupsPage = () => {
   }
 
   const handleAddArrowClick = () => {
+    clearData()
     if (addedMembers.length !== 0) {
       addMembersToGroup()
     }
 
     if (addedSubgroups.length !== 0) {
       addSubGroupsToGroup() 
+    }
+  }
+
+  const handleDeleteArrowClick = () => {
+    clearData()
+    if (deletedMembers.length !== 0) {
+      deleteMembers()
+    }
+
+    if (deletedSubgroups.length !== 0) {
+      deleteSubgroups()
     }
   }
 
@@ -336,9 +389,9 @@ const GroupsPage = () => {
                       ))}
                   </Dropdown.Menu>
               </Dropdown>
-              <AddButton onClick={() => setIsAddModalWindowOpened(true)}/>
+              <AddButton onClick={() => {setIsAddModalWindowOpened(true); clearData()}}/>
               <EditIcon onClick={handleEditButtonClick}/>
-              <BasketIcon onClick={() => deleteGroup()}/>
+              <BasketIcon onClick={() => {deleteGroup(); clearData()}}/>
              </div>
             
             {(isDetailedGroupLoading || isAllGroupsLoading) ? <div className={styles.loader__wrapper}>
@@ -350,7 +403,7 @@ const GroupsPage = () => {
                 activeMembers={addedMembers} activeSubgroups={addedSubgroups}/>
                 <div className={styles['groups__page-detailed-btns']}>
                   <Button onClick={handleAddArrowClick}><ArrowIcon/></Button>
-                  <Button className={styles['groups__page-detailed-reverse']}><ArrowIcon/></Button>
+                  <Button onClick={handleDeleteArrowClick} className={styles['groups__page-detailed-reverse']}><ArrowIcon/></Button>
                 </div>
                 <SearchList members={detailedGroup.members} subgroups={detailedGroup.childrenGroups} onSubgroupClick={handleSubgroupDelete} onMemberClick={handleMemberDelete}
                 activeMembers={deletedMembers} activeSubgroups={deletedSubgroups}/>
