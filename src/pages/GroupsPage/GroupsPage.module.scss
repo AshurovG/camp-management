@@ -118,7 +118,6 @@
         align-items: center;
         gap: 10px;
         padding-bottom: 10px;
-        padding-left: 30px;
     }
 
     &__btn {
@@ -130,6 +129,10 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+
+        &-list {
+
+        }
     }
 }
 
@@ -145,10 +148,6 @@
         border-color: $brand !important;
         font-size: 18px !important;
         margin-bottom: 15px;
-    }
-
-    &__btn {
-
     }
 }
 

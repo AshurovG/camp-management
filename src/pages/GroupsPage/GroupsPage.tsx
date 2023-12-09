@@ -35,6 +35,7 @@ const GroupsPage = () => {
   const [isEditModalWindowOpened, setIsEditModalWindowOpened] = useState(false)
   const [isAllGroupsLoading, setIsAllGroupsLoading] = useState(true)
   const [isDetailedGroupLoading, setIsDetailedGroupLoading] = useState(true)
+  const [isUsersLoading, setIsUsersLoading] = useState(false)
   const [isDeleteModalWindowOpened, setIsDeleteModalWindowOpened] = useState(false)
   const [isUsersModalWindowOpened, setIsUsersModalWindowOpened] = useState(false)
   const [usersWindowMode, setUsersWindowMode] = useState<'create' | 'edit' | 'show' |'detailed'>('show')
@@ -73,6 +74,7 @@ const GroupsPage = () => {
       })
 
       dispatch(setUsersAction(newUsersArr))
+      setIsUsersLoading(false)
 
     } catch(e) {
       throw e
@@ -373,6 +375,12 @@ const GroupsPage = () => {
     setUsersWindowMode('show');
   }
 
+  const handleBackButtonClick = () => {
+    setUsersWindowMode('show')
+    setIsUsersLoading(true)
+    getUsers()
+  }
+
   const handleSubgroupAdd = (id: number) => {
     if (addedSubgroups.includes(id)) {
       setAddedSubgroups(addedSubgroups.filter(subgroupId => subgroupId !== id));
@@ -475,10 +483,15 @@ const GroupsPage = () => {
       <ModalWindow handleBackdropClick={() => setIsUsersModalWindowOpened(false)} active={isUsersModalWindowOpened}>
         <div className={styles.modal__users}>
           {usersWindowMode === 'show' ? <><h3 className={styles.modal__title}>Список всех участников</h3>
-          <div className={styles.modal__btns}>
-            <AddButton onClick={() => setUsersWindowMode('create')}/>
+          {isUsersLoading ? <div className={styles.loader__wrapper}>
+              <Loader className={styles.loader} size='l' />
           </div>
-          <SearchList onMemberClick={(id) => {setSelectedUser(id); setUsersWindowMode('detailed')}} allUsers/></>
+          : <div className={styles['modal__users-list']}>
+            <div className={styles.modal__btns}>
+              <AddButton onClick={() => setUsersWindowMode('create')}/>
+            </div>
+            <SearchList onMemberClick={(id) => {setSelectedUser(id); setUsersWindowMode('detailed')}} allUsers/>
+          </div>}</>
           : usersWindowMode === 'create' ? <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleUserFormSubmit(event)} className={styles['form']}>
           <h3 className={styles.modal__title}>Заполните данные</h3>
           <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => setNewUserFirstName(event.target.value)} value={newUserFirstName} type="text" placeholder="Имя*" className={`${styles.form__input} ${styles.form__item}`} />
@@ -491,7 +504,7 @@ const GroupsPage = () => {
           
           </Form>
           
-          : selectedUser && <DetailedInfo onBackButtonClick={() => setUsersWindowMode('show')} id={selectedUser}/>}
+          : selectedUser && <DetailedInfo onBackButtonClick={handleBackButtonClick} onDeleteUserClick={handleBackButtonClick} id={selectedUser}/>}
         </div>
         
       </ModalWindow>
