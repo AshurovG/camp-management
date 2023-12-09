@@ -4,8 +4,8 @@ import styles from './GroupsPage.module.scss'
 import { RecGroupsData, RecUserData, UserData } from '../../../types';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
-import { useGroups, useUsers, useDetailedGroup,
-  setGroupsAction, setUsersAction, setDetailedGroupAction } from 'slices/GroupsSlice';
+import { useGroups, useUsers, useDetailedGroup, useFilteredUsers, useIsUserChanged,
+  setGroupsAction, setUsersAction, setDetailedGroupAction, setFilteredUsersAction,setIsUserChangedAction } from 'slices/GroupsSlice';
 import AddButton from 'components/Icons/AddButton';
 import Button from 'components/Button';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -24,9 +24,11 @@ const GroupsPage = () => {
   const dispatch = useDispatch();
   const groups = useGroups(); 
   const users = useUsers();
+  const filteredUsers = useFilteredUsers();
   const detailedGroup = useDetailedGroup();
   const [groupValue, setGroupValue] = useState<RecGroupsData>()
   const [addedSubgroups, setAddedSubgroups] = useState<number[]>([])
+  // const [filteredUsers, setFilteredUsers] = useState<UserData[]>([])
   const [addedMembers, setAddedMembers] = useState<number[]>([])
   const [deletedSubgroups, setDeletedSubgroups] = useState<number[]>([])
   const [deletedMembers, setDeletedMembers] = useState<number[]>([])
@@ -36,11 +38,14 @@ const GroupsPage = () => {
   const [isAllGroupsLoading, setIsAllGroupsLoading] = useState(true)
   const [isDetailedGroupLoading, setIsDetailedGroupLoading] = useState(true)
   const [isUsersLoading, setIsUsersLoading] = useState(false)
+  const [isFilteredUsersLoading, setIsFilteredUsersLoading] = useState(false)
   const [isDeleteModalWindowOpened, setIsDeleteModalWindowOpened] = useState(false)
   const [isUsersModalWindowOpened, setIsUsersModalWindowOpened] = useState(false)
   const [usersWindowMode, setUsersWindowMode] = useState<'create' | 'edit' | 'show' |'detailed'>('show')
   const [newUserFirstName, setNewUserFirstName] = useState('')
   const [newUserLastName, setNewUserLastName] = useState('')
+  const isUserChanged = useIsUserChanged()
+  // const [filteredUsers, setFilteredUsers] = useState<UserData[]>([])
 
 
   const [newGroupValue, setNewGroupValue] = useState('')
@@ -74,7 +79,9 @@ const GroupsPage = () => {
       })
 
       dispatch(setUsersAction(newUsersArr))
+      // dispatch(setFilteredUsersAction(filterUsers(newUsersArr, detailedGroup.allMembers)))
       setIsUsersLoading(false)
+      setIsFilteredUsersLoading(false)
 
     } catch(e) {
       throw e
@@ -265,6 +272,7 @@ const GroupsPage = () => {
         firstName: response.data.first_name,
         lastName: response.data.last_name
       }]))
+      dispatch(setIsUserChangedAction(true))
       toast.success("Участник успешно добавлен!");
     } catch(e) {
       throw e
@@ -275,6 +283,14 @@ const GroupsPage = () => {
     getGroups();
     getUsers();
   }, [])
+
+  React.useEffect(() => {
+    filterUsers(users, detailedGroup.allMembers)
+  }, [users])
+
+  React.useEffect(() => {
+    console.log(filteredUsers, 'поменялось')
+  }, [filteredUsers])
 
   React.useEffect(() => {
     if (groupValue) {
@@ -293,9 +309,10 @@ const GroupsPage = () => {
   };
 
   const filterUsers = (users: UserData[], currentUsers: UserData[]) => {
-    return users.filter((user: UserData) => {
+    const test =  users.filter((user: UserData) => {
       return !currentUsers.some((currentUser: UserData) => currentUser.id === user.id);
-    });
+    })
+    return test
   };
 
   const clearData = () => {
@@ -375,8 +392,19 @@ const GroupsPage = () => {
     setUsersWindowMode('show');
   }
 
+  const handleCloseUsersWindow = () => {
+    setIsUsersModalWindowOpened(false)
+    if (isUserChanged) {
+      setIsFilteredUsersLoading(true)
+      getUsers()
+      dispatch(setIsUserChangedAction(false))
+    }
+  }
+
   const handleBackButtonClick = () => {
     setUsersWindowMode('show')
+    // dispatch(setFilteredUsersAction(filterUsers(users, detailedGroup.allMembers)))
+    // setIsFilteredUsersLoading(true)
     setIsUsersLoading(true)
     getUsers()
   }
@@ -417,7 +445,7 @@ const GroupsPage = () => {
     <div className={styles.groups__page}>
         <div className={styles['groups__page-wrapper']}>
         <h1 className={styles['groups__page-title']}>Состав лагеря</h1>
-          {(isDetailedGroupLoading || isAllGroupsLoading) ? <div className={styles.loader__wrapper}>
+          {(isDetailedGroupLoading || isAllGroupsLoading || isFilteredUsersLoading) ? <div className={styles.loader__wrapper}>
               <Loader className={styles.loader} size='l' />
           </div>
             :<div>
@@ -480,7 +508,7 @@ const GroupsPage = () => {
         </div>
       </ModalWindow>
 
-      <ModalWindow handleBackdropClick={() => setIsUsersModalWindowOpened(false)} active={isUsersModalWindowOpened}>
+      <ModalWindow handleBackdropClick={handleCloseUsersWindow} active={isUsersModalWindowOpened}>
         <div className={styles.modal__users}>
           {usersWindowMode === 'show' ? <><h3 className={styles.modal__title}>Список всех участников</h3>
           {isUsersLoading ? <div className={styles.loader__wrapper}>

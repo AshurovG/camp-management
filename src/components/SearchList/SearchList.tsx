@@ -12,12 +12,13 @@ export type ListProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
     subgroups?: RecGroupsData[] | undefined;
     onMemberClick?: (id: number) => void;
     onSubgroupClick?: (id: number) => void;
+    getFilteredMembers?: () => void;
     activeMembers?: number[];
     activeSubgroups?: number[];
     className?: string;
 };
 
-const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMemberClick, onSubgroupClick, activeMembers, activeSubgroups, className}) => {
+const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMemberClick, onSubgroupClick, activeMembers, activeSubgroups, getFilteredMembers, className}) => {
     const users = useUsers()
     const [inputValue, setInputValue] = useState('')
     const [filteredMembers, setFilteredMembers] = useState<UserData[]>()
@@ -32,9 +33,8 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
     };
 
     const memberSearch = () => {
-        console.log('ttt')
+        console.log('ttt', members, allUsers)
         if (members !== undefined) {
-            console.log('undef')
           setFilteredMembers(
             members.filter((member) => {
               const firstNameMatch = member.firstName.toLowerCase().includes(inputValue.toLowerCase());
@@ -46,8 +46,9 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
     };
 
     React.useEffect(() => {
-
-        console.log('rerender', members)
+        console.log('rerender', members, allUsers)
+        if (getFilteredMembers)
+        console.log('rerender getter is', getFilteredMembers())
         if (subgroups && inputValue !== undefined) {
             subgroupSearch()
         }

@@ -1,4 +1,6 @@
 import React, { useState, ChangeEvent } from 'react'
+import { useDispatch } from 'react-redux';
+import { useUsers, setUsersAction, setIsUserChangedAction } from 'slices/GroupsSlice';
 import axios from 'axios'
 import { toast } from 'react-toastify';
 import styles from './DetailedInfo.module.scss'
@@ -17,6 +19,8 @@ export type DetailedInfoProps = {
 };
 
 const DetailedInfo: React.FC<DetailedInfoProps> = ({id, onBackButtonClick, onDeleteUserClick}) => {
+  const dispatch = useDispatch();
+  const users = useUsers();
   const [currentUser, setCurrentUser] = useState<DetailedUserData>({
     firstName: '',
     lastName: '',
@@ -57,6 +61,7 @@ const DetailedInfo: React.FC<DetailedInfoProps> = ({id, onBackButtonClick, onDel
           last_name: lastNameValue
         }
       })
+      
 
       const updatedData: DetailedUserData = {
         firstName: firstNameValue,
@@ -65,6 +70,7 @@ const DetailedInfo: React.FC<DetailedInfoProps> = ({id, onBackButtonClick, onDel
         appGroups: currentUser?.appGroups
       }
       setCurrentUser(updatedData);
+      dispatch(setIsUserChangedAction(true))
       toast.success("Информация обновлена успешно!");
     } catch(e) {
       throw e
@@ -77,6 +83,8 @@ const DetailedInfo: React.FC<DetailedInfoProps> = ({id, onBackButtonClick, onDel
         method: 'DELETE'
       })
       toast.success("Участник успешно удален!");
+      dispatch(setUsersAction(users.filter(user => user.id !== id)));
+      dispatch(setIsUserChangedAction(true))
     } catch(e) {
       throw e
     } finally {

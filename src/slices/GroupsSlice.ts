@@ -5,7 +5,9 @@ import { RecGroupsData, UserData, DetailedGroupData } from "../../types";
 interface DataState {
   groups: RecGroupsData[],
   users: UserData[],
-  detailedGroup: DetailedGroupData
+  filteredUsers: UserData[],
+  detailedGroup: DetailedGroupData,
+  isUserChanged: boolean
 }
 
 const dataSlice = createSlice({
@@ -13,12 +15,14 @@ const dataSlice = createSlice({
   initialState: {
     groups: [],
     users: [],
+    filteredUsers: [],
     detailedGroup: {
       members: [],
       allMembers: [],
       childrenGroups: [],
       allChildrenGroups: []
     },
+    isUserChanged: false
   } as DataState,
   reducers: {
     setGroups(state, action: PayloadAction<RecGroupsData[]>) {
@@ -27,11 +31,19 @@ const dataSlice = createSlice({
 
     setUsers(state, action: PayloadAction<UserData[]>) {
       state.users = action.payload;
-      console.log('set new user', action.payload)
+    },
+
+    setFilteredUsers(state, action: PayloadAction<UserData[]>) {
+      state.filteredUsers = action.payload;
+      console.log('set new filtered user', action.payload)
     },
 
     setDetailedGroup(state, action: PayloadAction<DetailedGroupData>) {
       state.detailedGroup = action.payload;
+    },
+
+    setIsUserChanged(state, action: PayloadAction<boolean>) {
+      state.isUserChanged = action.payload;
     },
   },
 });
@@ -42,8 +54,14 @@ export const useGroups = () =>
 export const useUsers = () =>
   useSelector((state: { groupsData: DataState }) => state.groupsData.users);
 
+export const useFilteredUsers = () =>
+  useSelector((state: { groupsData: DataState }) => state.groupsData.users);
+
 export const useDetailedGroup = () =>
   useSelector((state: { groupsData: DataState }) => state.groupsData.detailedGroup);
+
+export const useIsUserChanged = () =>
+  useSelector((state: { groupsData: DataState }) => state.groupsData.isUserChanged);
 
 
 
@@ -51,6 +69,8 @@ export const {
     setGroups: setGroupsAction,
     setUsers: setUsersAction,
     setDetailedGroup: setDetailedGroupAction,
+    setFilteredUsers: setFilteredUsersAction,
+    setIsUserChanged: setIsUserChangedAction,
 } = dataSlice.actions;
 
 export default dataSlice.reducer;
