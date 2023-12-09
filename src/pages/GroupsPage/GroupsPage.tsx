@@ -4,9 +4,8 @@ import styles from './GroupsPage.module.scss'
 import { RecGroupsData, RecUserData, UserData } from '../../../types';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
-import { useGroups, useUsers, useDetailedGroup, useFilteredUsers, useFilteredGroups,
-  setGroupsAction, setUsersAction, setDetailedGroupAction,
-  setFilteredUsersAction, setFilteredGroupsAction } from 'slices/GroupsSlice';
+import { useGroups, useUsers, useDetailedGroup,
+  setGroupsAction, setUsersAction, setDetailedGroupAction } from 'slices/GroupsSlice';
 import AddButton from 'components/Icons/AddButton';
 import Button from 'components/Button';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -25,8 +24,6 @@ const GroupsPage = () => {
   const groups = useGroups(); 
   const users = useUsers();
   const detailedGroup = useDetailedGroup();
-  const filteredUsers = useFilteredUsers();
-  const filteredGroups = useFilteredGroups();
   const [groupValue, setGroupValue] = useState<RecGroupsData>()
   const [addedSubgroups, setAddedSubgroups] = useState<number[]>([])
   const [addedMembers, setAddedMembers] = useState<number[]>([])
@@ -37,6 +34,11 @@ const GroupsPage = () => {
   const [isAllGroupsLoading, setIsAllGroupsLoading] = useState(true)
   const [isDetailedGroupLoading, setIsDetailedGroupLoading] = useState(true)
   const [isDeleteModalWindowOpened, setIsDeleteModalWindowOpened] = useState(false)
+  const [isUsersModalWindowOpened, setIsUsersModalWindowOpened] = useState(false)
+  const [usersWindowMode, setUsersWindowMode] = useState<'create' | 'edit' | 'show' |'detailed'>('show')
+  const [newUserFirstName, setNewUserFirstName] = useState('')
+  const [newUserLastName, setNewUserLastName] = useState('')
+
 
   const [newGroupValue, setNewGroupValue] = useState('')
 
@@ -102,8 +104,8 @@ const GroupsPage = () => {
         childrenGroups: response.data.children_groups,
         allChildrenGroups: response.data.all_children_groups
       }))
-      dispatch(setFilteredGroupsAction(filterGroups(groups, response.data.all_children_groups)))
-      dispatch(setFilteredUsersAction(filterUsers(users, newAllMembersArr)))
+      // dispatch(setFilteredUsersAction(filterUsers(users, newAllMembersArr)))
+      // dispatch(setFilteredGroupsAction(filterGroups(groups, response.data.all_children_groups)))
       setIsDetailedGroupLoading(false)
       
     } catch(e) {
@@ -245,6 +247,26 @@ const GroupsPage = () => {
     }
   }
 
+  const postUser = async () => {
+    try {
+      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/users`, {
+        method: 'POST',
+        data: {
+          first_name: newUserFirstName,
+          last_name: newUserLastName
+        }
+      })
+      dispatch(setUsersAction([...users, {
+        id: response.data.id,
+        firstName: response.data.first_name,
+        lastName: response.data.last_name
+      }]))
+      toast.success("Участник успешно добавлен!");
+    } catch(e) {
+      throw e
+    }
+  }
+
   React.useEffect(() => {
     getGroups();
     getUsers();
@@ -301,6 +323,12 @@ const GroupsPage = () => {
     setIsEditModalWindowOpened(false)
   }
 
+  const handleUserFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    postUser();
+    setUsersWindowMode('show')
+  }
+
   const handleEditButtonClick = () => {
     setIsEditModalWindowOpened(true);
     if (groupValue) {
@@ -317,6 +345,10 @@ const GroupsPage = () => {
     if (addedSubgroups.length !== 0) {
       addSubGroupsToGroup() 
     }
+
+    if (addedMembers.length !== 0 || addedSubgroups.length !== 0) {
+      toast.success("Состав группы успешно обновлен!");
+    }
   }
 
   const handleDeleteArrowClick = () => {
@@ -328,47 +360,45 @@ const GroupsPage = () => {
     if (deletedSubgroups.length !== 0) {
       deleteSubgroups()
     }
+
+    if (deletedMembers.length !== 0 || deletedSubgroups.length !== 0) {
+      toast.success("Состав группы успешно обновлен!");
+    }
+  }
+
+  const handleUsersButtonClick = () => {
+    setIsUsersModalWindowOpened(true);
   }
 
   const handleSubgroupAdd = (id: number) => {
     if (addedSubgroups.includes(id)) {
       setAddedSubgroups(addedSubgroups.filter(subgroupId => subgroupId !== id));
-      console.log('removed', id);
     } else {
       setAddedSubgroups([...addedSubgroups, id]);
-      console.log('added', id);
     }
   };
   
   const handleMemberAdd = (id: number) => {
     if (addedMembers.includes(id)) {
       setAddedMembers(addedMembers.filter(memberId => memberId !== id));
-      console.log('removed', id);
     } else {
       setAddedMembers([...addedMembers, id]);
-      console.log('added', id);
     }
-
-    console.log(addedMembers)
   };
 
   const handleSubgroupDelete = (id: number) => {
     if (deletedSubgroups.includes(id)) {
       setDeletedSubgroups(deletedSubgroups.filter(subgroupId => subgroupId !== id));
-      console.log('removed', id);
     } else {
       setDeletedSubgroups([...deletedSubgroups, id]);
-      console.log('added', id);
     }
   }
 
   const handleMemberDelete = (id: number) => {
     if (deletedMembers.includes(id)) {
       setDeletedMembers(deletedMembers.filter(memberId => memberId !== id));
-      console.log('removed', id);
     } else {
       setDeletedMembers([...deletedMembers, id]);
-      console.log('added', id);
     }
   }
 
@@ -403,10 +433,11 @@ const GroupsPage = () => {
               <AddButton onClick={() => {setIsAddModalWindowOpened(true); clearData()}}/>
               <EditIcon onClick={handleEditButtonClick}/>
               <BasketIcon onClick={() => setIsDeleteModalWindowOpened(true)}/>
+              <Button onClick={handleUsersButtonClick}>Все участники</Button>
             </div>
             <h4 className={styles['groups__page-subtitle']}>Здесь вы можете изменять состав группы</h4>
             <div className={styles['groups__page-detailed']}>    
-              <SearchList members={filteredUsers} subgroups={filteredGroups} onSubgroupClick={handleSubgroupAdd} onMemberClick={handleMemberAdd}
+              <SearchList members={filterUsers(users, detailedGroup.allMembers)} subgroups={filterGroups(groups, detailedGroup.allChildrenGroups)} onSubgroupClick={handleSubgroupAdd} onMemberClick={handleMemberAdd}
               activeMembers={addedMembers} activeSubgroups={addedSubgroups}/>
               <div className={styles['groups__page-detailed-btns']}>
                 <Button onClick={handleAddArrowClick}><ArrowIcon/></Button>
@@ -422,9 +453,9 @@ const GroupsPage = () => {
           <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleFormSubmit(event)}
           className={styles['form']}>
             <div className={styles.form__item}>
-              <Form.Group style={{height: 50}} className='mb-3' controlId="search__sub.input__sub">
-                <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => setNewGroupValue(event.target.value)} value={newGroupValue} style={{height: '100%', borderColor: '#3D348B', fontSize: 18}} type="text" placeholder="Название*" />
-              </Form.Group>
+              {/* <Form.Group style={{height: 50}} className='mb-3' controlId="search__sub.input__sub"> */}
+                <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => setNewGroupValue(event.target.value)} value={newGroupValue} className={styles.form__input} type="text" placeholder="Название*" />
+              {/* </Form.Group> */}
             </div>
             <Button disabled={newGroupValue ? false : true} type='submit'>Сохранить</Button>
           </Form>
@@ -432,10 +463,33 @@ const GroupsPage = () => {
 
       <ModalWindow handleBackdropClick={() => setIsDeleteModalWindowOpened(false)} active={isDeleteModalWindowOpened} className={styles.modal}>
         <h3 className={styles.modal__title}>Вы уверены, что хотите удалить данное мероприятние?</h3>
-        <div className={styles.modal__btns}>
+        <div className={styles['modal__delete-btns']}>
           <Button onClick={() => {deleteGroup(); clearData(); setIsDeleteModalWindowOpened(false)}} className={styles.modal__btn}>Подтвердить</Button>
           <Button onClick={() => setIsDeleteModalWindowOpened(false)} className={styles.modal__btn}>Закрыть</Button>
         </div>
+      </ModalWindow>
+
+      <ModalWindow handleBackdropClick={() => setIsUsersModalWindowOpened(false)} active={isUsersModalWindowOpened}>
+        <div className={styles.modal__users}>
+          {usersWindowMode === 'show' ? <><h3 className={styles.modal__title}>Список всех участников</h3>
+          <div className={styles.modal__btns}>
+            <AddButton onClick={() => setUsersWindowMode('create')}/>
+            <Button>Подробнее</Button>
+          </div>
+          <SearchList allUsers/></>
+          : <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleUserFormSubmit(event)} className={styles['form']}>
+          <h3 className={styles.modal__title}>Заполните данные</h3>
+          <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => setNewUserFirstName(event.target.value)} value={newUserFirstName} type="text" placeholder="Имя*" className={`${styles.form__input} ${styles.form__item}`} />
+
+          <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => setNewUserLastName(event.target.value)} value={newUserLastName} type="text" placeholder="Фамилия*" className={`${styles.form__input} ${styles.form__item}`} />
+          <div style={{display: 'flex', justifyContent: 'space-between'}}>
+            <Button className={styles.modal__btn} disabled={newUserFirstName && newUserLastName ? false : true} type='submit'>Сохранить</Button>
+            <Button className={styles.modal__btn} onClick={() => setUsersWindowMode('show')}>Назад</Button>
+          </div>
+          
+          </Form>}
+        </div>
+        
       </ModalWindow>
     </div>
   )

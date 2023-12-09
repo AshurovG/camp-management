@@ -106,14 +106,29 @@
         margin-bottom: 20px;
     }
 
-    &__btns {
+    &__delete-btns {
         display: flex;
         justify-content: center;
         gap: 10px;
     }
 
+    &__btns {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 10px;
+        padding-bottom: 10px;
+    }
+
     &__btn {
         width: 150px;
+    }
+
+    &__users {
+        width: 400px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 }
 
@@ -121,7 +136,14 @@
     display: flex;
     flex-direction: column;
     &__item {
-        width: 350px;
+        width: 350px !important;
+    }
+
+    &__input {
+        height: 50px;
+        border-color: $brand !important;
+        font-size: 18px !important;
+        margin-bottom: 15px;
     }
 
     &__btn {
