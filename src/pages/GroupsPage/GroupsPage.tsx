@@ -15,6 +15,7 @@ import BasketIcon from 'components/Icons/BasketIcon';
 import EditIcon from 'components/Icons/EditIcon';
 import ModalWindow from 'components/ModalWindow';
 import SearchList from 'components/SearchList';
+import DetailedInfo from 'components/DetailedInfo';
 import Form from 'react-bootstrap/Form';
 import Loader from 'components/Loader';
 
@@ -29,6 +30,7 @@ const GroupsPage = () => {
   const [addedMembers, setAddedMembers] = useState<number[]>([])
   const [deletedSubgroups, setDeletedSubgroups] = useState<number[]>([])
   const [deletedMembers, setDeletedMembers] = useState<number[]>([])
+  const [selectedUser, setSelectedUser] = useState<number>()
   const [isAddModalWindowOpened, setIsAddModalWindowOpened] = useState(false)
   const [isEditModalWindowOpened, setIsEditModalWindowOpened] = useState(false)
   const [isAllGroupsLoading, setIsAllGroupsLoading] = useState(true)
@@ -368,6 +370,7 @@ const GroupsPage = () => {
 
   const handleUsersButtonClick = () => {
     setIsUsersModalWindowOpened(true);
+    setUsersWindowMode('show');
   }
 
   const handleSubgroupAdd = (id: number) => {
@@ -474,10 +477,9 @@ const GroupsPage = () => {
           {usersWindowMode === 'show' ? <><h3 className={styles.modal__title}>Список всех участников</h3>
           <div className={styles.modal__btns}>
             <AddButton onClick={() => setUsersWindowMode('create')}/>
-            <Button>Подробнее</Button>
           </div>
-          <SearchList allUsers/></>
-          : <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleUserFormSubmit(event)} className={styles['form']}>
+          <SearchList onMemberClick={(id) => {setSelectedUser(id); setUsersWindowMode('detailed')}} allUsers/></>
+          : usersWindowMode === 'create' ? <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleUserFormSubmit(event)} className={styles['form']}>
           <h3 className={styles.modal__title}>Заполните данные</h3>
           <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => setNewUserFirstName(event.target.value)} value={newUserFirstName} type="text" placeholder="Имя*" className={`${styles.form__input} ${styles.form__item}`} />
 
@@ -487,7 +489,9 @@ const GroupsPage = () => {
             <Button className={styles.modal__btn} onClick={() => setUsersWindowMode('show')}>Назад</Button>
           </div>
           
-          </Form>}
+          </Form>
+          
+          : selectedUser && <DetailedInfo onBackButtonClick={() => setUsersWindowMode('show')} id={selectedUser}/>}
         </div>
         
       </ModalWindow>

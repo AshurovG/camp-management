@@ -37,12 +37,19 @@ export type UserData = {
     lastName: string;
 }
 
-export type DetailedGroupData= {
-    members: UserData[],
-    allMembers: UserData[],
-    childrenGroups: RecGroupsData[],
-    allChildrenGroups: RecGroupsData[]
-  }
+export type DetailedGroupData = {
+    members: UserData[];
+    allMembers: UserData[];
+    childrenGroups: RecGroupsData[];
+    allChildrenGroups: RecGroupsData[];
+}
+
+export type DetailedUserData = {
+    firstName: string;
+    lastName: string;
+    room: RecRoomData | null;
+    appGroups: RecGroupsData[];
+}
 
 
 // API types
