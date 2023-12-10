@@ -346,6 +346,12 @@ const GroupsPage = () => {
     }
   }
 
+  const handleDeleteConfirmClick = () => {
+    deleteGroup();
+    clearData(); 
+    setIsDeleteModalWindowOpened(false)
+  }
+
   const handleAddArrowClick = () => {
     clearData()
     if (addedMembers.length !== 0) {
@@ -392,8 +398,6 @@ const GroupsPage = () => {
 
   const handleBackButtonClick = () => {
     setUsersWindowMode('show')
-    // dispatch(setFilteredUsersAction(filterUsers(users, detailedGroup.allMembers)))
-    // setIsFilteredUsersLoading(true)
     setIsUsersLoading(true)
     getUsers()
   }
@@ -458,10 +462,12 @@ const GroupsPage = () => {
                       ))}
                   </Dropdown.Menu>
               </Dropdown>
-              <AddButton onClick={() => {setIsAddModalWindowOpened(true); clearData()}}/>
-              <EditIcon onClick={handleEditButtonClick}/>
-              <BasketIcon onClick={() => setIsDeleteModalWindowOpened(true)}/>
-              <Button onClick={handleUsersButtonClick}>Все участники</Button>
+              <div className={styles['groups__page-action-btns']}>
+                <AddButton onClick={() => {setIsAddModalWindowOpened(true); clearData()}}/>
+                <EditIcon onClick={handleEditButtonClick}/>
+                <BasketIcon onClick={() => setIsDeleteModalWindowOpened(true)}/>
+                <Button onClick={handleUsersButtonClick}>Все участники</Button>
+              </div>
             </div>
             <h4 className={styles['groups__page-subtitle']}>Здесь вы можете изменять состав группы</h4>
             <div className={styles['groups__page-detailed']}>    
@@ -492,7 +498,7 @@ const GroupsPage = () => {
       <ModalWindow handleBackdropClick={() => setIsDeleteModalWindowOpened(false)} active={isDeleteModalWindowOpened} className={styles.modal}>
         <h3 className={styles.modal__title}>Вы уверены, что хотите удалить данную группу?</h3>
         <div className={styles['modal__delete-btns']}>
-          <Button onClick={() => {deleteGroup(); clearData(); setIsDeleteModalWindowOpened(false)}} className={styles.modal__btn}>Подтвердить</Button>
+          <Button onClick={handleDeleteConfirmClick} className={styles.modal__btn}>Подтвердить</Button>
           <Button onClick={() => setIsDeleteModalWindowOpened(false)} className={styles.modal__btn}>Закрыть</Button>
         </div>
       </ModalWindow>

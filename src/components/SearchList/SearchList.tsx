@@ -5,6 +5,7 @@ import { Form } from 'react-bootstrap';
 import { RecGroupsData, UserData} from '../../../types';
 import { useDispatch } from 'react-redux';
 import { useUsers } from 'slices/GroupsSlice';
+import Button from 'components/Button';
 
 export type ListProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
     allUsers?: boolean;
@@ -15,6 +16,7 @@ export type ListProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
     getFilteredMembers?: () => void;
     activeMembers?: number[];
     activeSubgroups?: number[];
+    withActionBlock?: boolean;
     className?: string;
 };
 
@@ -23,6 +25,7 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
     const [inputValue, setInputValue] = useState('')
     const [filteredMembers, setFilteredMembers] = useState<UserData[]>()
     const [filteredSubgroups, setFilteredSubgroups] = useState<RecGroupsData[] | undefined>(subgroups)
+    const [showingMode, setShowingMode] = useState<'groups' | 'users' | 'all'>('all')
 
     const subgroupSearch = () => {
         if (subgroups !== undefined) {
@@ -32,15 +35,20 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
         }
     };
 
-    const memberSearch = () => {
-        if (members !== undefined) {
+    const memberSearch = (values: UserData[]) => {
+        if (values !== undefined) {
           setFilteredMembers(
-            members.filter((member) => {
-              const firstNameMatch = member.firstName.toLowerCase().includes(inputValue.toLowerCase());
-              const lastNameMatch = member.lastName.toLowerCase().includes(inputValue.toLowerCase());
+            values.filter((value) => {
+              const firstNameMatch = value.firstName.toLowerCase().includes(inputValue.toLowerCase());
+              const lastNameMatch = value.lastName.toLowerCase().includes(inputValue.toLowerCase());
               return firstNameMatch || lastNameMatch;
             })
           );
+          console.log('filtered value is',  values.filter((value) => {
+            const firstNameMatch = value.firstName.toLowerCase().includes(inputValue.toLowerCase());
+            const lastNameMatch = value.lastName.toLowerCase().includes(inputValue.toLowerCase());
+            return firstNameMatch || lastNameMatch;
+          }))
         }
     };
 
@@ -50,43 +58,66 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
         }
 
         if (members && inputValue !== undefined) {
-            memberSearch()
+            memberSearch(members)
+        }
+
+        if (!members && inputValue !== undefined) {
+            console.log()
+            memberSearch(users)
+            console.log('member не передан')
+        } else if (!members && inputValue === undefined) {
+            setFilteredMembers(users)
         }
     }, [inputValue])
 
     return (
         <div className={cn(styles.list, className)}>
-            <Form.Control type="text" placeholder="Поиск*" value={inputValue} onChange={(event: ChangeEvent<HTMLInputElement>) => setInputValue(event.target.value)} style={{ width: '100%', position: 'sticky', top: 0, zIndex: 1}} />
-            { !allUsers ?
-                <ul className={styles.list__options}>
-                {filteredSubgroups
-                ? filteredSubgroups.map((subgroup) => (
-                    <li
-                        onClick={() => onSubgroupClick && onSubgroupClick(subgroup.id)}
-                        className={activeSubgroups?.includes(subgroup.id) ? `${styles.list__option} ${styles['list__option-active']}` : styles.list__option}
-                    >
-                        {subgroup.name}
-                    </li>
-                    ))
-                : subgroups?.map((subgroup) => (
-                    <li
-                        onClick={() => onSubgroupClick && onSubgroupClick(subgroup.id)}
-                        className={activeSubgroups?.includes(subgroup.id) ? `${styles.list__option} ${styles['list__option-active']}` : styles.list__option}
-                    >
-                        {subgroup.name}
-                    </li>
-                    ))}
+            <div className={styles.list__action}>
+                <Button onClick={() => setShowingMode('groups')} className={styles['list__action-btn']}>Группы</Button>
+                <Button onClick={() => setShowingMode('users')} className={styles['list__action-btn']}>Участники</Button>
+                <Button onClick={() => setShowingMode('all')} className={styles['list__action-btn']}>Все</Button>
+            </div>
+            <div className={styles.list__wrapper}>
+                <Form.Control type="text" placeholder="Поиск*" value={inputValue} onChange={(event: ChangeEvent<HTMLInputElement>) => setInputValue(event.target.value)} style={{ width: '100%', position: 'sticky', top: 0, zIndex: 1}} />
+                { !allUsers ?
+                    <ul className={styles.list__options}>
+                    {filteredSubgroups
+                    ? filteredSubgroups.map((subgroup) => (
+                        <li
+                            onClick={() => onSubgroupClick && onSubgroupClick(subgroup.id)}
+                            className={activeSubgroups?.includes(subgroup.id) ? `${styles.list__option} ${styles['list__option-active']}` : styles.list__option}
+                        >
+                            {subgroup.name}
+                        </li>
+                        ))
+                    : subgroups?.map((subgroup) => (
+                        <li
+                            onClick={() => onSubgroupClick && onSubgroupClick(subgroup.id)}
+                            className={activeSubgroups?.includes(subgroup.id) ? `${styles.list__option} ${styles['list__option-active']}` : styles.list__option}
+                        >
+                            {subgroup.name}
+                        </li>
+                        ))}
 
-                {filteredMembers
-                ? filteredMembers.map((member) => (
-                    <li
-                        onClick={() => onMemberClick && onMemberClick(member.id)}
-                        className={activeMembers?.includes(member.id) ? `${styles.list__option} ${styles['list__option-active']}` : styles.list__option}
-                    >
-                        {`${member.firstName} ${member.lastName}`}
-                    </li>
-                    ))
-                : members?.map((member) => (
+                    {filteredMembers
+                    ? filteredMembers.map((member) => (
+                        <li
+                            onClick={() => onMemberClick && onMemberClick(member.id)}
+                            className={activeMembers?.includes(member.id) ? `${styles.list__option} ${styles['list__option-active']}` : styles.list__option}
+                        >
+                            {`${member.firstName} ${member.lastName}`}
+                        </li>
+                        ))
+                    : members?.map((member) => (
+                        <li
+                            onClick={() => onMemberClick && onMemberClick(member.id)}
+                            className={activeMembers?.includes(member.id) ? `${styles.list__option} ${styles['list__option-active']}` : styles.list__option}
+                        >
+                            {`${member.firstName} ${member.lastName}`}
+                        </li>
+                        ))}
+                    </ul>
+                : inputValue ? <ul className={styles.list__options}> {filteredMembers?.map((member) => (
                     <li
                         onClick={() => onMemberClick && onMemberClick(member.id)}
                         className={activeMembers?.includes(member.id) ? `${styles.list__option} ${styles['list__option-active']}` : styles.list__option}
@@ -95,16 +126,18 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
                     </li>
                     ))}
                 </ul>
-            : <ul className={styles.list__options}> {users.map((member) => (
-                <li
-                    onClick={() => onMemberClick && onMemberClick(member.id)}
-                    className={activeMembers?.includes(member.id) ? `${styles.list__option} ${styles['list__option-active']}` : styles.list__option}
-                >
-                    {`${member.firstName} ${member.lastName}`}
-                </li>
-                ))}
-            </ul>
-            }
+                : <ul className={styles.list__options}> {users.map((member) => (
+                    <li
+                        onClick={() => onMemberClick && onMemberClick(member.id)}
+                        className={activeMembers?.includes(member.id) ? `${styles.list__option} ${styles['list__option-active']}` : styles.list__option}
+                    >
+                        {`${member.firstName} ${member.lastName}`}
+                    </li>
+                    ))}
+                </ul>
+                }
+            </div>
+            
         </div>
     )
 }

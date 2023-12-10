@@ -2,15 +2,29 @@
 @import 'styles/mixins.scss';
 
 .list {
-    background-color: $brand;
-    width: 350px;
-    height: 300px;
-    overflow: auto;
-    flex-direction: column;
-    display: flex;
-    border-radius: 10px;
-    align-items: flex-start;
-    position: relative;
+    
+    &__wrapper {
+        background-color: $brand;
+        width: 350px;
+        height: 300px;
+        overflow: auto;
+        flex-direction: column;
+        display: flex;
+        border-radius: 10px;
+        align-items: flex-start;
+        position: relative;
+    }
+
+    &__action {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+
+        &-btn {
+            width: 110px;
+            font-size: 14px;
+        }
+    }
 
     &__options {
         width: 100%;
