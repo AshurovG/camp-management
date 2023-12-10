@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent, useCallback } from 'react';
 import axios from 'axios';
 import styles from './GroupsPage.module.scss'
 import { RecGroupsData, RecUserData, UserData } from '../../../types';
@@ -28,7 +28,6 @@ const GroupsPage = () => {
   const detailedGroup = useDetailedGroup();
   const [groupValue, setGroupValue] = useState<RecGroupsData>()
   const [addedSubgroups, setAddedSubgroups] = useState<number[]>([])
-  // const [filteredUsers, setFilteredUsers] = useState<UserData[]>([])
   const [addedMembers, setAddedMembers] = useState<number[]>([])
   const [deletedSubgroups, setDeletedSubgroups] = useState<number[]>([])
   const [deletedMembers, setDeletedMembers] = useState<number[]>([])
@@ -45,9 +44,6 @@ const GroupsPage = () => {
   const [newUserFirstName, setNewUserFirstName] = useState('')
   const [newUserLastName, setNewUserLastName] = useState('')
   const isUserChanged = useIsUserChanged()
-  // const [filteredUsers, setFilteredUsers] = useState<UserData[]>([])
-
-
   const [newGroupValue, setNewGroupValue] = useState('')
 
   const getGroups = async () => {
@@ -133,13 +129,14 @@ const GroupsPage = () => {
         }
       })
     setGroupValue(response.data)
+    getGroups()
     toast.success("Группа успешно добавлена!");
       
     } catch(e) {
       throw e
     } finally {
-      setIsAllGroupsLoading(true)
-      await getGroups()
+      // setIsAllGroupsLoading(true)
+      // await getGroups()
       if (groupValue) {
         setIsDetailedGroupLoading(true)
         await getDetailedGroup(groupValue.id)
@@ -166,7 +163,7 @@ const GroupsPage = () => {
       });
       setGroupValue(response.data)
       dispatch(setGroupsAction(updatedGroups))
-      toast.success("Группа успешно отредактирована!");
+      toast.success("Информация успешно обновлена!");
     } catch(e) {
       throw e
     }
@@ -183,6 +180,7 @@ const GroupsPage = () => {
         setGroupValue(groups[1])
       }
       dispatch(setGroupsAction(groups.filter(group => group.id !== groupValue?.id)));
+      toast.success("Группа успешно удалена!");
       
     } catch(e) {
       throw e
@@ -285,28 +283,19 @@ const GroupsPage = () => {
   }, [])
 
   React.useEffect(() => {
-    filterUsers(users, detailedGroup.allMembers)
-  }, [users])
-
-  React.useEffect(() => {
-    console.log(filteredUsers, 'поменялось')
-  }, [filteredUsers])
-
-  React.useEffect(() => {
     if (groupValue) {
       getDetailedGroup(groupValue.id)
     }
   }, [groupValue])
 
-  const filterGroups = (groups: RecGroupsData[], subgroups: RecGroupsData[]) => {
-    let filteredArr =  groups.filter((group: RecGroupsData) => {
-      return !subgroups.some((subgroup: RecGroupsData) => subgroup.id === group.id);
+  const filterGroups = useCallback((groups: RecGroupsData[], subgroups: RecGroupsData[]) => {
+    let filteredArr = groups.filter((group) => {
+      return !subgroups.some((subgroup) => subgroup.id === group.id);
     });
-
-    return filteredArr.filter((group: RecGroupsData) => {
-      return group !== groupValue
-    })
-  };
+    return filteredArr.filter((group) => {
+      return group.id !== groupValue?.id;
+    });
+  }, [groupValue]);
 
   const filterUsers = (users: UserData[], currentUsers: UserData[]) => {
     const test =  users.filter((user: UserData) => {
@@ -323,10 +312,10 @@ const GroupsPage = () => {
   }
 
   const handleGroupSelect = (eventKey: string | null) => {
-    setIsDetailedGroupLoading(true)
     if (eventKey !== null) {
       const selectedGroup = groups.find(group => group.id === parseInt(eventKey, 10));
-      if (selectedGroup) {
+      if (selectedGroup && selectedGroup.id !== groupValue?.id) {
+        setIsDetailedGroupLoading(true)
         setGroupValue(selectedGroup)
       }
     }
@@ -501,7 +490,7 @@ const GroupsPage = () => {
       </ModalWindow>
 
       <ModalWindow handleBackdropClick={() => setIsDeleteModalWindowOpened(false)} active={isDeleteModalWindowOpened} className={styles.modal}>
-        <h3 className={styles.modal__title}>Вы уверены, что хотите удалить данное мероприятние?</h3>
+        <h3 className={styles.modal__title}>Вы уверены, что хотите удалить данную группу?</h3>
         <div className={styles['modal__delete-btns']}>
           <Button onClick={() => {deleteGroup(); clearData(); setIsDeleteModalWindowOpened(false)}} className={styles.modal__btn}>Подтвердить</Button>
           <Button onClick={() => setIsDeleteModalWindowOpened(false)} className={styles.modal__btn}>Закрыть</Button>

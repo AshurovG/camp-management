@@ -33,7 +33,6 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
     };
 
     const memberSearch = () => {
-        console.log('ttt', members, allUsers)
         if (members !== undefined) {
           setFilteredMembers(
             members.filter((member) => {
@@ -46,9 +45,6 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
     };
 
     React.useEffect(() => {
-        console.log('rerender', members, allUsers)
-        if (getFilteredMembers)
-        console.log('rerender getter is', getFilteredMembers())
         if (subgroups && inputValue !== undefined) {
             subgroupSearch()
         }
