@@ -13,14 +13,14 @@ export type ListProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
     subgroups?: RecGroupsData[] | undefined;
     onMemberClick?: (id: number) => void;
     onSubgroupClick?: (id: number) => void;
-    getFilteredMembers?: () => void;
     activeMembers?: number[];
     activeSubgroups?: number[];
     withActionBlock?: boolean;
     className?: string;
 };
 
-const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMemberClick, onSubgroupClick, activeMembers, activeSubgroups, getFilteredMembers, className}) => {
+const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMemberClick, onSubgroupClick, 
+    activeMembers, activeSubgroups, withActionBlock, className}) => {
     const users = useUsers()
     const [inputValue, setInputValue] = useState('')
     const [filteredMembers, setFilteredMembers] = useState<UserData[]>()
@@ -72,16 +72,16 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
 
     return (
         <div className={cn(styles.list, className)}>
-            <div className={styles.list__action}>
+            {withActionBlock && <div className={styles.list__action}>
                 <Button onClick={() => setShowingMode('groups')} className={styles['list__action-btn']}>Группы</Button>
                 <Button onClick={() => setShowingMode('users')} className={styles['list__action-btn']}>Участники</Button>
                 <Button onClick={() => setShowingMode('all')} className={styles['list__action-btn']}>Все</Button>
-            </div>
+            </div>}
             <div className={styles.list__wrapper}>
                 <Form.Control type="text" placeholder="Поиск*" value={inputValue} onChange={(event: ChangeEvent<HTMLInputElement>) => setInputValue(event.target.value)} style={{ width: '100%', position: 'sticky', top: 0, zIndex: 1}} />
                 { !allUsers ?
                     <ul className={styles.list__options}>
-                    {filteredSubgroups
+                    {filteredSubgroups && (showingMode === 'all' || showingMode === 'groups')
                     ? filteredSubgroups.map((subgroup) => (
                         <li
                             onClick={() => onSubgroupClick && onSubgroupClick(subgroup.id)}
@@ -90,7 +90,7 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
                             {subgroup.name}
                         </li>
                         ))
-                    : subgroups?.map((subgroup) => (
+                    : (showingMode === 'all' || showingMode === 'groups') && subgroups?.map((subgroup) => (
                         <li
                             onClick={() => onSubgroupClick && onSubgroupClick(subgroup.id)}
                             className={activeSubgroups?.includes(subgroup.id) ? `${styles.list__option} ${styles['list__option-active']}` : styles.list__option}
@@ -99,7 +99,7 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
                         </li>
                         ))}
 
-                    {filteredMembers
+                    {filteredMembers && (showingMode === 'all' || showingMode === 'users')
                     ? filteredMembers.map((member) => (
                         <li
                             onClick={() => onMemberClick && onMemberClick(member.id)}
@@ -108,7 +108,7 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
                             {`${member.firstName} ${member.lastName}`}
                         </li>
                         ))
-                    : members?.map((member) => (
+                    : (showingMode === 'all' || showingMode === 'users') && members?.map((member) => (
                         <li
                             onClick={() => onMemberClick && onMemberClick(member.id)}
                             className={activeMembers?.includes(member.id) ? `${styles.list__option} ${styles['list__option-active']}` : styles.list__option}

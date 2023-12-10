@@ -471,13 +471,13 @@ const GroupsPage = () => {
             </div>
             <h4 className={styles['groups__page-subtitle']}>Здесь вы можете изменять состав группы</h4>
             <div className={styles['groups__page-detailed']}>    
-              <SearchList members={filterUsers(users, detailedGroup.allMembers)} subgroups={filterGroups(groups, detailedGroup.allChildrenGroups)} onSubgroupClick={handleSubgroupAdd} onMemberClick={handleMemberAdd}
+              <SearchList withActionBlock members={filterUsers(users, detailedGroup.allMembers)} subgroups={filterGroups(groups, detailedGroup.allChildrenGroups)} onSubgroupClick={handleSubgroupAdd} onMemberClick={handleMemberAdd}
               activeMembers={addedMembers} activeSubgroups={addedSubgroups}/>
               <div className={styles['groups__page-detailed-btns']}>
                 <Button onClick={handleAddArrowClick}><ArrowIcon/></Button>
                 <Button onClick={handleDeleteArrowClick} className={styles['groups__page-detailed-reverse']}><ArrowIcon/></Button>
               </div>
-              <SearchList members={detailedGroup.members} subgroups={detailedGroup.childrenGroups} onSubgroupClick={handleSubgroupDelete} onMemberClick={handleMemberDelete}
+              <SearchList withActionBlock members={detailedGroup.members} subgroups={detailedGroup.childrenGroups} onSubgroupClick={handleSubgroupDelete} onMemberClick={handleMemberDelete}
               activeMembers={deletedMembers} activeSubgroups={deletedSubgroups}/>
             </div>
           </div>}
