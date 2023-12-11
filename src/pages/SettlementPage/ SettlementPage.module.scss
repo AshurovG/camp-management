@@ -1,57 +1,56 @@
 @import 'styles/variables.scss';
 @import 'styles/mixins.scss';
 
-.list {
-    
-    &__wrapper {
-        background-color: $brand;
-        width: 350px;
-        height: 350px;
-        overflow: auto;
-        flex-direction: column;
-        display: flex;
-        border-radius: 10px;
-        align-items: flex-start;
-        position: relative;
+.settlement__page {
+    &-wrapper {
+        max-width: 1000px;
+        margin: 0 auto;
     }
 
-    &__action {
+    &-title {
+        font-size: 30px;
+        text-align: center;
+        color: $text-brand;
+        padding-top: 90px;
+        margin-bottom: 30px;
+    }
+
+    &-subtitle {
+        font-size: 24px;
+        margin-bottom: 15px;
+        color: $text-brand;
+    }
+
+    &-dropdowns {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 20px;
-
-        &-btn {
-            width: 110px;
-            font-size: 14px;
-        }
-    }
-
-    &__options {
-        width: 100%;
-        padding: 5px !important;
-        color: $text-default;
-    }
-
-    &__option {
-        padding: 5px 0;
-        line-height: 20px;
-        
-        &:hover {
-            background-color: $brand-hover;
-            cursor: pointer;
-        }
-
-        &-active {
-            background-color: $brand-hover;
-        }
     }
 }
 
-
 .dropdown {
-    width: 100%;
+    width: 350px;
+
+    &__wrapper {
+        width: 450px;
+    }
+
+    &__content {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 30px;
+    }
+
+    &__btns {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 15px;
+        margin-top: 15px;
+    }
+
     &__toggle {
-        height: 40px;
+        height: 60px;
         width: 100%;
         text-align-last: left;
         display: flex;
@@ -76,7 +75,7 @@
     &__menu {
         width: 100%;
         text-align-last: left;
-        max-height: 90px;
+        max-height: 200px;
         overflow: auto;
         right: 0;
         left: auto;

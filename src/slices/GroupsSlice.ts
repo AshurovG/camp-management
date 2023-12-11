@@ -7,7 +7,8 @@ interface DataState {
   users: UserData[],
   filteredUsers: UserData[],
   detailedGroup: DetailedGroupData,
-  isUserChanged: boolean
+  isUserChanged: boolean,
+  usersWithoutRoom: UserData[]
 }
 
 const dataSlice = createSlice({
@@ -22,7 +23,8 @@ const dataSlice = createSlice({
       childrenGroups: [],
       allChildrenGroups: []
     },
-    isUserChanged: false
+    isUserChanged: false,
+    usersWithoutRoom: []
   } as DataState,
   reducers: {
     setGroups(state, action: PayloadAction<RecGroupsData[]>) {
@@ -45,6 +47,10 @@ const dataSlice = createSlice({
     setIsUserChanged(state, action: PayloadAction<boolean>) {
       state.isUserChanged = action.payload;
     },
+
+    setUsersWithoutRoom(state, action: PayloadAction<UserData[]>) {
+      state.usersWithoutRoom = action.payload;
+    },
   },
 });
 
@@ -63,6 +69,9 @@ export const useDetailedGroup = () =>
 export const useIsUserChanged = () =>
   useSelector((state: { groupsData: DataState }) => state.groupsData.isUserChanged);
 
+export const useUsersWithoutRoom = () =>
+  useSelector((state: { groupsData: DataState }) => state.groupsData.usersWithoutRoom);
+
 
 
 export const {
@@ -71,6 +80,7 @@ export const {
     setDetailedGroup: setDetailedGroupAction,
     setFilteredUsers: setFilteredUsersAction,
     setIsUserChanged: setIsUserChangedAction,
+    setUsersWithoutRoom: setUsersWithoutRoomAction
 } = dataSlice.actions;
 
 export default dataSlice.reducer;

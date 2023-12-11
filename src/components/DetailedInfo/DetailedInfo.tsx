@@ -98,14 +98,15 @@ const DetailedInfo: React.FC<DetailedInfoProps> = ({id, onBackButtonClick, onDel
     setIsEditFormOpened(false)
   }
 
-  // const handleDeleteButtonClick = () => {
-  //   deleteUser();
-  //   onDeleteUserClick();
-  // }
-
   React.useEffect(() => {
     getDetailedUser();
   }, [])
+
+  const handleBackButtonClick = () => {
+    console.log('back')
+    setFirstNameValue('')
+    setLastNameValue('')
+  }
 
   return (
     <div className={styles.detailed}>
@@ -145,15 +146,15 @@ const DetailedInfo: React.FC<DetailedInfoProps> = ({id, onBackButtonClick, onDel
         </>
         : <>
             <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleFormSubmit(event)} className={styles['form']}>
-          <h3 className={styles.modal__title}>Заполните данные</h3>
-          <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => setFirstNameValue(event.target.value)} value={firstNameValue} type="text" placeholder="Имя*" className={`${styles.form__input} ${styles.form__item}`} />
+              <h3 className={styles.modal__title}>Заполните данные</h3>
+              <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => setFirstNameValue(event.target.value)} value={firstNameValue} type="text" placeholder="Имя*" className={`${styles.form__input} ${styles.form__item}`} />
 
-          <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => setLastNameValue(event.target.value)} value={lastNameValue} type="text" placeholder="Фамилия*" className={`${styles.form__input} ${styles.form__item}`} />
-          <div style={{display: 'flex', justifyContent: 'space-between'}}>
-            <Button className={styles.modal__btn} disabled={firstNameValue && lastNameValue ? false : true} type='submit'>Сохранить</Button>
-            <Button className={styles.modal__btn} onClick={() => setIsEditFormOpened(false)}>Назад</Button>
-          </div>
-          </Form>
+              <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => setLastNameValue(event.target.value)} value={lastNameValue} type="text" placeholder="Фамилия*" className={`${styles.form__input} ${styles.form__item}`} />
+              <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                <Button className={styles.modal__btn} disabled={firstNameValue && lastNameValue ? false : true} type='submit'>Сохранить</Button>
+                <Button className={styles.modal__btn} onClick={handleBackButtonClick}>Назад</Button>
+              </div>
+            </Form>
           </>  
       }
       </>}

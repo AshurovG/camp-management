@@ -1,11 +1,14 @@
-import React, { useState, ChangeEvent, MouseEventHandler} from 'react'
+import React, { useState, ChangeEvent} from 'react'
 import cn from 'classnames';
+import axios from 'axios';
 import styles from './SearchList.module.scss'
 import { Form } from 'react-bootstrap';
-import { RecGroupsData, UserData} from '../../../types';
+import { RecGroupsData, UserData, RecUserData} from '../../../types';
 import { useDispatch } from 'react-redux';
-import { useUsers } from 'slices/GroupsSlice';
+import { useUsers, useGroups, useUsersWithoutRoom, setGroupsAction } from 'slices/GroupsSlice';
 import Button from 'components/Button';
+import Dropdown from 'react-bootstrap/Dropdown';
+import ArrowDownIcon from 'components/Icons/ArrowDownIcon';
 
 export type ListProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
     allUsers?: boolean;
@@ -16,16 +19,25 @@ export type ListProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
     activeMembers?: number[];
     activeSubgroups?: number[];
     withActionBlock?: boolean;
+    areUsersWithoutRooms?: boolean;
     className?: string;
 };
 
 const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMemberClick, onSubgroupClick, 
-    activeMembers, activeSubgroups, withActionBlock, className}) => {
+    activeMembers, activeSubgroups, withActionBlock, areUsersWithoutRooms, className}) => {
+    const dispath = useDispatch()
     const users = useUsers()
+    const groups = useGroups()
+    const usersWithoutRoom = useUsersWithoutRoom()
     const [inputValue, setInputValue] = useState('')
     const [filteredMembers, setFilteredMembers] = useState<UserData[]>()
     const [filteredSubgroups, setFilteredSubgroups] = useState<RecGroupsData[] | undefined>(subgroups)
     const [showingMode, setShowingMode] = useState<'groups' | 'users' | 'all'>('all')
+    const [groupValue, setGroupValue] = useState<RecGroupsData>({
+        id: 0,
+        name: 'Все'
+    })
+    const [usersFromSelectedGroup, setUsersFromSelectedGroup] = useState<UserData[]>(usersWithoutRoom)
 
     const subgroupSearch = () => {
         if (subgroups !== undefined) {
@@ -44,30 +56,60 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
               return firstNameMatch || lastNameMatch;
             })
           );
-          console.log('filtered value is',  values.filter((value) => {
-            const firstNameMatch = value.firstName.toLowerCase().includes(inputValue.toLowerCase());
-            const lastNameMatch = value.lastName.toLowerCase().includes(inputValue.toLowerCase());
-            return firstNameMatch || lastNameMatch;
-          }))
         }
     };
 
+    const getUsersFromGroup = async (id: number) => {
+        try {
+            const response = await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${id}/detailed`, {
+                method: 'GET'
+            })
+
+            const newArr = response.data.members.map((member: RecUserData) => {
+                return {
+                    id: member.id,
+                    firstName: member.first_name,
+                    lastName: member.last_name
+                }
+            })
+
+            setUsersFromSelectedGroup(newArr)
+        } catch(e) {
+            throw e
+        }
+    }
+
+    const handleGroupSelect = (eventKey: string | null) => {
+        setInputValue('')
+        if (eventKey === 'all') {
+            setUsersFromSelectedGroup(usersWithoutRoom)
+        }
+        if (eventKey !== null) {
+          const selectedGroup = groups.find(group => group.id === parseInt(eventKey, 10));
+          if (selectedGroup && selectedGroup.id !== groupValue?.id) {
+            setGroupValue(selectedGroup)
+            getUsersFromGroup(Number(eventKey))
+          }
+        }
+      };
+
     React.useEffect(() => {
-        if (subgroups && inputValue !== undefined) {
+        if (subgroups && inputValue) {
             subgroupSearch()
         }
 
-        if (members && inputValue !== undefined) {
+        if (members && inputValue) {
             memberSearch(members)
         }
 
-        if (!members && inputValue !== undefined) {
-            console.log()
+        if (allUsers && inputValue) {
             memberSearch(users)
-            console.log('member не передан')
-        } else if (!members && inputValue === undefined) {
-            setFilteredMembers(users)
         }
+
+        if (areUsersWithoutRooms && inputValue) {
+            memberSearch(usersFromSelectedGroup)
+        }
+
     }, [inputValue])
 
     return (
@@ -78,8 +120,32 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
                 <Button onClick={() => setShowingMode('all')} className={styles['list__action-btn']}>Все</Button>
             </div>}
             <div className={styles.list__wrapper}>
-                <Form.Control type="text" placeholder="Поиск*" value={inputValue} onChange={(event: ChangeEvent<HTMLInputElement>) => setInputValue(event.target.value)} style={{ width: '100%', position: 'sticky', top: 0, zIndex: 1}} />
-                { !allUsers ?
+                <div className={styles.list__filter} style={{ width: '100%', position: 'sticky', top: 0, zIndex: 1}}>
+                    <Form.Control type="text" placeholder="Поиск*" value={inputValue} onChange={(event: ChangeEvent<HTMLInputElement>) => setInputValue(event.target.value)} />
+                    {areUsersWithoutRooms && <Dropdown className={styles['dropdown']} onSelect={handleGroupSelect}>
+                        <Dropdown.Toggle
+                            className={styles['dropdown__toggle']}
+                            style={{
+                                borderColor: '#000',
+                                backgroundColor: "#fff",
+                                color: '#000',
+                            }}
+                        >   
+                        {groupValue ? groupValue?.name : "Все"}
+                        <ArrowDownIcon className={styles.dropdown__icon}/>
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu className={styles['dropdown__menu']}>
+                        <Dropdown.Item
+                        className={styles['dropdown__menu-item']}
+                        key="all"
+                        eventKey="all">Все</Dropdown.Item>
+                            {groups.map(group => (
+                                <Dropdown.Item className={styles['dropdown__menu-item']} key={group.id} eventKey={group.id}>{group.name}</Dropdown.Item>
+                            ))}
+                        </Dropdown.Menu>
+                    </Dropdown>}
+                </div>
+                {!allUsers && !areUsersWithoutRooms ?
                     <ul className={styles.list__options}>
                     {filteredSubgroups && (showingMode === 'all' || showingMode === 'groups')
                     ? filteredSubgroups.map((subgroup) => (
@@ -117,7 +183,7 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
                         </li>
                         ))}
                     </ul>
-                : inputValue ? <ul className={styles.list__options}> {filteredMembers?.map((member) => (
+                : inputValue && allUsers ? <ul className={styles.list__options}> {filteredMembers?.map((member) => (
                     <li
                         onClick={() => onMemberClick && onMemberClick(member.id)}
                         className={activeMembers?.includes(member.id) ? `${styles.list__option} ${styles['list__option-active']}` : styles.list__option}
@@ -126,7 +192,34 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
                     </li>
                     ))}
                 </ul>
-                : <ul className={styles.list__options}> {users.map((member) => (
+                : allUsers ? <ul className={styles.list__options}> {users.map((member) => (
+                    <li
+                        onClick={() => onMemberClick && onMemberClick(member.id)}
+                        className={activeMembers?.includes(member.id) ? `${styles.list__option} ${styles['list__option-active']}` : styles.list__option}
+                    >
+                        {`${member.firstName} ${member.lastName}`}
+                    </li>
+                    ))}
+                </ul>
+                : inputValue && areUsersWithoutRooms ? <ul className={styles.list__options}> {filteredMembers?.map((member) => (
+                    <li
+                        onClick={() => onMemberClick && onMemberClick(member.id)}
+                        className={activeMembers?.includes(member.id) ? `${styles.list__option} ${styles['list__option-active']}` : styles.list__option}
+                    >
+                        {`${member.firstName} ${member.lastName}`}
+                    </li>
+                    ))}
+                </ul>
+                : groupValue.name !== 'Все' ? <ul className={styles.list__options}> {usersFromSelectedGroup.map((member) => (
+                    <li
+                        onClick={() => onMemberClick && onMemberClick(member.id)}
+                        className={activeMembers?.includes(member.id) ? `${styles.list__option} ${styles['list__option-active']}` : styles.list__option}
+                    >
+                        {`${member.firstName} ${member.lastName}`}
+                    </li>
+                    ))}
+                </ul>
+                : <ul className={styles.list__options}> {usersWithoutRoom.map((member) => (
                     <li
                         onClick={() => onMemberClick && onMemberClick(member.id)}
                         className={activeMembers?.includes(member.id) ? `${styles.list__option} ${styles['list__option-active']}` : styles.list__option}

@@ -1,5 +1,5 @@
 import React from 'react'
-import cn from 'classnames';
+// import cn from 'classnames';
 import styles from './CustomTable.module.scss'
 import Table from 'react-bootstrap/Table';
 import Button from 'components/Button';
@@ -21,7 +21,7 @@ export type TableData = {
   handleDeleteButtonClick?: () => void;
 };
 
-const CustomTable: React.FC<TableData> = ({columns, data, children, flag, 
+const CustomTable: React.FC<TableData> = ({columns, data, 
   handleUsersButtonCLick, handleChangeButtonClick, handleDeleteButtonClick, className}) => {
   return (
     <>

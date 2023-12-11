@@ -1,14 +1,8 @@
-#root {
+/* #root {
   font-family: "Nunito", sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  /* background-color: #FDA182; */
-  /* background-color: #F5DEB3; */
-  /* background-color: #77A6F7; */
-  /* background-color: #D3E3FC; */
-  /* background: #DEF2F1; */
   background: #FEFFFF;
-
+  min-height: 100vh;
+  width: 100%;
 }
 
 h1,
@@ -41,4 +35,15 @@ li {
 
 ul {
   padding-inline-start: 0;
+} */
+
+* {
+  margin: 0;
+  box-sizing: border-box;
+}
+
+#root {
+  background-color: #f2f2f7;
+  font-family: 'Mulish', serif;
+  min-height: 100vh;
 }

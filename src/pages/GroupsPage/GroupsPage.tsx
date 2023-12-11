@@ -4,8 +4,8 @@ import styles from './GroupsPage.module.scss'
 import { RecGroupsData, RecUserData, UserData } from '../../../types';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
-import { useGroups, useUsers, useDetailedGroup, useFilteredUsers, useIsUserChanged,
-  setGroupsAction, setUsersAction, setDetailedGroupAction, setFilteredUsersAction,setIsUserChangedAction } from 'slices/GroupsSlice';
+import { useGroups, useUsers, useDetailedGroup, useIsUserChanged,
+  setGroupsAction, setUsersAction, setDetailedGroupAction,setIsUserChangedAction } from 'slices/GroupsSlice';
 import AddButton from 'components/Icons/AddButton';
 import Button from 'components/Button';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -19,12 +19,11 @@ import DetailedInfo from 'components/DetailedInfo';
 import Form from 'react-bootstrap/Form';
 import Loader from 'components/Loader';
 
-
 const GroupsPage = () => {
   const dispatch = useDispatch();
   const groups = useGroups(); 
   const users = useUsers();
-  const filteredUsers = useFilteredUsers();
+  // const filteredUsers = useFilteredUsers();
   const detailedGroup = useDetailedGroup();
   const [groupValue, setGroupValue] = useState<RecGroupsData>()
   const [addedSubgroups, setAddedSubgroups] = useState<number[]>([])
@@ -436,7 +435,7 @@ const GroupsPage = () => {
 
   return (
     <div className={styles.groups__page}>
-        <div className={styles['groups__page-wrapper']}>
+      <div className={styles['groups__page-wrapper']}>
         <h1 className={styles['groups__page-title']}>Состав лагеря</h1>
           {(isDetailedGroupLoading || isAllGroupsLoading || isFilteredUsersLoading) ? <div className={styles.loader__wrapper}>
               <Loader className={styles.loader} size='l' />
@@ -522,7 +521,7 @@ const GroupsPage = () => {
           <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => setNewUserLastName(event.target.value)} value={newUserLastName} type="text" placeholder="Фамилия*" className={`${styles.form__input} ${styles.form__item}`} />
           <div style={{display: 'flex', justifyContent: 'space-between'}}>
             <Button className={styles.modal__btn} disabled={newUserFirstName && newUserLastName ? false : true} type='submit'>Сохранить</Button>
-            <Button className={styles.modal__btn} onClick={() => setUsersWindowMode('show')}>Назад</Button>
+            <Button className={styles.modal__btn} onClick={() => {setUsersWindowMode('show'); setNewUserFirstName(''); setNewUserLastName('')}}>Назад</Button>
           </div>
           
           </Form>
