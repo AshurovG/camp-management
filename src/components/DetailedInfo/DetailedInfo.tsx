@@ -103,9 +103,10 @@ const DetailedInfo: React.FC<DetailedInfoProps> = ({id, onBackButtonClick, onDel
   }, [])
 
   const handleBackButtonClick = () => {
+    setIsEditFormOpened(false)
     console.log('back')
-    setFirstNameValue('')
-    setLastNameValue('')
+    setFirstNameValue(currentUser.firstName)
+    setLastNameValue(currentUser.lastName)
   }
 
   return (
