@@ -30,10 +30,15 @@ const BuildingsPage = () => {
   // const [usersWithoutRooms, setUsersWithoutRooms] = useState<UserData[]>()
   const [roomValue, setRoomValue] = useState<RecRoomData>()
   const [newBuildingValue, setNewBuildingValue] = useState('')
+  const [newRoomNumberValue, setNewRoomNumberValue] = useState('')
+  const [newRoomCapacityValue, setNewRoomCapacityValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isCreateBuildingModalOpened, setIsCreateBuildingModalOpened] = useState(false)
   const [isEditBuildingModalOpened, setIsEditBuildingModalOpened] = useState(false)
   const [isDeleteBuildingModalOpened, setIsDeleteBuildingModalOpened] = useState(false)
+  const [isCreateRoomModalOpened, setIsCreateRoomModalOpened] = useState(false)
+  const [isEditRoomModalOpened, setIsEditRoomModalOpened] = useState(false)
+  const [isDeleteRoomModalOpened, setIsDeleteRoomModalOpened] = useState(false)
 
   const getBuildings = async () => {
     try {
@@ -167,6 +172,75 @@ const BuildingsPage = () => {
     }
   }
 
+  const postRoom = async () => {
+    try {
+      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/buildings/${buildingValue?.id}/rooms`, {
+        method: 'POST',
+        data: {
+          number: Number(newRoomNumberValue),
+          capacity: Number(newRoomCapacityValue)
+        }
+      })
+
+      setRoomValue(response.data)
+      toast.success("Комната успешно добавлена!");
+      if (currentRooms) {
+        setCurrentRooms([...currentRooms, response.data])
+      }
+    } catch {
+      toast.error("Комната с таким номером уже существует!");
+    }
+  }
+
+  const putRoom = async () => {
+    try {
+      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/buildings/${buildingValue?.id}/rooms/${roomValue?.id}`, {
+        method: 'PUT',
+        data: {
+          number: Number(newRoomNumberValue),
+          capacity: Number(newRoomCapacityValue)
+        }
+      })
+
+      const updatedRooms = currentRooms?.map(room => {
+        if (room.id === roomValue?.id) {
+          return {
+            ...room,
+            number: Number(newRoomNumberValue),
+            capacity: Number(newRoomCapacityValue)
+          };
+        }
+        return room;
+      });
+
+      setCurrentRooms(updatedRooms)
+      setRoomValue(response.data)
+      toast.success("Информация успешно обновлена!");
+    } catch {
+      toast.error("Комната с таким номером уже существует!");
+    }
+  }
+
+  const deleteRoom = async () => {
+    try {
+      await axios(`https://specializedcampbeta.roxmiv.com/api/buildings/${buildingValue?.id}/rooms/${roomValue?.id}`, {
+        method: 'DELETE'
+      })
+
+      const newArr = currentRooms?.filter(room => {
+        return room.id !== roomValue?.id
+      })
+
+      setCurrentRooms(newArr)
+      if (newArr?.length !== 0 && newArr) {
+        setRoomValue(newArr[0])
+      }
+      toast.success("Комната успешно удалена!");
+    } catch {
+
+    }
+  }
+
   React.useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -187,12 +261,25 @@ const BuildingsPage = () => {
     if (isCreateBuildingModalOpened) {
       postBuilding();
     } else {
-      console.log('put')
       putBuilding()
     }
     setNewBuildingValue('')
     setIsCreateBuildingModalOpened(false)
     setIsEditBuildingModalOpened(false)
+  }
+
+  const handleRoomFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (isCreateRoomModalOpened) {
+      postRoom();
+    } else {
+      console.log('put')
+      putRoom()
+    }
+    setNewRoomCapacityValue('')
+    setNewRoomNumberValue('')
+    setIsCreateRoomModalOpened(false)
+    setIsEditRoomModalOpened(false)
   }
 
   const handleBuildingSelect = (eventKey: string | null) => {
@@ -214,17 +301,31 @@ const BuildingsPage = () => {
     }
   };
 
-  const handleEditButtonClick = () => {
+  const handleEditBuildingButtonClick = () => {
     setIsEditBuildingModalOpened(true);
     if (buildingValue) {
       setNewBuildingValue(buildingValue.name)
     }
   }
+  
+  const handleEditRoomButtonClick = () => {
+    setIsEditRoomModalOpened(true);
+    if (roomValue) {
+      setNewRoomNumberValue((roomValue.number).toString())
+      setNewRoomCapacityValue((roomValue.capacity).toString())
+    }
+  }
 
-  const handleDeleteConfirmClick = () => {
+  const handleDeleteBuildingConfirmClick = () => {
     deleteBuilding();
     // clearData(); 
     setIsDeleteBuildingModalOpened(false)
+  }
+
+  const handleDeleteRoomConfirmClick = () => {
+    deleteRoom();
+    // clearData(); 
+    setIsDeleteRoomModalOpened(false)
   }
 
   
@@ -262,7 +363,7 @@ const BuildingsPage = () => {
                 </div>
                 <div className={styles.dropdown__btns}>
                   <AddButton onClick={() => setIsCreateBuildingModalOpened(true)}/>
-                  <EditIcon onClick={handleEditButtonClick}/>
+                  <EditIcon onClick={handleEditBuildingButtonClick}/>
                   <BasketIcon onClick={() => setIsDeleteBuildingModalOpened(true)}/>
                 </div>
               </div>
@@ -290,9 +391,9 @@ const BuildingsPage = () => {
                   </Dropdown>
                 </div>
                 <div className={styles.dropdown__btns}>
-                  <AddButton onClick={() => {}}/>
-                  <EditIcon onClick={() => {}}/>
-                  <BasketIcon onClick={() => {}}/>
+                  <AddButton onClick={() => setIsCreateRoomModalOpened(true)}/>
+                  <EditIcon onClick={handleEditRoomButtonClick}/>
+                  <BasketIcon onClick={() => setIsDeleteRoomModalOpened(true)}/>
                 </div>
               </div>
             </div>
@@ -319,15 +420,38 @@ const BuildingsPage = () => {
             </div>
             <Button disabled={newBuildingValue ? false : true} type='submit'>Сохранить</Button>
           </Form>
-      </ModalWindow>
+        </ModalWindow>
 
-      <ModalWindow handleBackdropClick={() => setIsDeleteBuildingModalOpened(false)} active={isDeleteBuildingModalOpened} className={styles.modal}>
-        <h3 className={styles.modal__title}>Вы уверены, что хотите удалить данную группу?</h3>
-        <div className={styles['modal__delete-btns']}>
-          <Button onClick={handleDeleteConfirmClick} className={styles.modal__btn}>Подтвердить</Button>
-          <Button onClick={() => setIsDeleteBuildingModalOpened(false)} className={styles.modal__btn}>Закрыть</Button>
-        </div>
-      </ModalWindow>
+        <ModalWindow handleBackdropClick={() => setIsDeleteBuildingModalOpened(false)} active={isDeleteBuildingModalOpened} className={styles.modal}>
+          <h3 className={styles.modal__title}>Вы уверены, что хотите удалить данное здание?</h3>
+          <div className={styles['modal__delete-btns']}>
+            <Button onClick={handleDeleteBuildingConfirmClick} className={styles.modal__btn}>Подтвердить</Button>
+            <Button onClick={() => setIsDeleteBuildingModalOpened(false)} className={styles.modal__btn}>Закрыть</Button>
+          </div>
+        </ModalWindow>
+
+        <ModalWindow handleBackdropClick={() => {setIsCreateRoomModalOpened(false); setIsEditRoomModalOpened(false); newRoomCapacityValue && setNewRoomCapacityValue(''); newRoomNumberValue && setNewRoomNumberValue('')}}
+        className={styles.modal} active={isCreateRoomModalOpened || isEditRoomModalOpened}>
+          <h3 className={styles.modal__title}>Заполните данные</h3>
+          <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleRoomFormSubmit(event)}
+          className={styles['form']}>
+            <div className={styles.form__item}>
+              <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => setNewRoomNumberValue(event.target.value)} value={newRoomNumberValue} className={styles.form__input} type="text" placeholder="Номер комнаты*" />
+            </div>
+            <div className={styles.form__item}>
+              <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => setNewRoomCapacityValue(event.target.value)} value={newRoomCapacityValue} className={styles.form__input} type="text" placeholder="Вместимость*" />
+            </div>
+            <Button disabled={newRoomCapacityValue && newRoomNumberValue ? false : true} type='submit'>Сохранить</Button>
+          </Form>
+        </ModalWindow>
+
+        <ModalWindow handleBackdropClick={() => setIsDeleteRoomModalOpened(false)} active={isDeleteRoomModalOpened} className={styles.modal}>
+          <h3 className={styles.modal__title}>Вы уверены, что хотите удалить данную комнату?</h3>
+          <div className={styles['modal__delete-btns']}>
+            <Button onClick={handleDeleteRoomConfirmClick} className={styles.modal__btn}>Подтвердить</Button>
+            <Button onClick={() => setIsDeleteRoomModalOpened(false)} className={styles.modal__btn}>Закрыть</Button>
+          </div>
+        </ModalWindow>
     </div>
   )
 }
