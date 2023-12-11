@@ -121,8 +121,7 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
             </div>}
             <div className={styles.list__wrapper}>
                 <div className={styles.list__filter} style={{ width: '100%', position: 'sticky', top: 0, zIndex: 1}}>
-                    <Form.Control type="text" placeholder="Поиск*" value={inputValue} onChange={(event: ChangeEvent<HTMLInputElement>) => setInputValue(event.target.value)} />
-                    {areUsersWithoutRooms && <Dropdown className={styles['dropdown']} onSelect={handleGroupSelect}>
+                {areUsersWithoutRooms && <Dropdown className={styles['dropdown']} onSelect={handleGroupSelect}>
                         <Dropdown.Toggle
                             className={styles['dropdown__toggle']}
                             style={{
@@ -144,6 +143,7 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
                             ))}
                         </Dropdown.Menu>
                     </Dropdown>}
+                    <Form.Control type="text" placeholder="Поиск*" value={inputValue} onChange={(event: ChangeEvent<HTMLInputElement>) => setInputValue(event.target.value)} />
                 </div>
                 {!allUsers && !areUsersWithoutRooms ?
                     <ul className={styles.list__options}>
