@@ -32,13 +32,15 @@ const BuildingsPage = () => {
   const [newBuildingValue, setNewBuildingValue] = useState('')
   const [newRoomNumberValue, setNewRoomNumberValue] = useState('')
   const [newRoomCapacityValue, setNewRoomCapacityValue] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isRoomsLoding, setIsRoomsLoading] = useState(false)
   const [isCreateBuildingModalOpened, setIsCreateBuildingModalOpened] = useState(false)
   const [isEditBuildingModalOpened, setIsEditBuildingModalOpened] = useState(false)
   const [isDeleteBuildingModalOpened, setIsDeleteBuildingModalOpened] = useState(false)
   const [isCreateRoomModalOpened, setIsCreateRoomModalOpened] = useState(false)
   const [isEditRoomModalOpened, setIsEditRoomModalOpened] = useState(false)
   const [isDeleteRoomModalOpened, setIsDeleteRoomModalOpened] = useState(false)
+  const [isValid, setIsValid] = useState(true)
 
   const getBuildings = async () => {
     try {
@@ -51,7 +53,7 @@ const BuildingsPage = () => {
       if (!buildingValue) {
         setBuildingValue(response.data[0])
       }
-
+      setIsRoomsLoading(true)
       getRoomsFromBuilding(response.data[0].id)
 
     } catch(e) {
@@ -69,6 +71,7 @@ const BuildingsPage = () => {
 
       setCurrentRooms(response.data)
       setRoomValue(response.data[0])
+      setIsRoomsLoading(false)
     } catch(e) {
       throw e
     }
@@ -93,6 +96,14 @@ const BuildingsPage = () => {
       console.log(`newarr is ${newArr}`)
     } catch(e) {
       throw e
+    }
+  }
+
+  const getUsersFromRoom = async () => {
+    try {
+      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/users/`)
+    } catch {
+
     }
   }
 
@@ -328,6 +339,11 @@ const BuildingsPage = () => {
     setIsDeleteRoomModalOpened(false)
   }
 
+  const handleRoomChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setNewRoomNumberValue(event.target.value)
+    console.log(Number(event.target.value))
+  }
+
   
 
   return (
@@ -368,7 +384,7 @@ const BuildingsPage = () => {
                 </div>
               </div>
               
-              <div className={styles.dropdown__wrapper}>
+              { roomValue ? <div className={styles.dropdown__wrapper}>
                 <div className={styles.dropdown__content}>
                   <h4 className={styles['settlement__page-subtitle']}>Комнаты</h4>
                   <Dropdown className={styles['dropdown']} onSelect={handleRoomSelect}>
@@ -396,18 +412,28 @@ const BuildingsPage = () => {
                   <BasketIcon onClick={() => setIsDeleteRoomModalOpened(true)}/>
                 </div>
               </div>
+              : !isRoomsLoding && <div>
+                <h4 className={styles['settlement__page-subtitle']}>В этом здании комнаты не добавлены</h4>
+                <div className={styles.dropdown__btns}>
+                  <AddButton onClick={() => setIsCreateRoomModalOpened(true)}/>
+                </div>
+            </div>  
+            }
             </div>
-            <div className={styles['settlement__page-actions']}>
+            {roomValue && <div className={styles['settlement__page-actions']}>
               <div className={styles['settlement__page-item']}>
-              <h4 className={styles['settlement__page-subtitle']}>Вместимость: {roomValue?.capacity}</h4>
+                <h4 className={styles['settlement__page-subtitle']}>Вместимость: {roomValue?.capacity}</h4>
                 <SearchList areUsersWithoutRooms/>
               </div>
               <div className={styles['settlement__page-actions-btns']}>
                 <Button onClick={() => {}}><ArrowIcon/></Button>
                 <Button onClick={() => {}} className={styles['settlement__page-actions-reverse']}><ArrowIcon/></Button>
               </div>
-              <SearchList areUsersWithoutRooms/>
-            </div>   
+              <div className={styles['settlement__page-item']}>
+                <h4 className={styles['settlement__page-subtitle']}>Доступные участники</h4>
+                <SearchList areUsersWithoutRooms/>
+              </div>
+            </div>  } 
           </div>}
         </div>
 
@@ -436,12 +462,15 @@ const BuildingsPage = () => {
           <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleRoomFormSubmit(event)}
           className={styles['form']}>
             <div className={styles.form__item}>
-              <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => setNewRoomNumberValue(event.target.value)} value={newRoomNumberValue} className={styles.form__input} type="text" placeholder="Номер комнаты*" />
+              <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => {setNewRoomNumberValue(event.target.value); isNaN(Number(event.target.value)) ? setIsValid(false) : setIsValid(true)}} value={newRoomNumberValue} className={styles.form__input} type="text" placeholder="Номер комнаты*" />
             </div>
             <div className={styles.form__item}>
-              <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => setNewRoomCapacityValue(event.target.value)} value={newRoomCapacityValue} className={styles.form__input} type="text" placeholder="Вместимость*" />
+              <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => {setNewRoomCapacityValue(event.target.value); isNaN(Number(event.target.value)) ? setIsValid(false) : setIsValid(true)}} value={newRoomCapacityValue} className={styles.form__input} type="text" placeholder="Вместимость*" />
             </div>
-            <Button disabled={newRoomCapacityValue && newRoomNumberValue ? false : true} type='submit'>Сохранить</Button>
+            <Button disabled={newRoomCapacityValue && newRoomNumberValue && isValid ? false : true} type='submit'>Сохранить</Button>
+            {isValid ? <p style={{opacity: 0}} className={styles.modal__error}>Поля должны быть числовыми!</p>
+            : <p className={styles.modal__error}>Поля должны быть числовыми!</p>
+          }
           </Form>
         </ModalWindow>
 

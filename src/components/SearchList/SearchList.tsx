@@ -20,11 +20,12 @@ export type ListProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
     activeSubgroups?: number[];
     withActionBlock?: boolean;
     areUsersWithoutRooms?: boolean;
+    isCounterNeed?: boolean;
     className?: string;
 };
 
 const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMemberClick, onSubgroupClick, 
-    activeMembers, activeSubgroups, withActionBlock, areUsersWithoutRooms, className}) => {
+    activeMembers, activeSubgroups, withActionBlock, areUsersWithoutRooms, isCounterNeed, className}) => {
     const dispath = useDispatch()
     const users = useUsers()
     const groups = useGroups()
@@ -119,6 +120,7 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
                 <Button onClick={() => setShowingMode('users')} className={styles['list__action-btn']}>Участники</Button>
                 <Button onClick={() => setShowingMode('all')} className={styles['list__action-btn']}>Все</Button>
             </div>}
+            {isCounterNeed && <p>Участников: {members?.length}, подрупп: {subgroups?.length}</p>}
             <div className={styles.list__wrapper}>
                 <div className={styles.list__filter} style={{ width: '100%', position: 'sticky', top: 0, zIndex: 1}}>
                 {areUsersWithoutRooms && <Dropdown className={styles['dropdown']} onSelect={handleGroupSelect}>
