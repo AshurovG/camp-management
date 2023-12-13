@@ -60,19 +60,43 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
         }
     };
 
+    // const getUsersFromGroup = async (id: number) => {
+    //     try {
+    //         const response = await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${id}/detailed`, {
+    //             method: 'GET'
+    //         })
+
+    //         const newArr = response.data.members.map((member: RecUserData) => {
+    //             return {
+    //                 id: member.id,
+    //                 firstName: member.first_name,
+    //                 lastName: member.last_name
+    //             }
+    //         })
+
+    //         setUsersFromSelectedGroup(newArr)
+    //     } catch(e) {
+    //         throw e
+    //     }
+    // }
+
     const getUsersFromGroup = async (id: number) => {
         try {
-            const response = await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${id}/detailed`, {
+            const response = await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${id}/members/without_room`, {
                 method: 'GET'
             })
+            console.log(response.data)
+            let newArr = []
+            if (response.data.length > 0) {
+                newArr = response.data.map((member: RecUserData) => {
+                    return {
+                        id: member.id,
+                        firstName: member.first_name,
+                        lastName: member.last_name
+                    }
+                })
+            }
 
-            const newArr = response.data.members.map((member: RecUserData) => {
-                return {
-                    id: member.id,
-                    firstName: member.first_name,
-                    lastName: member.last_name
-                }
-            })
 
             setUsersFromSelectedGroup(newArr)
         } catch(e) {
@@ -150,7 +174,7 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
                             ))}
                         </Dropdown.Menu>
                     </Dropdown>}
-                    <Form.Control type="text" placeholder="Поиск*" value={inputValue} onChange={(event: ChangeEvent<HTMLInputElement>) => setInputValue(event.target.value)} />
+                    <Form.Control type="text" placeholder="Поиск*" value={inputValue} onChange={(event: ChangeEvent<HTMLInputElement>) => setInputValue(event.target.value)} className={styles['list__filter-input']}/>
                 </div>
                 {!allUsers && !areUsersWithoutRooms ?
                     <ul className={styles.list__options}>

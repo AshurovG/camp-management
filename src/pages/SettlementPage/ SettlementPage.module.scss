@@ -22,6 +22,7 @@
     }
 
     &-dropdowns {
+
         display: flex;
         justify-content: space-between;
 
@@ -85,6 +86,7 @@
         align-items: center;
         padding-right: 1rem;
         font-size: 18px;
+        border: none !important;
 
         &::after {
             color: transparent;
@@ -171,7 +173,7 @@
 
     &__input {
         height: 50px;
-        border-color: $brand !important;
+        // border-color: $brand !important;
         font-size: 18px !important;
         margin-bottom: 15px;
     }

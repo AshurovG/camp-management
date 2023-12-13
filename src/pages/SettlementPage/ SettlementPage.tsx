@@ -20,15 +20,12 @@ import { RecBuildingData, RecGroupsData, RecRoomData, UserData, RecUserData } fr
 
 const BuildingsPage = () => {
   const dispatch = useDispatch()
-  const groups = useGroups()
-  const usersWithoutRooms = useUsersWithoutRoom()
   const buildings = useBuildings()
   const [groupValue, setGroupValue] = useState<RecGroupsData>()
   const [buildingValue, setBuildingValue] = useState<RecBuildingData>()
   const [currentRooms, setCurrentRooms] = useState<RecRoomData[]>()
   const [usersFromRoom, setUsersFromRoom] = useState<UserData[]>()
-  // const [usersWithoutRooms, setUsersWithoutRooms] = useState<UserData[]>()
-  const [roomValue, setRoomValue] = useState<RecRoomData>()
+  const [roomValue, setRoomValue] = useState<RecRoomData | null>()
   const [newBuildingValue, setNewBuildingValue] = useState('')
   const [newRoomNumberValue, setNewRoomNumberValue] = useState('')
   const [newRoomCapacityValue, setNewRoomCapacityValue] = useState('')
@@ -36,6 +33,7 @@ const BuildingsPage = () => {
   const [deletedUsers, setDeletedUsers] = useState<number[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isRoomsLoding, setIsRoomsLoading] = useState(false)
+  const [isUsersLoading, setIsUsersLoading] = useState(false)
   const [isCreateBuildingModalOpened, setIsCreateBuildingModalOpened] = useState(false)
   const [isEditBuildingModalOpened, setIsEditBuildingModalOpened] = useState(false)
   const [isDeleteBuildingModalOpened, setIsDeleteBuildingModalOpened] = useState(false)
@@ -70,10 +68,13 @@ const BuildingsPage = () => {
       })
 
       console.log(response.data)
-      if (response.data) {
+      if (response.data.length > 0) {
         getUsersFromRoom(id, response.data[0].id)
         setCurrentRooms(response.data)
         setRoomValue(response.data[0])
+      } else {
+        setCurrentRooms([])
+        setRoomValue(null)
       }
      
       setIsRoomsLoading(false)
@@ -122,6 +123,8 @@ const BuildingsPage = () => {
 
     } catch (e){
       throw e
+    } finally {
+      setIsUsersLoading(false);
     }
   }
 
@@ -135,6 +138,7 @@ const BuildingsPage = () => {
     } catch {
 
     } finally {
+        toast.success("Информация о комнате успешно обновлена!");
         getUsersWithoutRoom()
         if (buildingValue && roomValue) {
           getUsersFromRoom(buildingValue.id, roomValue.id)
@@ -152,6 +156,7 @@ const BuildingsPage = () => {
     } catch {
 
     } finally {
+        toast.success("Информация о комнате успешно обновлена!");
         getUsersWithoutRoom()
         if (buildingValue && roomValue) {
           getUsersFromRoom(buildingValue.id, roomValue.id)
@@ -227,8 +232,9 @@ const BuildingsPage = () => {
       
       dispatch(setBuildingsAction(newArr))
       toast.success("Здание успешно удалено!");
-      if (newArr.length !== 0) {
+      if (newArr.length > 0) {
         setBuildingValue(newArr[0])
+        getRoomsFromBuilding(newArr[0].id)
       }
     } catch(e) {
       throw e
@@ -246,6 +252,9 @@ const BuildingsPage = () => {
       })
 
       setRoomValue(response.data)
+      if (buildingValue) {
+        getUsersFromRoom(buildingValue?.id, response.data.id)
+      }
       toast.success("Комната успешно добавлена!");
       if (currentRooms) {
         setCurrentRooms([...currentRooms, response.data])
@@ -297,6 +306,9 @@ const BuildingsPage = () => {
       setCurrentRooms(newArr)
       if (newArr?.length !== 0 && newArr) {
         setRoomValue(newArr[0])
+        if (buildingValue) {
+          getUsersFromRoom(buildingValue.id, newArr[0].id)
+        }
       } else {
         setRoomValue(undefined)
       }
@@ -406,6 +418,9 @@ const BuildingsPage = () => {
       setAddedUsers(addedUsers.filter(userId => userId !== id));
     } else {
       setAddedUsers([...addedUsers, id]);
+      if (usersFromRoom && roomValue && (addedUsers.length + 1 + usersFromRoom?.length > roomValue?.capacity)) {
+        toast.error('В комнате не хватает мест!')
+      }
     }
   };
 
@@ -414,6 +429,20 @@ const BuildingsPage = () => {
       setDeletedUsers(deletedUsers.filter(userId => userId !== id));
     } else {
       setDeletedUsers([...deletedUsers, id]);
+    }
+  }
+  
+  const handleAddUsers = () => {
+    if (addedUsers.length !== 0) {
+      setIsUsersLoading(true)
+      addUsersToRoom()
+    }
+  }
+
+  const handleDeleteUsers = () => {
+    if (deletedUsers.length !== 0) {
+      setIsUsersLoading(true)
+      deleteUsersFromRoom()
     }
   }
 
@@ -501,20 +530,24 @@ const BuildingsPage = () => {
             </div>  
             }
             </div>
-            {roomValue && <div className={styles['settlement__page-actions']}>
+            {roomValue && !isUsersLoading ? <div className={styles['settlement__page-actions']}>
               <div className={styles['settlement__page-item']}>
                 <h4 className={styles['settlement__page-subtitle']}>Доступные участники</h4>
                 <SearchList onMemberClick={handleUserAdd} activeMembers={addedUsers} areUsersWithoutRooms/>
               </div>
               <div className={styles['settlement__page-actions-btns']}>
-                <Button onClick={() => addUsersToRoom()}><ArrowIcon/></Button>
-                <Button onClick={() => deleteUsersFromRoom()} className={styles['settlement__page-actions-reverse']}><ArrowIcon/></Button>
+                <Button disabled={usersFromRoom && (usersFromRoom.length + addedUsers.length > roomValue.capacity)} onClick={handleAddUsers}><ArrowIcon/></Button>
+                <Button onClick={handleDeleteUsers} className={styles['settlement__page-actions-reverse']}><ArrowIcon/></Button>
               </div>
               <div className={styles['settlement__page-item']}>
                 <h4 className={styles['settlement__page-subtitle']}>Вместимость: {roomValue?.capacity}</h4>
                 <SearchList onMemberClick={handleUserDelete} activeMembers={deletedUsers} members={usersFromRoom}/>
               </div>
-            </div>  } 
+            </div>
+            : roomValue && <div className={styles.loader__wrapper}>
+                <Loader className={styles.loader} size='l' />
+              </div>
+            } 
           </div>}
         </div>
 
