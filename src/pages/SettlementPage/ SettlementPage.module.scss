@@ -24,6 +24,16 @@
     &-dropdowns {
         display: flex;
         justify-content: space-between;
+
+        &-empty {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        &-btn {
+            margin-bottom: 30px;
+        }
     }
 
     &-actions {

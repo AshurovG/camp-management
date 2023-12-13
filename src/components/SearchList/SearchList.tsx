@@ -90,6 +90,11 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
           if (selectedGroup && selectedGroup.id !== groupValue?.id) {
             setGroupValue(selectedGroup)
             getUsersFromGroup(Number(eventKey))
+          } else {
+            setGroupValue({
+                id: 0,
+                name: 'Все'
+            })
           }
         }
       };

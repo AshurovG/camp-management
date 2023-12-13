@@ -32,6 +32,8 @@ const BuildingsPage = () => {
   const [newBuildingValue, setNewBuildingValue] = useState('')
   const [newRoomNumberValue, setNewRoomNumberValue] = useState('')
   const [newRoomCapacityValue, setNewRoomCapacityValue] = useState('')
+  const [addedUsers, setAddedUsers] = useState<number[]>([])
+  const [deletedUsers, setDeletedUsers] = useState<number[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isRoomsLoding, setIsRoomsLoading] = useState(false)
   const [isCreateBuildingModalOpened, setIsCreateBuildingModalOpened] = useState(false)
@@ -68,9 +70,12 @@ const BuildingsPage = () => {
       })
 
       console.log(response.data)
-
-      setCurrentRooms(response.data)
-      setRoomValue(response.data[0])
+      if (response.data) {
+        getUsersFromRoom(id, response.data[0].id)
+        setCurrentRooms(response.data)
+        setRoomValue(response.data[0])
+      }
+     
       setIsRoomsLoading(false)
     } catch(e) {
       throw e
@@ -99,11 +104,58 @@ const BuildingsPage = () => {
     }
   }
 
-  const getUsersFromRoom = async () => {
+  const getUsersFromRoom = async (buildingId: number, roomId: number) => {
     try {
-      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/users/`)
+      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/buildings/${buildingId}/rooms/${roomId}/users`, {
+        method: 'GET'
+      })
+
+      const newArr = response.data.map((row: RecUserData) => {
+        return {
+          id: row.id,
+          firstName: row.first_name,
+          lastName: row.last_name
+        }
+      })
+
+      setUsersFromRoom(newArr)
+
+    } catch (e){
+      throw e
+    }
+  }
+
+  const addUsersToRoom = async () => {
+    try {
+      await axios(`https://specializedcampbeta.roxmiv.com/api/buildings/${buildingValue?.id}/rooms/${roomValue?.id}/add_users`, {
+        method: 'PATCH',
+        data: addedUsers
+      })
+      clearData()
     } catch {
 
+    } finally {
+        getUsersWithoutRoom()
+        if (buildingValue && roomValue) {
+          getUsersFromRoom(buildingValue.id, roomValue.id)
+        }
+    }
+  }
+
+  const deleteUsersFromRoom = async () => {
+    try {
+      await axios(`https://specializedcampbeta.roxmiv.com/api/buildings/${buildingValue?.id}/rooms/${roomValue?.id}/remove_users`, {
+        method: 'PATCH',
+        data: deletedUsers
+      })
+      clearData()
+    } catch {
+
+    } finally {
+        getUsersWithoutRoom()
+        if (buildingValue && roomValue) {
+          getUsersFromRoom(buildingValue.id, roomValue.id)
+        }
     }
   }
 
@@ -245,6 +297,8 @@ const BuildingsPage = () => {
       setCurrentRooms(newArr)
       if (newArr?.length !== 0 && newArr) {
         setRoomValue(newArr[0])
+      } else {
+        setRoomValue(undefined)
       }
       toast.success("Комната успешно удалена!");
     } catch {
@@ -308,6 +362,9 @@ const BuildingsPage = () => {
       const selectedRoom = currentRooms?.find(room => room.id === parseInt(eventKey, 10));
       if (selectedRoom && selectedRoom.id !== roomValue?.id) {
         setRoomValue(selectedRoom)
+        if (buildingValue) {
+          getUsersFromRoom(buildingValue?.id, Number(eventKey))
+        }
       }
     }
   };
@@ -329,19 +386,40 @@ const BuildingsPage = () => {
 
   const handleDeleteBuildingConfirmClick = () => {
     deleteBuilding();
-    // clearData(); 
+    clearData(); 
     setIsDeleteBuildingModalOpened(false)
   }
 
   const handleDeleteRoomConfirmClick = () => {
     deleteRoom();
-    // clearData(); 
+    clearData(); 
     setIsDeleteRoomModalOpened(false)
   }
 
-  const handleRoomChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setNewRoomNumberValue(event.target.value)
-    console.log(Number(event.target.value))
+  // const handleRoomChange = (event: ChangeEvent<HTMLInputElement>) => {
+  //   setNewRoomNumberValue(event.target.value)
+  //   console.log(Number(event.target.value))
+  // }
+
+  const handleUserAdd = (id: number) => {
+    if (addedUsers.includes(id)) {
+      setAddedUsers(addedUsers.filter(userId => userId !== id));
+    } else {
+      setAddedUsers([...addedUsers, id]);
+    }
+  };
+
+  const handleUserDelete = (id: number) => {
+    if (deletedUsers.includes(id)) {
+      setDeletedUsers(deletedUsers.filter(userId => userId !== id));
+    } else {
+      setDeletedUsers([...deletedUsers, id]);
+    }
+  }
+
+  const clearData = () => {
+    setAddedUsers([])
+    setDeletedUsers([])
   }
 
   
@@ -378,7 +456,7 @@ const BuildingsPage = () => {
                   </Dropdown>
                 </div>
                 <div className={styles.dropdown__btns}>
-                  <AddButton onClick={() => setIsCreateBuildingModalOpened(true)}/>
+                  <AddButton onClick={() => {setIsCreateBuildingModalOpened(true); clearData()}}/>
                   <EditIcon onClick={handleEditBuildingButtonClick}/>
                   <BasketIcon onClick={() => setIsDeleteBuildingModalOpened(true)}/>
                 </div>
@@ -407,31 +485,34 @@ const BuildingsPage = () => {
                   </Dropdown>
                 </div>
                 <div className={styles.dropdown__btns}>
-                  <AddButton onClick={() => setIsCreateRoomModalOpened(true)}/>
+                  <AddButton onClick={() => {setIsCreateRoomModalOpened(true); clearData()}}/>
                   <EditIcon onClick={handleEditRoomButtonClick}/>
                   <BasketIcon onClick={() => setIsDeleteRoomModalOpened(true)}/>
                 </div>
               </div>
               : !isRoomsLoding && <div>
                 <h4 className={styles['settlement__page-subtitle']}>В этом здании комнаты не добавлены</h4>
-                <div className={styles.dropdown__btns}>
-                  <AddButton onClick={() => setIsCreateRoomModalOpened(true)}/>
+                <div className={styles['settlement__page-dropdowns-empty']}>
+                  <h4 className={styles['settlement__page-subtitle']}>Хотите добавить комнату?</h4>
+                  <div className={styles.dropdown__btns}>
+                    <AddButton className={styles['settlement__page-dropdowns-btn']} onClick={() => {setIsCreateRoomModalOpened(true); clearData()}}/>
+                  </div>
                 </div>
             </div>  
             }
             </div>
             {roomValue && <div className={styles['settlement__page-actions']}>
               <div className={styles['settlement__page-item']}>
-                <h4 className={styles['settlement__page-subtitle']}>Вместимость: {roomValue?.capacity}</h4>
-                <SearchList areUsersWithoutRooms/>
+                <h4 className={styles['settlement__page-subtitle']}>Доступные участники</h4>
+                <SearchList onMemberClick={handleUserAdd} activeMembers={addedUsers} areUsersWithoutRooms/>
               </div>
               <div className={styles['settlement__page-actions-btns']}>
-                <Button onClick={() => {}}><ArrowIcon/></Button>
-                <Button onClick={() => {}} className={styles['settlement__page-actions-reverse']}><ArrowIcon/></Button>
+                <Button onClick={() => addUsersToRoom()}><ArrowIcon/></Button>
+                <Button onClick={() => deleteUsersFromRoom()} className={styles['settlement__page-actions-reverse']}><ArrowIcon/></Button>
               </div>
               <div className={styles['settlement__page-item']}>
-                <h4 className={styles['settlement__page-subtitle']}>Доступные участники</h4>
-                <SearchList areUsersWithoutRooms/>
+                <h4 className={styles['settlement__page-subtitle']}>Вместимость: {roomValue?.capacity}</h4>
+                <SearchList onMemberClick={handleUserDelete} activeMembers={deletedUsers} members={usersFromRoom}/>
               </div>
             </div>  } 
           </div>}
