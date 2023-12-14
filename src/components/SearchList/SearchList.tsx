@@ -4,8 +4,7 @@ import axios from 'axios';
 import styles from './SearchList.module.scss'
 import { Form } from 'react-bootstrap';
 import { RecGroupsData, UserData, RecUserData} from '../../../types';
-import { useDispatch } from 'react-redux';
-import { useUsers, useGroups, useUsersWithoutRoom, setGroupsAction } from 'slices/GroupsSlice';
+import { useUsers, useGroups, useUsersWithoutRoom } from 'slices/GroupsSlice';
 import Button from 'components/Button';
 import Dropdown from 'react-bootstrap/Dropdown';
 import ArrowDownIcon from 'components/Icons/ArrowDownIcon';
@@ -26,7 +25,6 @@ export type ListProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMemberClick, onSubgroupClick, 
     activeMembers, activeSubgroups, withActionBlock, areUsersWithoutRooms, isCounterNeed, className}) => {
-    const dispath = useDispatch()
     const users = useUsers()
     const groups = useGroups()
     const usersWithoutRoom = useUsersWithoutRoom()
@@ -59,26 +57,6 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
           );
         }
     };
-
-    // const getUsersFromGroup = async (id: number) => {
-    //     try {
-    //         const response = await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${id}/detailed`, {
-    //             method: 'GET'
-    //         })
-
-    //         const newArr = response.data.members.map((member: RecUserData) => {
-    //             return {
-    //                 id: member.id,
-    //                 firstName: member.first_name,
-    //                 lastName: member.last_name
-    //             }
-    //         })
-
-    //         setUsersFromSelectedGroup(newArr)
-    //     } catch(e) {
-    //         throw e
-    //     }
-    // }
 
     const getUsersFromGroup = async (id: number) => {
         try {

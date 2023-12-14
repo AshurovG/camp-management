@@ -4,7 +4,7 @@ import axios from 'axios'
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { useBuildings, setBuildingsAction } from 'slices/BuildingsSlice';
-import { useGroups, useUsersWithoutRoom, setGroupsAction, setUsersWithoutRoomAction, useIsUserChanged } from 'slices/GroupsSlice';
+import { setGroupsAction, setUsersWithoutRoomAction } from 'slices/GroupsSlice';
 import Button from 'components/Button';
 import Form from 'react-bootstrap/Form';
 import Dropdown from 'react-bootstrap/Dropdown';
