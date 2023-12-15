@@ -8,7 +8,6 @@ import CalendarPage from 'pages/CalendarPage'
 import SettlementPage from 'pages/SettlementPage'
 import EventsPage from 'pages/EventsPage'
 import EventMembersPage from 'pages/EventMembersPage'
-import BuildingsDetailedPage from 'pages/BuildingsDetailedPage'
 import 'bootstrap/dist/css/bootstrap.css';
 
 function App() {
@@ -21,9 +20,6 @@ function App() {
             <Route path='/' element={<GroupsPage/>}/>
             <Route path='/calendar' element={<CalendarPage/>}/>
             <Route path='/buildings' element={<SettlementPage/>}/>
-            <Route path='/buildings'>
-              <Route path=':id' element={<BuildingsDetailedPage/>}></Route>
-            </Route>
             <Route path="/events">
               <Route path=":id" element={<EventsPage />} />
             </Route>

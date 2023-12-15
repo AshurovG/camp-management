@@ -1,188 +1,6 @@
 // import React from 'react'
 // import axios from 'axios'
-import styles from './CalendarPage.module.scss'
-// import Calendar from 'components/Calendar'
-// import { DayData, EventData } from '../../../types'
-// import { RecEventsData } from '../../../types'
-// import { useDispatch } from 'react-redux'
-// import { useEvents, setEventsAction } from 'slices/EventsSlice'
-
-// const days = [
-//   {
-//     id: 1,
-//     title: '1 декабря',
-//     weekDay: 'Понедельник',
-//     events: [
-//       {
-//         id: 1,
-//         title: 'Событие 1',
-//         timeStart: '10:00',
-//         timeEnd: '12:00',
-//         place: 'Актовый зал'
-//       },
-//       {
-//         id: 2,
-//         title: 'Событие 2',
-//         timeStart: '10:00',
-//         timeEnd: '12:00',
-//         place: 'Актовый зал'
-//       },
-//       {
-//         id: 3,
-//         title: 'Событие 3',
-//         timeStart: '10:00',
-//         timeEnd: '12:00',
-//         place: 'Актовый зал'
-//       }
-//     ]
-//   },
-//   {
-//     id: 2,
-//     title: '2 декабря',
-//     weekDay: 'Вторник',
-//     events: [
-//       {
-//         id: 1,
-//         title: 'Событие 1',
-//         timeStart: '10:00',
-//         timeEnd: '12:00',
-//         place: 'Актовый зал'
-//       },
-//       {
-//         id: 2,
-//         title: 'Событие 2',
-//         timeStart: '10:00',
-//         timeEnd: '12:00',
-//         place: 'Актовый зал'
-//       },
-//       {
-//         id: 3,
-//         title: 'Событие 3',
-//         timeStart: '10:00',
-//         timeEnd: '12:00',
-//         place: 'Актовый зал'
-//       }
-//     ]
-//   },
-//   {
-//     id: 3,
-//     title: '3 декабря',
-//     weekDay: 'Среда',
-//     events: [
-//       {
-//         id: 1,
-//         title: 'Событие 1',
-//         timeStart: '10:00',
-//         timeEnd: '12:00',
-//         place: 'Актовый зал'
-//       },
-//       {
-//         id: 2,
-//         title: 'Событие 2',
-//         timeStart: '10:00',
-//         timeEnd: '12:00',
-//         place: 'Актовый зал'
-//       },
-//       {
-//         id: 3,
-//         title: 'Событие 3',
-//         timeStart: '10:00',
-//         timeEnd: '12:00',
-//         place: 'Актовый зал'
-//       }
-//     ]
-//   },
-//   {
-//     id: 4,
-//     title: '4 декабря',
-//     weekDay: 'Четверг',
-//     events: [
-//       {
-//         id: 1,
-//         title: 'Событие 1',
-//         timeStart: '10:00',
-//         timeEnd: '12:00',
-//         place: 'Актовый зал'
-//       },
-//       {
-//         id: 2,
-//         title: 'Событие 2',
-//         timeStart: '10:00',
-//         timeEnd: '12:00',
-//         place: 'Актовый зал'
-//       },
-//       {
-//         id: 3,
-//         title: 'Событие 3',
-//         timeStart: '10:00',
-//         timeEnd: '12:00',
-//         place: 'Актовый зал'
-//       }
-//     ]
-//   },
-//   {
-//     id: 5,
-//     title: '5 декабря',
-//     weekDay: 'Пятница',
-//     events: [
-//       {
-//         id: 1,
-//         title: 'Событие 1',
-//         timeStart: '10:00',
-//         timeEnd: '12:00',
-//         place: 'Актовый зал'
-//       },
-//       {
-//         id: 2,
-//         title: 'Событие 2',
-//         timeStart: '10:00',
-//         timeEnd: '12:00',
-//         place: 'Актовый зал'
-//       },
-//       {
-//         id: 3,
-//         title: 'Событие 3',
-//         timeStart: '10:00',
-//         timeEnd: '12:00',
-//         place: 'Актовый зал'
-//       }
-//     ]
-//   },
-//   {
-//     id: 6,
-//     title: '6 декабря',
-//     weekDay: 'Суббота',
-//     events: [
-//       {
-//         id: 1,
-//         title: 'Событие 1',
-//         timeStart: '10:00',
-//         timeEnd: '12:00',
-//         place: 'Актовый зал'
-//       },
-//       {
-//         id: 2,
-//         title: 'Событие 2',
-//         timeStart: '10:00',
-//         timeEnd: '12:00',
-//         place: 'Актовый зал'
-//       },
-//       {
-//         id: 3,
-//         title: 'Событие 3',
-//         timeStart: '10:00',
-//         timeEnd: '12:00',
-//         place: 'Актовый зал'
-//       }
-//     ]
-//   }
-// ]
-
-const CalendarPage = () => {
-  // const dispatch = useDispatch();
-  // const events = useEvents();
-
-  // const getEvents = async () => {
+// const getEvents = async () => {
   //   try {
   //     const response = await axios('https://specializedcampbeta.roxmiv.com/api/events', {
   //       method: 'GET'
@@ -265,15 +83,89 @@ const CalendarPage = () => {
   //   getEvents();
   // }, [])
 
+// import Calendar from 'components/Calendar'
+// import { DayData, EventData } from '../../../types'
+// import { RecEventsData } from '../../../types'
+// import { useDispatch } from 'react-redux'
+// import { useEvents, setEventsAction } from 'slices/EventsSlice'
+
+
+
+import React from 'react';
+
+import styles from './CalendarPage.module.scss'
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+// import { Calendar, momentLocalizer } from 'react-big-calendar';
+import FullCalendar from '@fullcalendar/react'
+import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
+import timeGridPlugin from '@fullcalendar/timegrid';
+
+import esLocale from '@fullcalendar/core/locales/ru';
+import { useEffect } from 'react';
+import moment, { months } from 'moment';
+import 'moment/dist/locale/ru';
+
+// const localizer = momentLocalizer(moment);
+
+
+const events = [
+  {
+    title: 'Событие 1',
+    start: new Date(2023, 11, 14, 18, 0), // Пример даты и времени начала события
+    end: new Date(2023, 11, 14, 20, 0), // Пример даты и времени окончания события
+  },
+  {
+    title: 'Событие 2',
+    start: new Date(2023, 11, 14, 19, 0), // Пример даты и времени начала события
+    end: new Date(2023, 11, 14, 19, 30), // Пример даты и времени окончания события
+  },
+  {
+    title: 'Событие 3',
+    start: new Date(2023, 11, 14, 12, 0), // Пример даты и времени начала события
+    end: new Date(2023, 11, 14, 15, 30), // Пример даты и времени окончания события
+  },
+];
+type Event = {
+  title: string;
+  start: Date;
+  end: Date;
+  [key: string]: any;
+ };
+
+ import styled from "@emotion/styled";
+
+
+//  export const StyleWrapper = styled.div`
+//  .fc-button.fc-prev-button, .fc-button.fc-next-button, .fc-button.fc-button-primary{
+//    background: red;
+//    background-image: none;
+// }`
+
+const CalendarPage = () => {
+
+
   return (
     <div className={styles.events__page}>
-        {/* <div className={styles['events__page-wrapper']}>
-            <h1 className={styles['events__page-title']}>Календарь мероприятий</h1>
-            <div className={styles['events__page-content']}>
-              <Calendar days={days}/>
-            </div>
-        </div> */}
-    </div>
+     <div className={styles['events__page-wrapper']}>
+       <h1 className={styles['events__page-title']}>Календарь мероприятий</h1>
+       <div className={styles['events__page-content']}>
+       {/* <StyleWrapper> */}
+       <FullCalendar
+        plugins={[ dayGridPlugin, timeGridPlugin ]}
+        initialView="timeGridWeek"
+        locale={esLocale}
+        initialDate={new Date(2023, 11, 12)} // Начальная дата
+        validRange={{ // Диапазон дат
+          start: new Date(2023, 11, 12), // Минимальная дата
+          end: new Date(2023, 11, 20) // Максимальная дата
+        }}
+        events={events}
+        slotLabelFormat={{ hour: '2-digit', minute: '2-digit' }}
+      />
+      {/* </StyleWrapper> */}
+       </div>
+     </div>
+   </div>
   )
 }
 
