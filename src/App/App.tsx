@@ -8,15 +8,34 @@ import CalendarPage from 'pages/CalendarPage'
 import SettlementPage from 'pages/SettlementPage'
 import EventsPage from 'pages/EventsPage'
 import EventMembersPage from 'pages/EventMembersPage'
+import LoginPage from 'pages/LoginPage';
 import 'bootstrap/dist/css/bootstrap.css';
+import axios from 'axios';
+import React from 'react';
 
 function App() {
+  const getUserInfo = async () => {
+    try {
+      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/self`, {
+        method: 'POST',
+        withCredentials: true
+      })
+    } catch {
+      
+    }
+  }
+
+  React.useEffect(() => {
+    getUserInfo()
+  }, [])
+
   return (
     <div className='app'>
       <HashRouter>
         <Header></Header>
         <div className={styles.content}>
           <Routes >
+            <Route path='/login' element={<LoginPage/>}></Route>
             <Route path='/' element={<GroupsPage/>}/>
             <Route path='/calendar' element={<CalendarPage/>}/>
             <Route path='/buildings' element={<SettlementPage/>}/>

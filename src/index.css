@@ -47,3 +47,30 @@ ul {
   font-family: 'Mulish', serif;
   min-height: 100vh;
 }
+
+.fc .fc-col-header-cell-cushion {
+  padding: 2px 4px;
+  color: #194f4c;
+}
+
+.fc-view-harness .fc-view .fc-slats {
+  display: none !important;
+ }
+
+ .fc-slats {
+  visibility: hidden !important;
+ }
+
+ .fc-view-harness .fc-view .fc-slats {
+  display: none !important;
+ }
+
+ .fc-button.fc-prev-button, .fc-button.fc-next-button, .fc-button.fc-button-primary{
+  background: #3AAFA9;
+  background-image: none;
+}
+
+.fc-day-grid {
+  /* background: #3AAFA9 !important; */
+  border: none;
+ }
