@@ -1,5 +1,7 @@
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { useCommon, setCommonAction } from 'slices/MainSlice';
 import 'react-toastify/dist/ReactToastify.css';
 import styles from './App.module.scss'
 import Header from 'components/Header'
@@ -14,6 +16,8 @@ import axios from 'axios';
 import React from 'react';
 
 function App() {
+  const dispatch = useDispatch()
+  const common = useCommon()
   // const getUserInfo = async () => {
   //   try {
   //     const response = await axios(`https://specializedcampbeta.roxmiv.com/api/self`, {
@@ -31,6 +35,14 @@ function App() {
         method: 'GET',
         // withCredentials: true
       })
+
+      dispatch(setCommonAction({
+        name: response.data.name,
+        startDate: response.data.start_date,
+        endDate: response.data.end_date,
+        color: response.data.color,
+        logo: response.data.logo
+      }))
     } catch {
 
     }

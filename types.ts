@@ -51,6 +51,14 @@ export type DetailedUserData = {
     appGroups: RecGroupsData[];
 }
 
+export type CommonData = {
+    name: string,
+    startDate: string,
+    endDate: string,
+    color: string,
+    logo: string
+}
+
 
 // API types
 

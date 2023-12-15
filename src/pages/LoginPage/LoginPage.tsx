@@ -28,6 +28,8 @@ const LoginPage = () => {
             method: 'GET',
             withCredentials: true
           })
+
+          
         } catch {
           
         }

@@ -1,29 +1,29 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { useSelector } from "react-redux";
-import { EventsData } from "../../types";
+import { CommonData } from "../../types";
 
 interface DataState {
-  events: EventsData[],
+  common: CommonData | null
 }
 
 const dataSlice = createSlice({
   name: "data",
   initialState: {
-    events: []
+    common: null
   } as DataState,
   reducers: {
-    setEvents(state, action: PayloadAction<EventsData[]>) {
-      state.events = action.payload;
+    setCommon(state, action: PayloadAction<CommonData>) {
+      state.common = action.payload;
       console.log(action.payload)
     },
   },
 });
 
-export const useEvents = () =>
-  useSelector((state: { eventsData: DataState }) => state.eventsData.events);
+export const useCommon = () =>
+  useSelector((state: { mainData: DataState }) => state.mainData.common);
 
 export const {
-  setEvents: setEventsAction,
+  setCommon: setCommonAction
 } = dataSlice.actions;
 
 export default dataSlice.reducer;
