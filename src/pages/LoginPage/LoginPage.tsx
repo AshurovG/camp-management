@@ -1,4 +1,6 @@
 import React, {useState, ChangeEvent} from 'react'
+import axios from 'axios'
+import { toast } from 'react-toastify';
 import styles from './LoginPage.module.scss'
 import {Form} from 'react-bootstrap'
 import Button from 'components/Button'
@@ -6,8 +8,35 @@ import Button from 'components/Button'
 const LoginPage = () => {
     const [passwordValue, setPasswordValue] = useState('')
 
+    const login = async () => {
+        try {
+            const response = await axios(`https://specializedcampbeta.roxmiv.com/api/login`, {
+                method: 'POST',
+                data: {code: passwordValue}
+            })
+            toast.success('Вы успешно вошли в систему!')
+        } catch {
+            toast.error('Неверный код!')
+        } finally {
+            // getUserInfo()
+        }
+    }
+
+    const getUserInfo = async () => {
+        try {
+          const response = await axios(`https://specializedcampbeta.roxmiv.com/api/self`, {
+            method: 'GET',
+            withCredentials: true
+          })
+        } catch {
+          
+        }
+    }
+    
+
     const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
+        login()
     }
 
     return (

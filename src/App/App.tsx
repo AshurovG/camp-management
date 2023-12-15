@@ -14,19 +14,31 @@ import axios from 'axios';
 import React from 'react';
 
 function App() {
-  const getUserInfo = async () => {
+  // const getUserInfo = async () => {
+  //   try {
+  //     const response = await axios(`https://specializedcampbeta.roxmiv.com/api/self`, {
+  //       method: 'GET',
+  //       withCredentials: true
+  //     })
+  //   } catch {
+      
+  //   }
+  // }
+
+  const getCommonInfo = async () => {
     try {
-      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/self`, {
-        method: 'POST',
-        withCredentials: true
+      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/common/info`, {
+        method: 'GET',
+        // withCredentials: true
       })
     } catch {
-      
+
     }
   }
 
   React.useEffect(() => {
-    getUserInfo()
+    // getUserInfo()
+    getCommonInfo()
   }, [])
 
   return (
