@@ -1,8 +1,8 @@
 export type EventData = {
     id: number;
     title: string;
-    timeStart: string;
-    timeEnd: string;
+    start: string;
+    end: string;
     place: string;
 }
 
@@ -11,6 +11,11 @@ export type EventsData = {
     title: string,
     startTime: string,
     endTime: string,
+    place: {
+        building: RecBuildingData,
+        id: number,
+        name: string
+    },
     notification: boolean,
     isNeedScreen: boolean,
     isNeedComputer: boolean,

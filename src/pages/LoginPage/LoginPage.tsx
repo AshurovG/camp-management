@@ -1,5 +1,5 @@
 import React, {useState, ChangeEvent} from 'react'
-import axios from 'axios'
+import axios, {AxiosResponse} from 'axios'
 import { toast } from 'react-toastify';
 import styles from './LoginPage.module.scss'
 import {Form} from 'react-bootstrap'
@@ -10,15 +10,15 @@ const LoginPage = () => {
 
     const login = async () => {
         try {
-            const response = await axios(`https://specializedcampbeta.roxmiv.com/api/login`, {
+            const response: AxiosResponse = await axios(`https://specializedcampbeta.roxmiv.com/api/login`, {
                 method: 'POST',
-                data: {code: passwordValue}
+                data: {code: passwordValue},
+                withCredentials: true
             })
             toast.success('Вы успешно вошли в систему!')
         } catch {
             toast.error('Неверный код!')
         } finally {
-            // getUserInfo()
         }
     }
 

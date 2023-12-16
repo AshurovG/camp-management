@@ -18,16 +18,16 @@ import React from 'react';
 function App() {
   const dispatch = useDispatch()
   const common = useCommon()
-  // const getUserInfo = async () => {
-  //   try {
-  //     const response = await axios(`https://specializedcampbeta.roxmiv.com/api/self`, {
-  //       method: 'GET',
-  //       withCredentials: true
-  //     })
-  //   } catch {
+  const getUserInfo = async () => {
+    try {
+      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/self`, {
+        method: 'GET',
+        withCredentials: true
+      })
+    } catch {
       
-  //   }
-  // }
+    }
+  }
 
   const getCommonInfo = async () => {
     try {
@@ -49,7 +49,7 @@ function App() {
   }
 
   React.useEffect(() => {
-    // getUserInfo()
+    getUserInfo()
     getCommonInfo()
   }, [])
 

@@ -99,7 +99,6 @@ const BuildingsPage = () => {
 
       dispatch(setUsersWithoutRoomAction(newArr))
 
-      console.log(`newarr is ${newArr}`)
     } catch(e) {
       throw e
     }
