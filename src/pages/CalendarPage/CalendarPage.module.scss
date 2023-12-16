@@ -71,7 +71,7 @@
         width: 150px;
     }
 
-    
+
 
     &__users {
         width: 400px;
@@ -84,5 +84,28 @@
         color: red;
         padding-top: 5px;
         text-align: center;
+    }
+}
+
+
+.loader__wrapper {
+    width: 100%;
+    height: 170px;
+    margin-top: 113px;
+    display: flex;
+    justify-content: center;
+}
+
+.loader {
+    animation: rotate 1s infinite linear;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg) scale(1);
+    }
+
+    to {
+        transform: rotate((800deg));
     }
 }

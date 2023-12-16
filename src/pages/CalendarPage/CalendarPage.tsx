@@ -9,18 +9,22 @@ import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid' 
 import timeGridPlugin from '@fullcalendar/timegrid';
 import esLocale from '@fullcalendar/core/locales/ru';
+import { useDispatch } from 'react-redux';
 import { useCommon } from 'slices/MainSlice';
 import axios from 'axios'
 import { RecEventsData, EventsData } from '../../../types';
 import { Form } from 'react-bootstrap'
 import Button from 'components/Button';
 import CheckBox from 'components/CheckBox';
-import { useCurrentEvent } from 'slices/EventsSlice';
+import Loader from 'components/Loader';
+import { useCurrentEvent, useIsEventsChanged, setIsEventsChangedAction } from 'slices/EventsSlice';
 import { toast } from 'react-toastify';
  
 const CalendarPage = () => {
+  const dispatch = useDispatch()
   const currentEvent = useCurrentEvent()
   const common = useCommon()
+  const isEventsChanged = useIsEventsChanged()
   const [events, setEvents] = useState<EventsData[]>()
   // const [isCreateModalOpened, setIsCreateModalOpened] = useState(false)
   const [isModalOpened, setIsModalOpened] = useState(false)
@@ -36,6 +40,16 @@ const CalendarPage = () => {
   const [newIsNeedComputerValue, setNewIsNeedComputerValue] = useState(false)
   const [newIsNeedWiteboardValue, setNewIsNeedWhiteboardValue] = useState(false)
   const [newDateValue, setNewDateValue] = useState('')
+  const [isEventsLoading, setIsEventsLoading] = useState(true)
+
+  const clearData = () => {
+    setNewTitleValue('')
+    setNewEndTimeValue('')
+    setNewStartTimeValue('')
+    setNewIsNeedComputerValue(false)
+    setNewIsNeedScreenValue(false)
+    setNewIsNeedWhiteboardValue(false)
+  }
 
 
   const getEvents = async () => {
@@ -59,10 +73,13 @@ const CalendarPage = () => {
       setEvents(newArr)
     } catch(e) {
       throw e
+    } finally {
+      setIsEventsLoading(false)
     }
   }
 
   const putEvent = async (start: string, end: string) => {
+    dispatch(setIsEventsChangedAction(true))
     try {
       await axios(`https://specializedcampbeta.roxmiv.com/api/events/${currentEvent?.id}`,{
         method: 'PATCH',
@@ -85,6 +102,7 @@ const CalendarPage = () => {
   }
 
   const postEvent = async (start: string, end: string) => {
+    setIsEventsLoading(true)
     try {
       await axios('https://specializedcampbeta.roxmiv.com/api/events', {
         method: 'POST',
@@ -104,6 +122,7 @@ const CalendarPage = () => {
       throw e
     } finally {
       setIsCreateEventModalOpened(false)
+      getEvents()
     }
   }
 
@@ -175,20 +194,24 @@ const CalendarPage = () => {
     }
   }
 
-  const clearData = () => {
-    setNewTitleValue('')
-    setNewEndTimeValue('')
-    setNewStartTimeValue('')
-    setNewIsNeedComputerValue(false)
-    setNewIsNeedScreenValue(false)
-    setNewIsNeedWhiteboardValue(false)
+  const handleBackClick = () => {
+    if (isEventsChanged) {
+      setIsEventsLoading(true)
+      getEvents()
+      dispatch(setIsEventsChangedAction(false))
+    }
+    setIsModalOpened(false)
+    clearData()
   }
 
   return (
     <div className={styles.events__page}>
      <div className={styles['events__page-wrapper']}>
        <h1 className={styles['events__page-title']}>Календарь мероприятий</h1>
-       <div className={styles['events__page-content']}>
+       {isEventsLoading ? <div className={styles.loader__wrapper}>
+              <Loader className={styles.loader} size='l' />
+          </div>
+        : <div className={styles['events__page-content']}>
        {common && events && <FullCalendar
         height={600}
         plugins={[ dayGridPlugin, timeGridPlugin ]}
@@ -228,9 +251,9 @@ const CalendarPage = () => {
             setSelectedEvent(Number(info.event.id))
            }}
         />}
-       </div>
+       </div>}
      </div>
-     <ModalWindow className={styles.modal} handleBackdropClick={() => {setIsModalOpened(false); clearData()}} active={isModalOpened}>
+     <ModalWindow className={styles.modal} handleBackdropClick={handleBackClick} active={isModalOpened}>
         {eventWindowMode === 'showEvent' && isModalOpened ? <DetailedEventInfo handleDeleteEventButtonClick={() => deleteEvent()} id={selectedEvent} handleEditEventButtonClick={handleEditEventButtonClick}/>
         : isModalOpened &&<Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleEditEventFormSubmit(event)}
         className={styles['form']}>
