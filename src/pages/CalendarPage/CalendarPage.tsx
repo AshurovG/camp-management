@@ -1,37 +1,3 @@
-// import React from 'react'
-// import axios from 'axios'
-
-
-  // const postEvent = async (event: EventsData) => {
-  //   try {
-  //     const response = await axios('https://specializedcampbeta.roxmiv.com/api/events', {
-  //       method: 'POST',
-  //       data: {
-  //         id: event.id,
-  //         title: event.title,
-  //         start_time: event.startTime,
-  //         end_time: event.endTime,
-  //         notification: event.notification,
-  //         is_need_screen: event.isNeedScreen,
-  //         is_need_computer: event.isNeedComputer,
-  //         is_need_whiteboard: event.isNeedWhiteboard
-  //       }
-  //     })
-
-  //     dispatch(setEventsAction([events, response.data]))
-  //   } catch(e) {
-  //     throw e
-  //   }
-  // }
-
-// import Calendar from 'components/Calendar'
-// import { DayData, EventData } from '../../../types'
-// import { RecEventsData } from '../../../types'
-// import { useDispatch } from 'react-redux'
-// import { useEvents, setEventsAction } from 'slices/EventsSlice'
-
-
-
 import React, { useState, ChangeEvent } from 'react';
 import moment from 'moment';
 import 'moment/dist/locale/ru';
@@ -50,6 +16,7 @@ import { Form } from 'react-bootstrap'
 import Button from 'components/Button';
 import CheckBox from 'components/CheckBox';
 import { useCurrentEvent } from 'slices/EventsSlice';
+import { toast } from 'react-toastify';
  
 const CalendarPage = () => {
   const currentEvent = useCurrentEvent()
@@ -57,15 +24,18 @@ const CalendarPage = () => {
   const [events, setEvents] = useState<EventsData[]>()
   // const [isCreateModalOpened, setIsCreateModalOpened] = useState(false)
   const [isModalOpened, setIsModalOpened] = useState(false)
+  const [isCreateEventModalOpened, setIsCreateEventModalOpened] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState(0)
-  const [isShowEvent, setIsShowEvent] = useState(false)
-  const [isEditEvent, setIsEditEvent] = useState(false)
+  const [eventWindowMode, setEventWindowMode] = useState<'showEvent' | 'editEvent' | 'showUsers'>('showEvent')
+  // const [isShowEvent, setIsShowEvent] = useState(false)
+  // const [isEditEvent, setIsEditEvent] = useState(false)
   const [newStartTimeValue, setNewStartTimeValue] = useState('')
   const [newEndTimeValue, setNewEndTimeValue] = useState('')
   const [newTitleValue, setNewTitleValue] = useState('')
   const [newIsNeedScreenValue, setNewIsNeedScreenValue] = useState(false)
   const [newIsNeedComputerValue, setNewIsNeedComputerValue] = useState(false)
   const [newIsNeedWiteboardValue, setNewIsNeedWhiteboardValue] = useState(false)
+  const [newDateValue, setNewDateValue] = useState('')
 
 
   const getEvents = async () => {
@@ -100,14 +70,38 @@ const CalendarPage = () => {
           title: newTitleValue,
           start_time: start,
           end_time: end,
-          is_need_sreen: newIsNeedScreenValue,
+          is_need_screen: newIsNeedScreenValue,
           is_need_computer: newIsNeedComputerValue,
           is_need_whiteboard: newIsNeedWiteboardValue
         },
         // withCredentials: true
       })
-    } catch {
+      toast.success('Информация успешно обновлена!')
+    } catch(e) {
+      throw e
+    } finally {
+        setEventWindowMode('showEvent')
+    }
+  }
 
+  const postEvent = async (start: string, end: string) => {
+    try {
+      await axios('https://specializedcampbeta.roxmiv.com/api/events', {
+        method: 'POST',
+        data: {
+          title: newTitleValue,
+          start_time: start,
+          end_time: end,
+          is_need_screen: newIsNeedScreenValue,
+          is_need_computer: newIsNeedComputerValue,
+          is_need_whiteboard: newIsNeedWiteboardValue
+        },
+        // withCredentials: true
+      })
+
+      toast.success('Событие добавлено успешно!')
+    } catch(e) {
+      throw e
     }
   }
 
@@ -116,8 +110,7 @@ const CalendarPage = () => {
   }, [])
 
   const handleEditEventButtonClick = () => {
-    setIsEditEvent(true)
-    setIsShowEvent(false)
+    setEventWindowMode('editEvent')
     if (currentEvent) {
       setNewTitleValue(currentEvent.title)
       setNewIsNeedComputerValue(currentEvent.isNeedComputer)
@@ -128,10 +121,21 @@ const CalendarPage = () => {
     }
   }
 
-  React.useEffect(() => {
-    console.log('isneeed')
-    console.log(currentEvent?.isNeedComputer)
-  }, [isEditEvent])
+  const handleCreateEventFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const date = moment(newDateValue, 'YYYY-MM-DD');
+    const startTime = moment(newStartTimeValue, 'HH:mm');
+    date.hour(startTime.hour());
+    date.minute(startTime.minute());
+    const start = date.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+
+    const endTIme = moment(newEndTimeValue, 'HH:mm');
+    date.hour(endTIme.hour());
+    date.minute(endTIme.minute());
+    const end = date.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+    
+    postEvent(start, end)
+  }
 
   const handleEditEventFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -156,12 +160,22 @@ const CalendarPage = () => {
     }
   }
 
+  const clearData = () => {
+    setNewTitleValue('')
+    setNewEndTimeValue('')
+    setNewStartTimeValue('')
+    setNewIsNeedComputerValue(false)
+    setNewIsNeedScreenValue(false)
+    setNewIsNeedWhiteboardValue(false)
+  }
+
   return (
     <div className={styles.events__page}>
      <div className={styles['events__page-wrapper']}>
        <h1 className={styles['events__page-title']}>Календарь мероприятий</h1>
        <div className={styles['events__page-content']}>
        {common && events && <FullCalendar
+        height={600}
         plugins={[ dayGridPlugin, timeGridPlugin ]}
         initialView="timeGridWeek"
         locale={esLocale}
@@ -182,19 +196,27 @@ const CalendarPage = () => {
           headerToolbar={{
             left: 'title',
             center: '',
-            right: 'prev,next'
+            right: 'createEventButton,prev,next'
+           }}
+           customButtons={{
+            createEventButton: {
+              text: 'Создать',
+              click: function() {
+                setIsCreateEventModalOpened(true)
+              }
+            }
            }}
            eventClick={(info) => {
             console.log('Clicked on event with id: ' + info.event.id);
             setIsModalOpened(true)
-            setIsShowEvent(true)
+            setEventWindowMode('showEvent')
             setSelectedEvent(Number(info.event.id))
            }}
         />}
        </div>
      </div>
-     <ModalWindow className={styles.modal} handleBackdropClick={() => setIsModalOpened(false)} active={isModalOpened}>
-        {isShowEvent && isModalOpened ? <DetailedEventInfo id={selectedEvent} handleEditEventButtonClick={handleEditEventButtonClick}/>
+     <ModalWindow className={styles.modal} handleBackdropClick={() => {setIsModalOpened(false); clearData()}} active={isModalOpened}>
+        {eventWindowMode === 'showEvent' && isModalOpened ? <DetailedEventInfo id={selectedEvent} handleEditEventButtonClick={handleEditEventButtonClick}/>
         : isModalOpened &&<Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleEditEventFormSubmit(event)}
         className={styles['form']}>
           <h3 className={styles.modal__title}>Заполните данные</h3>
@@ -231,10 +253,68 @@ const CalendarPage = () => {
             <p>Нужна доска?</p> 
             <CheckBox className={styles.form__checkbox} checked={newIsNeedWiteboardValue} onChange={() => setNewIsNeedWhiteboardValue(!newIsNeedWiteboardValue)}/>
           </div>
-          <Button disabled={newTitleValue ? false : true} type='submit'>Сохранить</Button>
+          <div style={{display: 'flex', justifyContent: 'space-between'}}>
+            <Button className={styles.modal__btn}  disabled={newTitleValue ? false : true} type='submit'>Сохранить</Button>
+            <Button className={styles.modal__btn} onClick={() => {setEventWindowMode('showEvent')}}>Назад</Button>
+          </div>
         </Form>
         }
      </ModalWindow>
+
+      <ModalWindow className={styles.modal} handleBackdropClick={() => setIsCreateEventModalOpened(false)} active={isCreateEventModalOpened}>
+      <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleCreateEventFormSubmit(event)}
+        className={styles['form']}>
+          <h3 className={styles.modal__title}>Заполните данные</h3>
+          <div className={styles.form__item}>
+            <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => {setNewTitleValue(event.target.value)}} value={newTitleValue} className={styles.form__input} type="text" placeholder="Название события*" />
+          </div>
+          <div className={styles.form__item}>
+          {common && <Form.Control 
+          type="date" 
+          value={newDateValue} 
+          onChange={(event) => setNewDateValue(event.target.value)} 
+          className={styles.form__input} 
+          placeholder="Дата*" 
+          min={common.startDate} // Минимальная дата
+          max={common.endDate} // Максимальная дата
+          />}
+          </div>
+          <div className={styles.form__item}>
+            <Form.Control 
+              type="time" 
+              value={ newStartTimeValue} 
+              onChange={(event) => setNewStartTimeValue(event.target.value)} 
+              className={styles.form__input} 
+              placeholder="Время начала*" 
+            />
+          </div>
+
+          <Form.Control 
+            type="time" 
+            value={ newEndTimeValue} 
+            onChange={(event) => setNewEndTimeValue(event.target.value)} 
+            className={styles.form__input} 
+            placeholder="Время окончания*" 
+          />
+
+          <div className={`${styles.form__item} ${styles['form__item-choose']}`}>
+            <p>Нужен экран?</p> 
+            <CheckBox className={styles.form__checkbox} checked={newIsNeedScreenValue} onChange={() => setNewIsNeedScreenValue(!newIsNeedScreenValue)}/>
+          </div>
+          <div className={styles.form__item}>
+            <p>Нужен компьютер?</p> 
+            <CheckBox className={styles.form__checkbox} checked={newIsNeedComputerValue} onChange={() => setNewIsNeedComputerValue(!newIsNeedComputerValue)}/>
+          </div>
+          <div className={styles.form__item}>
+            <p>Нужна доска?</p> 
+            <CheckBox className={styles.form__checkbox} checked={newIsNeedWiteboardValue} onChange={() => setNewIsNeedWhiteboardValue(!newIsNeedWiteboardValue)}/>
+          </div>
+          <div style={{display: 'flex', justifyContent: 'space-between'}}>
+            <Button className={styles.modal__btn}  disabled={newTitleValue ? false : true} type='submit'>Сохранить</Button>
+            <Button className={styles.modal__btn} onClick={() => {setEventWindowMode('showEvent')}}>Назад</Button>
+          </div>
+        </Form>
+      </ModalWindow>
    </div>
   )
 }

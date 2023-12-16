@@ -72,11 +72,11 @@ const DetailedEventInfo: React.FC<DetailedInfoProps> = ({id, handleEditEventButt
                 endTime: response.data.end_time,
                 place: response.data.place,
                 notification: response.data.notification,
-                isNeedScreen: response.data.is_need_sreen,
+                isNeedScreen: response.data.is_need_screen,
                 isNeedComputer: response.data.is_need_computer,
                 isNeedWhiteboard: response.data.is_need_whiteboard
             }))
-            getNecessaryRquipment(response.data.is_need_computer, response.data.is_need_screen, response.data.is_need_whiteboard)
+            getNecessaryRquipment(response.data.is_need_screen, response.data.is_need_computer, response.data.is_need_whiteboard)
         } catch(e) {
             throw e
         }

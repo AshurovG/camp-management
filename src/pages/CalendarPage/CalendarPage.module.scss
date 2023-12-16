@@ -17,8 +17,7 @@
     }
 
     &-content {
-        height: 600px;
-        overflow: auto;
+        max-height: 600px;
     }
 }
 
