@@ -32,8 +32,9 @@
 
 
 
-import React, { useState } from 'react';
-
+import React, { useState, ChangeEvent } from 'react';
+import moment from 'moment';
+import 'moment/dist/locale/ru';
 import styles from './CalendarPage.module.scss'
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import DetailedEventInfo from 'components/DetailedEventInfo';
@@ -42,24 +43,36 @@ import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid' 
 import timeGridPlugin from '@fullcalendar/timegrid';
 import esLocale from '@fullcalendar/core/locales/ru';
-import { useEffect } from 'react';
-// import moment, { months } from 'moment';
-// import 'moment/dist/locale/ru';
 import { useCommon } from 'slices/MainSlice';
 import axios from 'axios'
 import { RecEventsData, EventsData } from '../../../types';
-
+import { Form } from 'react-bootstrap'
+import Button from 'components/Button';
+import CheckBox from 'components/CheckBox';
+import { useCurrentEvent } from 'slices/EventsSlice';
+ 
 const CalendarPage = () => {
+  const currentEvent = useCurrentEvent()
   const common = useCommon()
   const [events, setEvents] = useState<EventsData[]>()
-  const [isCreateModalOpened, setIsCreateModalOpened] = useState(false)
+  // const [isCreateModalOpened, setIsCreateModalOpened] = useState(false)
+  const [isModalOpened, setIsModalOpened] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState(0)
-  // const [currentEvent]
+  const [isShowEvent, setIsShowEvent] = useState(false)
+  const [isEditEvent, setIsEditEvent] = useState(false)
+  const [newStartTimeValue, setNewStartTimeValue] = useState('')
+  const [newEndTimeValue, setNewEndTimeValue] = useState('')
+  const [newTitleValue, setNewTitleValue] = useState('')
+  const [newIsNeedScreenValue, setNewIsNeedScreenValue] = useState(false)
+  const [newIsNeedComputerValue, setNewIsNeedComputerValue] = useState(false)
+  const [newIsNeedWiteboardValue, setNewIsNeedWhiteboardValue] = useState(false)
+
 
   const getEvents = async () => {
     try {
       const response = await axios('https://specializedcampbeta.roxmiv.com/api/events', {
-        method: 'GET'
+        method: 'GET',
+        withCredentials: true
       })
       const newArr = response.data.map((raw: RecEventsData) => {
         return {
@@ -82,6 +95,28 @@ const CalendarPage = () => {
   React.useEffect(() => {
     getEvents()
   }, [])
+
+  const handleEditEventButtonClick = () => {
+    setIsEditEvent(true)
+    setIsShowEvent(false)
+    if (currentEvent) {
+      setNewTitleValue(currentEvent.title)
+      setNewIsNeedComputerValue(currentEvent.isNeedComputer)
+      setNewIsNeedScreenValue(currentEvent.isNeedScreen)
+      setNewIsNeedWhiteboardValue(currentEvent.isNeedWhiteboard)
+      setNewStartTimeValue(moment(currentEvent.startTime).format('HH:mm'))
+      setNewEndTimeValue(moment(currentEvent.endTime).format('HH:mm'))
+    }
+  }
+
+  React.useEffect(() => {
+    console.log('isneeed')
+    console.log(currentEvent?.isNeedComputer)
+  }, [isEditEvent])
+
+  const handleEditEventFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+  }
 
   return (
     <div className={styles.events__page}>
@@ -113,14 +148,54 @@ const CalendarPage = () => {
            }}
            eventClick={(info) => {
             console.log('Clicked on event with id: ' + info.event.id);
-            setIsCreateModalOpened(true)
+            setIsModalOpened(true)
+            setIsShowEvent(true)
             setSelectedEvent(Number(info.event.id))
            }}
         />}
        </div>
      </div>
-     <ModalWindow handleBackdropClick={() => setIsCreateModalOpened(false)} active={isCreateModalOpened}>
-        {selectedEvent !== 0 && <DetailedEventInfo id={selectedEvent}/>}
+     <ModalWindow className={styles.modal} handleBackdropClick={() => setIsModalOpened(false)} active={isModalOpened}>
+        {isShowEvent && isModalOpened ? <DetailedEventInfo id={selectedEvent} handleEditEventButtonClick={handleEditEventButtonClick}/>
+        : isModalOpened &&<Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleEditEventFormSubmit(event)}
+        className={styles['form']}>
+          <h3 className={styles.modal__title}>Заполните данные</h3>
+          <div className={styles.form__item}>
+            <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => {setNewTitleValue(event.target.value)}} value={newTitleValue} className={styles.form__input} type="text" placeholder="Название события*" />
+          </div>
+          <div className={styles.form__item}>
+            <Form.Control 
+            type="time" 
+            value={ newStartTimeValue} 
+            onChange={(event) => setNewStartTimeValue(event.target.value)} 
+            className={styles.form__input} 
+            placeholder="Время начала*" 
+            />
+          </div>
+          <div className={styles.form__item}>
+            <Form.Control 
+            type="time" 
+            value={newEndTimeValue} 
+            onChange={(event) => setNewEndTimeValue(event.target.value)} 
+            className={styles.form__input} 
+            placeholder="Время завершения*" 
+            />
+          </div>
+          <div className={`${styles.form__item} ${styles['form__item-choose']}`}>
+            <p>Нужен экран?</p> 
+            <CheckBox className={styles.form__checkbox} checked={newIsNeedScreenValue} onChange={() => setNewIsNeedScreenValue(!newIsNeedScreenValue)}/>
+          </div>
+          <div className={styles.form__item}>
+            <p>Нужен компьютер?</p> 
+            <CheckBox className={styles.form__checkbox} checked={newIsNeedComputerValue} onChange={() => setNewIsNeedComputerValue(!newIsNeedComputerValue)}/>
+          </div>
+          <div className={styles.form__item}>
+            <p>Нужна доска?</p> 
+            <CheckBox className={styles.form__checkbox} checked={newIsNeedWiteboardValue} onChange={() => setNewIsNeedWhiteboardValue(!newIsNeedWiteboardValue)}/>
+          </div>
+          <Button disabled={newTitleValue ? false : true} type='submit'>Сохранить</Button>
+        </Form>
+        }
      </ModalWindow>
    </div>
   )

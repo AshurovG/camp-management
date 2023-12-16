@@ -47,7 +47,10 @@ const GroupsPage = () => {
 
   const getGroups = async () => {
     try {
-      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/groups`)
+      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/groups`, {
+        method: 'GET',
+        withCredentials: true
+      })
       dispatch(setGroupsAction(response.data))
       if (!groupValue) {
         setGroupValue(response.data[0])
@@ -63,7 +66,7 @@ const GroupsPage = () => {
     try {
       const response = await axios(`https://specializedcampbeta.roxmiv.com/api/users`, {
         method: 'GET',
-        // withCredentials: true
+        withCredentials: true
       })
 
       const newUsersArr = response.data.map((raw: RecUserData) => {
@@ -88,7 +91,7 @@ const GroupsPage = () => {
     try {
       const response = await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${id}/detailed`, {
         method: 'GET',
-        // withCredentials: true
+        withCredentials: true
       })
 
       const newMembersArr = response.data.members.map((raw: RecUserData) => {
@@ -128,7 +131,7 @@ const GroupsPage = () => {
         data: {
           "name": newGroupValue
         },
-        // withCredentials: true
+        withCredentials: true
       })
     setGroupValue(response.data)
     getGroups()
@@ -153,7 +156,7 @@ const GroupsPage = () => {
         data: {
           "name": newGroupValue
         },
-        // withCredentials: true
+        withCredentials: true
       })
       const updatedGroups = groups.map(group => {
         if (group.id === groupValue?.id) {
@@ -176,7 +179,7 @@ const GroupsPage = () => {
     try {
       await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${groupValue?.id}`, {
         method: 'DELETE',
-        // withCredentials: true
+        withCredentials: true
       })
       if (groups.length > 0 && groupValue?.id !== groups[0].id) {
         setGroupValue(groups[0])
@@ -201,7 +204,7 @@ const GroupsPage = () => {
       await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${groupValue?.id}/add_members`, {
         method: 'PATCH',
         data: addedMembers,
-        // withCredentials: true
+        withCredentials: true
       })
     } catch(e) {
       throw e
@@ -218,7 +221,7 @@ const GroupsPage = () => {
       await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${groupValue?.id}/add_children`, {
         method: 'PATCH' ,
         data: addedSubgroups,
-        // withCredentials: true
+        withCredentials: true
       })
     } catch(e) {
       throw e
@@ -235,7 +238,7 @@ const GroupsPage = () => {
       await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${groupValue?.id}/remove_members`, {
         method: 'PATCH',
         data: deletedMembers,
-        // withCredentials: true
+        withCredentials: true
       })
     } catch(e) {
       throw e
@@ -252,7 +255,7 @@ const GroupsPage = () => {
       await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${groupValue?.id}/remove_children`, {
         method: 'PATCH',
         data: deletedSubgroups,
-        // withCredentials: true
+        withCredentials: true
       })
     } catch(e) {
       throw e
@@ -272,7 +275,7 @@ const GroupsPage = () => {
           first_name: newUserFirstName,
           last_name: newUserLastName
         },
-        // withCredentials: true
+        withCredentials: true
       })
       dispatch(setUsersAction([...users, {
         id: response.data.id,

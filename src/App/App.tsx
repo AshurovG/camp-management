@@ -1,7 +1,7 @@
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify';
 import { useDispatch } from 'react-redux';
-import { useCommon, setCommonAction } from 'slices/MainSlice';
+import { setCommonAction } from 'slices/MainSlice';
 import 'react-toastify/dist/ReactToastify.css';
 import styles from './App.module.scss'
 import Header from 'components/Header'
@@ -17,10 +17,10 @@ import React from 'react';
 
 function App() {
   const dispatch = useDispatch()
-  const common = useCommon()
+  // const common = useCommon()
   const getUserInfo = async () => {
     try {
-      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/self`, {
+      await axios(`https://specializedcampbeta.roxmiv.com/api/self`, {
         method: 'GET',
         withCredentials: true
       })
@@ -33,7 +33,7 @@ function App() {
     try {
       const response = await axios(`https://specializedcampbeta.roxmiv.com/api/common/info`, {
         method: 'GET',
-        // withCredentials: true
+        withCredentials: true
       })
 
       dispatch(setCommonAction({

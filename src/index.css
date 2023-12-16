@@ -1,4 +1,4 @@
-/* #root {
+#root {
   font-family: "Nunito", sans-serif;
   background: #FEFFFF;
   min-height: 100vh;
@@ -35,7 +35,7 @@ li {
 
 ul {
   padding-inline-start: 0;
-} */
+}
 
 * {
   margin: 0;

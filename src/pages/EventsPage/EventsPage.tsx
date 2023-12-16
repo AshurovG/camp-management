@@ -68,8 +68,8 @@ const EventsPage = () => {
 
   const handleChangeButtonClick = (event: EventData) => {
     setTitleValue(event.title);
-    setTimeStart(event.timeStart);
-    setTimeEnd(event.timeEnd);
+    // setTimeStart(event.timeStart);
+    // setTimeEnd(event.timeEnd);
     setPlace(event.place);
     setIsChangeModalWindowOpened(true);
   }

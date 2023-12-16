@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+// import axios from 'axios';
 import { Link } from 'react-router-dom'
-import { toast } from 'react-toastify';
+// import { toast } from 'react-toastify';
 import styles from './Header.module.scss'
 import ProfileIcon from 'components/Icons/ProfileIcon';
 import ProfileWindow from 'components/ProfileWindow';
@@ -12,18 +12,18 @@ const Header: React.FC = () => {
     const common = useCommon()
     const [isProfileButtonClicked, setIsProfileButtonClicked] = useState(false)
 
-    const logout = async () => {
-        try {
-            const response = await axios(`https://specializedcampbeta.roxmiv.com/api/logout`, {
-                method: 'POST',
-                withCredentials: true
-            })
-            toast.success('Вы успешно вышли из систему!')
-        } catch(e) {
-            throw e
-        } finally {
-        }
-    }
+    // const logout = async () => {
+    //     try {
+    //         const response = await axios(`https://specializedcampbeta.roxmiv.com/api/logout`, {
+    //             method: 'POST',
+    //             withCredentials: true
+    //         })
+    //         toast.success('Вы успешно вышли из систему!')
+    //     } catch(e) {
+    //         throw e
+    //     } finally {
+    //     }
+    // }
 
     return (
         <div className={styles.header}>

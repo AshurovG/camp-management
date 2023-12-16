@@ -28,7 +28,7 @@ const Calendar: React.FC<CalendarProps> = ({days}) => {
                         <div className={styles['calendar__item-events']}>
                             {day.events.map((event: EventData) => (
                                 <p className={styles['calendar__item-event']}>
-                                    {event.title}  с {event.timeStart} до {event.timeEnd} 
+                                    {event.title}
                                     <br/>
                                     Место проведения: {event.place}
                                 </p>

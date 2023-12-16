@@ -45,7 +45,8 @@ const BuildingsPage = () => {
   const getBuildings = async () => {
     try {
       const response = await axios('https://specializedcampbeta.roxmiv.com/api/buildings', {
-        method: 'GET'
+        method: 'GET',
+        withCredentials: true
       })
       console.log(response.data)
       dispatch(setBuildingsAction(response.data))
@@ -64,7 +65,8 @@ const BuildingsPage = () => {
   const getRoomsFromBuilding = async (id: number) => {
     try {
       const response = await axios(`https://specializedcampbeta.roxmiv.com/api/buildings/${id}/rooms`, {
-        method: 'GET'
+        method: 'GET',
+        withCredentials: true
       })
 
       console.log(response.data)
@@ -86,7 +88,8 @@ const BuildingsPage = () => {
   const getUsersWithoutRoom = async () => {
     try {
       const response = await axios(`https://specializedcampbeta.roxmiv.com/api/users/without_rooms`, {
-        method: 'GET'
+        method: 'GET',
+        withCredentials: true
       })
 
       const newArr = response.data.map((user: RecUserData) => {
@@ -107,7 +110,8 @@ const BuildingsPage = () => {
   const getUsersFromRoom = async (buildingId: number, roomId: number) => {
     try {
       const response = await axios(`https://specializedcampbeta.roxmiv.com/api/buildings/${buildingId}/rooms/${roomId}/users`, {
-        method: 'GET'
+        method: 'GET',
+        withCredentials: true
       })
 
       const newArr = response.data.map((row: RecUserData) => {
@@ -131,7 +135,8 @@ const BuildingsPage = () => {
     try {
       await axios(`https://specializedcampbeta.roxmiv.com/api/buildings/${buildingValue?.id}/rooms/${roomValue?.id}/add_users`, {
         method: 'PATCH',
-        data: addedUsers
+        data: addedUsers,
+        withCredentials: true
       })
       clearData()
     } catch {
@@ -149,7 +154,8 @@ const BuildingsPage = () => {
     try {
       await axios(`https://specializedcampbeta.roxmiv.com/api/buildings/${buildingValue?.id}/rooms/${roomValue?.id}/remove_users`, {
         method: 'PATCH',
-        data: deletedUsers
+        data: deletedUsers,
+        withCredentials: true
       })
       clearData()
     } catch {
@@ -166,7 +172,8 @@ const BuildingsPage = () => {
   const getGroups = async () => {
     try {
       const response = await axios(`https://specializedcampbeta.roxmiv.com/api/groups`, {
-        method: 'GET'
+        method: 'GET',
+        withCredentials: true
       })
       dispatch(setGroupsAction(response.data))
       if (!groupValue) {
@@ -183,7 +190,8 @@ const BuildingsPage = () => {
         method: 'POST',
         data: {
           "name": newBuildingValue
-        }
+        },
+        withCredentials: true
       })
 
       dispatch(setBuildingsAction([...buildings, response.data]))
@@ -199,7 +207,8 @@ const BuildingsPage = () => {
         method: 'PUT',
         data: {
           "name": newBuildingValue
-        }
+        },
+        withCredentials: true
       })
 
       const updatedBuildings = buildings.map(building => {
@@ -222,7 +231,8 @@ const BuildingsPage = () => {
   const deleteBuilding = async () => {
     try {
       await axios(`https://specializedcampbeta.roxmiv.com/api/buildings/${buildingValue?.id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        withCredentials: true
       })
 
       const newArr = buildings.filter((building) => {
@@ -247,7 +257,8 @@ const BuildingsPage = () => {
         data: {
           number: Number(newRoomNumberValue),
           capacity: Number(newRoomCapacityValue)
-        }
+        },
+        withCredentials: true
       })
 
       setRoomValue(response.data)
@@ -270,7 +281,8 @@ const BuildingsPage = () => {
         data: {
           number: Number(newRoomNumberValue),
           capacity: Number(newRoomCapacityValue)
-        }
+        },
+        withCredentials: true
       })
 
       const updatedRooms = currentRooms?.map(room => {
@@ -295,7 +307,8 @@ const BuildingsPage = () => {
   const deleteRoom = async () => {
     try {
       await axios(`https://specializedcampbeta.roxmiv.com/api/buildings/${buildingValue?.id}/rooms/${roomValue?.id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        withCredentials: true
       })
 
       const newArr = currentRooms?.filter(room => {
