@@ -92,6 +92,25 @@ const CalendarPage = () => {
     }
   }
 
+  const putEvent = async (start: string, end: string) => {
+    try {
+      await axios(`https://specializedcampbeta.roxmiv.com/api/events/${currentEvent?.id}`,{
+        method: 'PATCH',
+        data: {
+          title: newTitleValue,
+          start_time: start,
+          end_time: end,
+          is_need_sreen: newIsNeedScreenValue,
+          is_need_computer: newIsNeedComputerValue,
+          is_need_whiteboard: newIsNeedWiteboardValue
+        },
+        // withCredentials: true
+      })
+    } catch {
+
+    }
+  }
+
   React.useEffect(() => {
     getEvents()
   }, [])
@@ -116,6 +135,25 @@ const CalendarPage = () => {
 
   const handleEditEventFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    const date = moment(currentEvent?.endTime);
+    console.log('было', date)
+    if (currentEvent) {
+      const startTime = moment(newStartTimeValue, 'HH:mm');
+      date.set({
+        hour: startTime.hour(),
+        minute: startTime.minute(),
+        second: startTime.second()
+       });
+      const start = date.toISOString()
+      const endTime = moment(newEndTimeValue, 'HH:mm');
+      date.set({
+        hour: endTime.hour(),
+        minute: endTime.minute(),
+        second: endTime.second()
+       });
+       const end = date.toISOString()
+       putEvent(start, end)
+    }
   }
 
   return (
