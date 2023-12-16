@@ -19,44 +19,11 @@ export type DetailedInfoProps = {
     handleEditPlaceButtonClick?: () => void;
 };
 
-const DetailedEventInfo: React.FC<DetailedInfoProps> = ({id, handleEditEventButtonClick}) => {
+const DetailedEventInfo: React.FC<DetailedInfoProps> = ({id, handleEditEventButtonClick, handleDeleteEventButtonClick}) => {
     const dispatch = useDispatch()
     const currentEvent = useCurrentEvent()
     // const [currentEvent, setCurrentEvent] = useState<EventsData>()
     const [necessaryEquipment, setNecessaryEquipment] = useState('')
-    
-    // const putEvent = async (event: EventsData) => {
-    //     try {
-    //       const response = await axios(`https://specializedcampbeta.roxmiv.com/api/events/${event.id}`, {
-    //         method: 'PUT',
-    //         data: {
-    //           title: event.title,
-    //           start_time: event.startTime,
-    //           end_time: event.endTime,
-    //           notification: event.notification,
-    //           is_need_screen: event.isNeedScreen,
-    //           is_need_computer: event.isNeedComputer,
-    //           is_need_whiteboard: event.isNeedWhiteboard
-    //         }
-    //       })
-    
-    //       dispatch(setEventsAction([events, response.data]))
-    //     } catch(e) {
-    //       throw e
-    //     }
-    //   }
-    
-    //   const deleteEvent = async (id: number) => {
-    //     try {
-    //       const response = await axios(`https://specializedcampbeta.roxmiv.com/api/events/${id}`, {
-    //         method: 'DELETE',
-    //       })
-    
-    //       // Нужно еще изменить глобальное состояние событий
-    //     } catch(e) {
-    //       throw e
-    //     }
-    //   }
 
     const getDetailedEvent = async() => {
         try {
@@ -108,7 +75,7 @@ const DetailedEventInfo: React.FC<DetailedInfoProps> = ({id, handleEditEventButt
             {currentEvent && <h5 className={styles.detailed__subtitle}> {moment(currentEvent.startTime).format('D MMMM')}, {moment(currentEvent.startTime).format('HH:mm')} - {moment(currentEvent.endTime).format('HH:mm')}</h5>}
             <div className={styles.detailed__btns}>
                 <EditIcon onClick={handleEditEventButtonClick}/>
-                <BasketIcon/>
+                <BasketIcon onClick={handleDeleteEventButtonClick}/>
                 <Button>Участники</Button>
             </div>
             <ul className={styles.detailed__list}>

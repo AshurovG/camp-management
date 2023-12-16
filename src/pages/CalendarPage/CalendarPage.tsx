@@ -96,14 +96,29 @@ const CalendarPage = () => {
           is_need_computer: newIsNeedComputerValue,
           is_need_whiteboard: newIsNeedWiteboardValue
         },
-        // withCredentials: true
+        // withCredentials: true 
       })
 
       toast.success('Событие добавлено успешно!')
     } catch(e) {
       throw e
+    } finally {
+      setIsCreateEventModalOpened(false)
     }
   }
+
+  const deleteEvent = async () => {
+    try {
+        await axios(`https://specializedcampbeta.roxmiv.com/api/events/${currentEvent?.id}`, {
+        method: 'DELETE',
+        })
+        toast.success('Событие удалено успешно!')
+    } catch(e) {
+        throw e
+    } finally {
+      setIsModalOpened(false)
+    }
+    }
 
   React.useEffect(() => {
     getEvents()
@@ -216,7 +231,7 @@ const CalendarPage = () => {
        </div>
      </div>
      <ModalWindow className={styles.modal} handleBackdropClick={() => {setIsModalOpened(false); clearData()}} active={isModalOpened}>
-        {eventWindowMode === 'showEvent' && isModalOpened ? <DetailedEventInfo id={selectedEvent} handleEditEventButtonClick={handleEditEventButtonClick}/>
+        {eventWindowMode === 'showEvent' && isModalOpened ? <DetailedEventInfo handleDeleteEventButtonClick={() => deleteEvent()} id={selectedEvent} handleEditEventButtonClick={handleEditEventButtonClick}/>
         : isModalOpened &&<Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleEditEventFormSubmit(event)}
         className={styles['form']}>
           <h3 className={styles.modal__title}>Заполните данные</h3>
@@ -310,8 +325,7 @@ const CalendarPage = () => {
             <CheckBox className={styles.form__checkbox} checked={newIsNeedWiteboardValue} onChange={() => setNewIsNeedWhiteboardValue(!newIsNeedWiteboardValue)}/>
           </div>
           <div style={{display: 'flex', justifyContent: 'space-between'}}>
-            <Button className={styles.modal__btn}  disabled={newTitleValue ? false : true} type='submit'>Сохранить</Button>
-            <Button className={styles.modal__btn} onClick={() => {setEventWindowMode('showEvent')}}>Назад</Button>
+            <Button style={{width: '100%'}}  disabled={newTitleValue ? false : true} type='submit'>Сохранить</Button>
           </div>
         </Form>
       </ModalWindow>
