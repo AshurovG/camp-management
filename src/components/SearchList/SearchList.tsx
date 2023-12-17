@@ -1,6 +1,6 @@
 import React, { useState, ChangeEvent} from 'react'
 import cn from 'classnames';
-import axios, { all } from 'axios';
+import axios from 'axios';
 import styles from './SearchList.module.scss'
 import { Form } from 'react-bootstrap';
 import { RecGroupsData, UserData, RecUserData} from '../../../types';

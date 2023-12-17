@@ -39,13 +39,19 @@ const Header: React.FC = () => {
             <div className={styles.header__wrapper}>
                 {userInfo && !isUserInfoLoading && <span className={styles.header__logo}>{common?.name}</span>}
 
-                {userInfo && !isUserInfoLoading ? <div className={styles.header__blocks}>
+                {/* {userInfo && !isUserInfoLoading ? <div className={styles.header__blocks}>
                     <Link className={styles.header__block} to='/'>Состав Лагеря</Link>
                     <Link className={styles.header__block} to='/buildings'>Размещение</Link>
                     <Link className={styles.header__block} to='/calendar'>Мероприятия</Link>
                 </div>
                 : !isUserInfoLoading && <p className={styles.header__title}>Вход в систему</p>
-                }
+                } */}
+
+                <div className={styles.header__blocks}>
+                    <Link className={styles.header__block} to='/'>Состав Лагеря</Link>
+                    <Link className={styles.header__block} to='/buildings'>Размещение</Link>
+                    <Link className={styles.header__block} to='/calendar'>Мероприятия</Link>
+                </div>
 
                 {userInfo && <div className={styles.header__icons}>
                     <div className={styles['application__icon-wrapper']}>

@@ -608,7 +608,7 @@ const BuildingsPage = () => {
   return (
     <div className={styles.settlement__page}>
         <div className={styles['settlement__page-wrapper']}>
-          <h1 className={styles['settlement__page-title']}>Помещения лагеря и расселение</h1>
+          <h1 className={styles['settlement__page-title']}>Помещения и расселение</h1>
           {isLoading ? <div className={styles.loader__wrapper}>
               <Loader className={styles.loader} size='l' />
           </div>
@@ -642,8 +642,8 @@ const BuildingsPage = () => {
                   <BasketIcon onClick={() => setIsDeleteBuildingModalOpened(true)}/>
                 </div>
               </div>
-              <div className={styles['settlement__page-content-action']}>
-                { placeValue ? <div className={styles.dropdown__wrapper}>
+              {/* <div className={styles['settlement__page-content-action']}> */}
+              { placeValue ? <div className={styles.dropdown__wrapper}>
                   <div className={styles.dropdown__content}>
                     <h4 className={styles['settlement__page-subtitle']}>Помещения</h4>
                     <Dropdown className={styles['dropdown']} onSelect={handlePlaceSelect}>
@@ -672,9 +672,8 @@ const BuildingsPage = () => {
                   </div>
                 </div>
                 : !isPlacesLoading && <div>
-                  <h4 className={styles['settlement__page-subtitle']}>В этом здании помещения не добавлены</h4>
                   <div className={styles['settlement__page-dropdowns-empty']}>
-                    <h4 className={styles['settlement__page-subtitle']}>Хотите добавить помещение?</h4>
+                    <h5 className={styles['settlement__page-text']}>Хотите добавить помещение?</h5>
                     <div className={styles.dropdown__btns}>
                       <AddButton className={styles['settlement__page-dropdowns-btn']} onClick={() => {setIsCreatePlaceModalOpened(true); clearData()}}/>
                     </div>
@@ -710,16 +709,16 @@ const BuildingsPage = () => {
                   </div>
                 </div>
                 : !isRoomsLoding && <div>
-                  <h4 className={styles['settlement__page-subtitle']}>В этом здании комнаты не добавлены</h4>
+                  {/* <h4 className={styles['settlement__page-subtitle']}>В этом здании комнаты не добавлены</h4> */}
                   <div className={styles['settlement__page-dropdowns-empty']}>
-                    <h4 className={styles['settlement__page-subtitle']}>Хотите добавить комнату?</h4>
+                  <h5 className={styles['settlement__page-text']}>Хотите добавить комнату?</h5>
                     <div className={styles.dropdown__btns}>
                       <AddButton className={styles['settlement__page-dropdowns-btn']} onClick={() => {setIsCreateRoomModalOpened(true); clearData()}}/>
                     </div>
                   </div>
               </div>  
               }
-            </div>
+            {/* </div> */}
             </div>
             {roomValue && !isUsersLoading ? <div className={styles['settlement__page-actions']}>
               <div className={styles['settlement__page-item']}>
@@ -728,7 +727,7 @@ const BuildingsPage = () => {
                 <p>Выбрано: {addedUsers.length}</p>
               </div>
               <div className={styles['settlement__page-actions-btns']}>
-                <Button disabled={usersFromRoom && (usersFromRoom.length + addedUsers.length > roomValue.capacity)} onClick={handleAddUsers}><ArrowIcon/></Button>
+                <Button className={styles['settlement__page-actions-common']} disabled={usersFromRoom && (usersFromRoom.length + addedUsers.length > roomValue.capacity)} onClick={handleAddUsers}><ArrowIcon/></Button>
                 <Button onClick={handleDeleteUsers} className={styles['settlement__page-actions-reverse']}><ArrowIcon/></Button>
               </div>
               <div className={styles['settlement__page-item']}>

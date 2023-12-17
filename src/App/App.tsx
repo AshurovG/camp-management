@@ -1,26 +1,23 @@
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify';
 import { useDispatch } from 'react-redux';
-import { setCommonAction, useUserInfo, setUserInfoAction, 
-  useIsUserInfoLoading, setIsUserInfoLoadingAction } from 'slices/MainSlice';
+import { setCommonAction, setUserInfoAction, setIsUserInfoLoadingAction } from 'slices/MainSlice';
 import 'react-toastify/dist/ReactToastify.css';
-import styles from './App.module.scss'
+// import styles from './App.module.scss'
 import Header from 'components/Header'
 import GroupsPage from 'pages/GroupsPage'
 import CalendarPage from 'pages/CalendarPage'
 import SettlementPage from 'pages/SettlementPage'
-import EventsPage from 'pages/EventsPage'
-import EventMembersPage from 'pages/EventMembersPage'
 import LoginPage from 'pages/LoginPage';
 import 'bootstrap/dist/css/bootstrap.css';
 import axios from 'axios';
 import React from 'react';
-import Loader from 'components/Loader';
+// import Loader from 'components/Loader';
 
 function App() {
   const dispatch = useDispatch()
-  const userInfo = useUserInfo()
-  const isUserInfoLoading = useIsUserInfoLoading()
+  // const userInfo = useUserInfo()
+  // const isUserInfoLoading = useIsUserInfoLoading()
   // const common = useCommon()
   const getUserInfo = async () => {
     try {
@@ -69,25 +66,25 @@ function App() {
     <div className='app'>
       <HashRouter>
         <Header></Header>
-        {isUserInfoLoading ? <div className={styles.loader__wrapper}>
+        {/* {isUserInfoLoading ? <div className={styles.loader__wrapper}>
               <Loader className={styles.loader} size='l' />
           </div>
-          : <div className={styles.content}>
+          : <div className={styles.content}> */}
           <Routes >
-            {!userInfo ? <>
+            {/* {!userInfo ? <> */}
               <Route path='/login' element={<LoginPage/>}></Route>
               <Route path="*" element={<Navigate to="/login" replace />} />
-            </>
-            :
-            <>
+            {/* </> */}
+            {/* :
+            <> */}
               <Route path='/' element={<GroupsPage/>}/>
               <Route path='/calendar' element={<CalendarPage/>}/>
               <Route path='/buildings' element={<SettlementPage/>}/>
               <Route path="*" element={<Navigate to="/" replace />} />
-            </>
-            }
+            {/* </>
+            } */}
           </Routes>
-        </div>}
+        {/* </div>} */}
       </HashRouter>
       <ToastContainer autoClose={1000} pauseOnHover={false} />
     </div>
