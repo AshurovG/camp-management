@@ -4,12 +4,12 @@ import moment from 'moment';
 import 'moment/dist/locale/ru';
 import { toast } from 'react-toastify';
 import styles from './DetailedEventInfo.module.scss'
-import { EventsData } from '../../../types';
+import { EventsData, RecGroupsData, RecUserData, UserData } from '../../../types';
 import EditIcon from 'components/Icons/EditIcon';
 import BasketIcon from 'components/Icons/BasketIcon';
 import Button from 'components/Button';
 import { useDispatch } from 'react-redux';
-import { useCurrentEvent, setCurrentEventAction } from 'slices/EventsSlice';
+import { useCurrentEvent, setCurrentEventAction, setUsersFromEventAction, setGroupsFromEventAction } from 'slices/EventsSlice';
 
 export type DetailedInfoProps = {
     id: number;
@@ -19,7 +19,7 @@ export type DetailedInfoProps = {
     handleEditPlaceButtonClick?: () => void;
 };
 
-const DetailedEventInfo: React.FC<DetailedInfoProps> = ({id, handleEditEventButtonClick, handleDeleteEventButtonClick}) => {
+const DetailedEventInfo: React.FC<DetailedInfoProps> = ({id, handleEditEventButtonClick, handleDeleteEventButtonClick, handleShowUsersButtonClick}) => {
     const dispatch = useDispatch()
     const currentEvent = useCurrentEvent()
     // const [currentEvent, setCurrentEvent] = useState<EventsData>()
@@ -43,6 +43,18 @@ const DetailedEventInfo: React.FC<DetailedInfoProps> = ({id, handleEditEventButt
                 isNeedComputer: response.data.is_need_computer,
                 isNeedWhiteboard: response.data.is_need_whiteboard
             }))
+
+            const newUsersArr = response.data.users.map((user: RecUserData) => {
+                return {
+                    id: user.id,
+                    firstName: user.first_name,
+                    lastName: user.last_name
+                }
+            })
+            dispatch(setUsersFromEventAction(newUsersArr))
+
+            dispatch(setGroupsFromEventAction(response.data.groups))
+
             getNecessaryRquipment(response.data.is_need_screen, response.data.is_need_computer, response.data.is_need_whiteboard)
         } catch(e) {
             throw e
@@ -76,7 +88,7 @@ const DetailedEventInfo: React.FC<DetailedInfoProps> = ({id, handleEditEventButt
             <div className={styles.detailed__btns}>
                 <EditIcon onClick={handleEditEventButtonClick}/>
                 <BasketIcon onClick={handleDeleteEventButtonClick}/>
-                <Button>Участники</Button>
+                <Button onClick={handleShowUsersButtonClick}>Участники</Button>
             </div>
             <ul className={styles.detailed__list}>
                <li>Необходимое оборудование: {necessaryEquipment}</li>

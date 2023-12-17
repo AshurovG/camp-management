@@ -12,18 +12,25 @@ import esLocale from '@fullcalendar/core/locales/ru';
 import { useDispatch } from 'react-redux';
 import { useCommon } from 'slices/MainSlice';
 import axios from 'axios'
-import { RecEventsData, EventsData } from '../../../types';
+import { RecEventsData, EventsData, RecUserData } from '../../../types';
 import { Form } from 'react-bootstrap'
 import Button from 'components/Button';
 import CheckBox from 'components/CheckBox';
 import Loader from 'components/Loader';
-import { useCurrentEvent, useIsEventsChanged, setIsEventsChangedAction } from 'slices/EventsSlice';
+import SearchList from 'components/SearchList';
+import ArrowIcon from 'components/Icons/ArrowIcon';
+import { useCurrentEvent, useIsEventsChanged, useUsersFromEvent, useGroupsFromEvent, setIsEventsChangedAction } from 'slices/EventsSlice';
+import { useUsers, useGroups, setUsersAction, setGroupsAction } from 'slices/GroupsSlice';
 import { toast } from 'react-toastify';
  
 const CalendarPage = () => {
   const dispatch = useDispatch()
   const currentEvent = useCurrentEvent()
   const common = useCommon()
+  const users = useUsers()
+  const groups = useGroups()
+  const usersFromEvent = useUsersFromEvent()
+  const groupsFromEvent = useGroupsFromEvent()
   const isEventsChanged = useIsEventsChanged()
   const [events, setEvents] = useState<EventsData[]>()
   // const [isCreateModalOpened, setIsCreateModalOpened] = useState(false)
@@ -127,6 +134,7 @@ const CalendarPage = () => {
   }
 
   const deleteEvent = async () => {
+    setIsEventsLoading(true)
     try {
         await axios(`https://specializedcampbeta.roxmiv.com/api/events/${currentEvent?.id}`, {
         method: 'DELETE',
@@ -136,11 +144,48 @@ const CalendarPage = () => {
         throw e
     } finally {
       setIsModalOpened(false)
+      getEvents()
     }
+  }
+
+  const getUsers = async () => {
+    try {
+      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/users`, {
+        method: 'GET',
+        withCredentials: true
+      })
+
+      const newUsersArr = response.data.map((raw: RecUserData) => {
+        return {
+          id: raw.id,
+          firstName: raw.first_name,
+          lastName: raw.last_name
+        }
+      })
+      dispatch(setUsersAction(newUsersArr))
+    } catch(e) {
+      throw e
     }
+  }
+
+  const getGroups = async () => {
+    try {
+      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/groups`, {
+        method: 'GET',
+        withCredentials: true
+      })
+      dispatch(setGroupsAction(response.data))
+    } catch(e) {
+      throw e
+    }
+  }
 
   React.useEffect(() => {
     getEvents()
+    if (users.length === 0) {
+      getUsers()
+      getGroups()
+    }
   }, [])
 
   const handleEditEventButtonClick = () => {
@@ -204,6 +249,14 @@ const CalendarPage = () => {
     clearData()
   }
 
+  const handleAddArrowClick = () => {
+
+  }
+
+  const handleDeleteArrowClick = () => {
+
+  }
+
   return (
     <div className={styles.events__page}>
      <div className={styles['events__page-wrapper']}>
@@ -254,8 +307,8 @@ const CalendarPage = () => {
        </div>}
      </div>
      <ModalWindow className={styles.modal} handleBackdropClick={handleBackClick} active={isModalOpened}>
-        {eventWindowMode === 'showEvent' && isModalOpened ? <DetailedEventInfo handleDeleteEventButtonClick={() => deleteEvent()} id={selectedEvent} handleEditEventButtonClick={handleEditEventButtonClick}/>
-        : isModalOpened &&<Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleEditEventFormSubmit(event)}
+        {eventWindowMode === 'showEvent' && isModalOpened ? <DetailedEventInfo handleDeleteEventButtonClick={() => deleteEvent() } id={selectedEvent} handleEditEventButtonClick={handleEditEventButtonClick} handleShowUsersButtonClick={() => setEventWindowMode('showUsers')}/>
+        : eventWindowMode === 'editEvent' && isModalOpened ? <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleEditEventFormSubmit(event)}
         className={styles['form']}>
           <h3 className={styles.modal__title}>Заполните данные</h3>
           <div className={styles.form__item}>
@@ -296,6 +349,15 @@ const CalendarPage = () => {
             <Button className={styles.modal__btn} onClick={() => {setEventWindowMode('showEvent')}}>Назад</Button>
           </div>
         </Form>
+
+        : eventWindowMode === 'showUsers' && <div className={styles.modal__groups}>
+            <SearchList withActionBlock onMemberClick={(id) => {id}} members={users} subgroups={groups}/>
+            <div className={styles['modal__groups-btns']}>
+                <Button onClick={handleAddArrowClick}><ArrowIcon/></Button>
+                <Button onClick={handleDeleteArrowClick} className={styles['modal__groups-reverse']}><ArrowIcon/></Button>
+              </div>
+            <SearchList withActionBlock onMemberClick={(id) => {id}} members={usersFromEvent} subgroups={groupsFromEvent}/>
+        </div>
         }
      </ModalWindow>
 
@@ -351,6 +413,7 @@ const CalendarPage = () => {
             <Button style={{width: '100%'}}  disabled={newTitleValue ? false : true} type='submit'>Сохранить</Button>
           </div>
         </Form>
+        {/* <SearchList onMemberClick={(id) => {setSelectedUser(id); setUsersWindowMode('detailed')}} allUsers/> */}
       </ModalWindow>
    </div>
   )
