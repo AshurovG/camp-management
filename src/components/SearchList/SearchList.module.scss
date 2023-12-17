@@ -1,0 +1,150 @@
+@import 'styles/variables.scss';
+@import 'styles/mixins.scss';
+
+.list {
+    &__wrapper {
+        background-color: $brand;
+        width: 350px;
+        height: 300px;
+        overflow: auto;
+        flex-direction: column;
+        display: flex;
+        border-radius: 10px;
+        align-items: flex-start;
+        position: relative;
+    }
+
+    &__filter {
+        &-input {
+            box-shadow: none !important;
+            border-radius: 0 !important;
+
+            &:focus {
+                border-color: $brand !important;
+            }
+        }
+    }
+
+    &__action {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        gap: 5px;
+
+        &-btn {
+            width: 110px;
+            font-size: 14px;
+        }
+    }
+
+    &__options {
+        width: 100%;
+        padding: 5px !important;
+        color: $text-default;
+    }
+
+    &__option {
+        padding: 5px 0;
+        line-height: 20px;
+        
+        &:hover {
+            background-color: $brand-hover;
+            cursor: pointer;
+        }
+
+        &-active {
+            background-color: $brand-hover;
+        }
+        
+    }
+}
+
+
+.dropdown {
+    width: 100%;
+    &__toggle {
+        height: 40px;
+        width: 100%;
+        text-align-last: left;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-right: 1rem;
+        font-size: 18px;
+        border: none !important;
+        border-radius: 0 !important;
+
+        &::after {
+            color: transparent;
+        }
+
+        &:focus {
+            box-shadow: none;
+        }
+
+        &:active {
+            box-shadow: none;
+        }
+    }
+
+    &__menu {
+        width: 100%;
+        text-align-last: left;
+        max-height: 90px;
+        overflow: auto;
+        right: 0;
+        left: auto;
+
+        &-item {
+            &:active {
+                background-color: $brand !important;
+                color: red;
+            }
+        }
+    }
+
+    &__icon {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        right: 3%;
+    }
+}
+
+
+@include mediumTablet {
+    .list {
+        &__wrapper {
+            width: 350px;
+        }
+    }
+}
+
+@include smallTablet {
+    .list {
+        width: 300px;
+        &__wrapper {
+            width: 300px;
+        }
+
+        &__action {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 5px;
+        
+            &-btn {
+                width: 100px;
+                font-size: 13px;
+            }
+        }
+    }
+}
+
+@include mobileLandscape {
+    .list {
+        &__wrapper {
+            height: 180px;
+        }
+    }
+}

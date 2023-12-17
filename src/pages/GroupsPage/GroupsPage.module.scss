@@ -1,0 +1,365 @@
+@import 'styles/variables.scss';
+@import 'styles/mixins.scss';
+
+.groups__page {
+    &-wrapper {
+        max-width: 1000px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 90px;
+        padding-bottom: 50px;
+    }
+
+
+    &-title {
+        font-size: 30px;
+        color: $text-brand;
+        margin-bottom: 40px;
+        text-align: center;
+    }
+
+    &-subtitle {
+        font-size: 24px;
+        margin-bottom: 15px;
+        color: $text-brand;
+    }
+
+    &-action {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        margin-bottom: 30px;
+
+        &-btns {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+    }
+
+    &-detailed {
+        display: flex;
+        align-items: center;
+        gap: 60px;
+
+        &-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        &-reverse {
+            transform: rotate(180deg);
+        }
+    }
+
+    &-text {
+        font-size: 18px;
+        color: $text-brand;
+    }
+}
+
+
+.dropdown {
+    width: 300px;
+    min-width: 290px;
+
+    &__toggle {
+        height: 60px;
+        width: 100%;
+        text-align-last: left;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-right: 1rem;
+        font-size: 18px;
+        border: none !important;
+
+        &::after {
+            color: transparent;
+        }
+
+        &:focus {
+            box-shadow: none;
+        }
+
+        &:active {
+            box-shadow: none;
+        }
+    }
+
+    &__menu {
+        width: 100%;
+        text-align-last: left;
+        max-height: 200px;
+        overflow: auto;
+        right: 0;
+        left: auto;
+
+        &-item {
+            &:active {
+                background-color: $brand !important;
+                color: red;
+            }
+        }
+    }
+
+    &__icon {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        right: 3%;
+    }
+}
+
+.modal {
+    max-width: 95%;
+    &__title {
+        font-size: 24px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    &__delete-btns {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    &__btns {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-bottom: 10px;
+    }
+
+    &__btn {
+        width: 150px;
+    }
+
+    &__users {
+        width: 400px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    &__item {
+        width: 350px !important;
+    }
+
+    &__input {
+        height: 50px;
+        border-color: $brand !important;
+        font-size: 18px !important;
+        margin-bottom: 15px;
+    }
+}
+
+
+.loader__wrapper {
+    width: 100%;
+    height: 170px;
+    margin-top: 113px;
+    display: flex;
+    justify-content: center;
+}
+
+.loader {
+    animation: rotate 1s infinite linear;
+}
+
+
+.bloader__wrapper {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+   }
+   
+   .bloader {
+    animation: rotate 1s infinite linear;
+   }
+   
+@keyframes rotate {
+    from {
+        transform: rotate(0deg) scale(1);
+    }
+
+    to {
+        transform: rotate((800deg));
+    }
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg) scale(1);
+    }
+
+    to {
+        transform: rotate((800deg));
+    }
+}
+
+
+
+  
+@include largeTablet {
+    .groups__page {
+        &-wrapper {
+            max-width: 900px;
+        }
+
+        &-info {
+            width: 100%;
+        }
+    }
+}
+  
+@include mediumTablet {
+    .groups__page {
+        &-wrapper {
+            max-width: 800px;
+        }
+
+        &-subtitle {
+            max-width: 100%;
+        }
+
+        &-detailed {
+            gap: 20px;
+        }
+    }
+}
+  
+@include smallTablet {
+    .groups__page {
+        &-wrapper {
+            max-width: 700px;
+        }
+
+        &-subtitle {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+    }
+}
+
+@include mobileLandscape {
+    .groups__page {
+        &-wrapper {
+            max-width: 600px;
+        }
+
+        &-title {
+            font-size: 24px;
+        }
+
+        &-text {
+            text-align: center;
+        }
+
+        &-detailed {
+            flex-direction: column;
+
+            &-btns {
+                flex-direction: row;
+            }
+
+            &-reverse {
+                transform: rotate(270deg);
+            }
+
+            &-common {
+                transform: rotate(90deg);
+            }
+        }
+
+        &-action {
+            &-btns {
+                gap: 10px;
+                font-size: 13px;
+            }
+        }
+    }
+
+    .modal {
+        &__title {
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        &__btn {
+            width: 120px;
+            font-size: 14px;
+        }
+    }
+}
+  
+@include mobile {
+    .groups__page {
+        &-wrapper {
+            max-width: 500px;
+        }
+
+        &-action {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        &-action {
+            width: 300px;
+
+            &-btns {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    }
+}
+  
+@include smallMobile {
+    .groups__page {
+        &-wrapper {
+            max-width: 450px;
+        }
+
+        &-main {
+            width: 300px;
+        }
+    }
+}
+  
+@include extraSmallMobile {
+    .groups__page-wrapper {
+      max-width: 380px;
+    }
+}
+  
+@include ultraSmallMobile {
+    .groups__page {
+        &-wrapper {
+            max-width: 330px;
+        }
+    }
+}
+  
+@include tinyMobile {
+    .groups__page-wrapper {
+      max-width: 290px;
+    }
+}

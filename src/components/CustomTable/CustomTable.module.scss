@@ -1,0 +1,43 @@
+@import 'styles/variables.scss';
+@import 'styles/mixins.scss';
+
+th {
+    background-color: inherit !important;
+    color: $text-brand !important;
+    vertical-align: middle;
+}
+
+td {
+    background-color: inherit !important;
+    vertical-align: middle;
+}
+
+tr {
+    border: 1px solid #000 !important;
+}
+
+.table {
+    padding: 20px;
+
+    &__container {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    &__head {
+        padding: 20px;
+    }
+
+    &__action {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: flex-end;
+        border: none !important;
+
+        &-btn {
+            width: 120px;
+            font-size: 14px;
+        }
+    }
+}
