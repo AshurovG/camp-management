@@ -125,7 +125,7 @@ const DetailedInfo: React.FC<DetailedInfoProps> = ({id, onBackButtonClick, onDel
               Фамилия: {currentUser?.lastName}
             </li>
             {/* {currentUser?.room &&  */}
-              <li className={styles['detailed__list-item']}>Комната: № {5}</li>
+              {currentUser.room && <li className={styles['detailed__list-item']}>Комната: № {currentUser.room?.number}</li>}
             {currentUser?.appGroups.length !== 0 && (
             <li>
               Группа: {currentUser?.appGroups.map((group, index) => (

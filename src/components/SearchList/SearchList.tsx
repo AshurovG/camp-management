@@ -1,6 +1,6 @@
 import React, { useState, ChangeEvent} from 'react'
 import cn from 'classnames';
-import axios from 'axios';
+import axios, { all } from 'axios';
 import styles from './SearchList.module.scss'
 import { Form } from 'react-bootstrap';
 import { RecGroupsData, UserData, RecUserData} from '../../../types';
@@ -104,7 +104,11 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
       };
 
     React.useEffect(() => {
-        if (subgroups && inputValue) {
+        if (!inputValue && !allUsers) {
+            setFilteredMembers(members)
+            setFilteredSubgroups(subgroups)
+        }
+         if (subgroups && inputValue) {
             subgroupSearch()
         }
 
