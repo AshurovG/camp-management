@@ -1,7 +1,8 @@
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify';
 import { useDispatch } from 'react-redux';
-import { setCommonAction } from 'slices/MainSlice';
+import { setCommonAction, useUserInfo, setUserInfoAction, 
+  useIsUserInfoLoading, setIsUserInfoLoadingAction } from 'slices/MainSlice';
 import 'react-toastify/dist/ReactToastify.css';
 import styles from './App.module.scss'
 import Header from 'components/Header'
@@ -14,18 +15,29 @@ import LoginPage from 'pages/LoginPage';
 import 'bootstrap/dist/css/bootstrap.css';
 import axios from 'axios';
 import React from 'react';
+import Loader from 'components/Loader';
 
 function App() {
   const dispatch = useDispatch()
+  const userInfo = useUserInfo()
+  const isUserInfoLoading = useIsUserInfoLoading()
   // const common = useCommon()
   const getUserInfo = async () => {
     try {
-      await axios(`https://specializedcampbeta.roxmiv.com/api/self`, {
+      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/self`, {
         method: 'GET',
         withCredentials: true
       })
+
+      dispatch(setUserInfoAction({
+        id: response.data.id,
+        firstName: response.data.first_name,
+        lastName: response.data.last_name
+      }))
     } catch {
       
+    } finally {
+      dispatch(setIsUserInfoLoadingAction(false))
     }
   }
 
@@ -57,21 +69,25 @@ function App() {
     <div className='app'>
       <HashRouter>
         <Header></Header>
-        <div className={styles.content}>
+        {isUserInfoLoading ? <div className={styles.loader__wrapper}>
+              <Loader className={styles.loader} size='l' />
+          </div>
+          : <div className={styles.content}>
           <Routes >
-            <Route path='/login' element={<LoginPage/>}></Route>
-            <Route path='/' element={<GroupsPage/>}/>
-            <Route path='/calendar' element={<CalendarPage/>}/>
-            <Route path='/buildings' element={<SettlementPage/>}/>
-            <Route path="/events">
-              <Route path=":id" element={<EventsPage />} />
-            </Route>
-            <Route path="/events_members">
-              <Route path=":id" element={<EventMembersPage />} />
-            </Route>
-            <Route path="*" element={<Navigate to="/" replace />} />
+            {!userInfo ? <>
+              <Route path='/login' element={<LoginPage/>}></Route>
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </>
+            :
+            <>
+              <Route path='/' element={<GroupsPage/>}/>
+              <Route path='/calendar' element={<CalendarPage/>}/>
+              <Route path='/buildings' element={<SettlementPage/>}/>
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </>
+            }
           </Routes>
-        </div>
+        </div>}
       </HashRouter>
       <ToastContainer autoClose={1000} pauseOnHover={false} />
     </div>

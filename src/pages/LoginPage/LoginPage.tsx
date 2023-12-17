@@ -4,9 +4,14 @@ import { toast } from 'react-toastify';
 import styles from './LoginPage.module.scss'
 import {Form} from 'react-bootstrap'
 import Button from 'components/Button'
+import { useDispatch } from 'react-redux';
+import { setUserInfoAction } from 'slices/MainSlice';
+import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
     const [passwordValue, setPasswordValue] = useState('')
+    const dispatch = useDispatch()
+    const navigate = useNavigate();
 
     const login = async () => {
         try {
@@ -16,24 +21,30 @@ const LoginPage = () => {
                 withCredentials: true
             })
             toast.success('Вы успешно вошли в систему!')
+            navigate('/')
         } catch {
             toast.error('Неверный код!')
         } finally {
+            getUserInfo()
         }
     }
 
-    // const getUserInfo = async () => {
-    //     try {
-    //       const response = await axios(`https://specializedcampbeta.roxmiv.com/api/self`, {
-    //         method: 'GET',
-    //         withCredentials: true
-    //       })
-
+    const getUserInfo = async () => {
+        try {
+          const response = await axios(`https://specializedcampbeta.roxmiv.com/api/self`, {
+            method: 'GET',
+            withCredentials: true
+          })
+    
+          dispatch(setUserInfoAction({
+            id: response.data.id,
+            firstName: response.data.first_name,
+            lastName: response.data.last_name
+          }))
+        } catch {
           
-    //     } catch {
-          
-    //     }
-    // }
+        }
+    }
     
 
     const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -46,7 +57,7 @@ const LoginPage = () => {
             <div className={styles['login__page-wrapper']}>
                 <div className={styles['login__page-content']}>
                     <h1 className={styles['login__page-title']}>Необходимо войти в систему</h1>
-                    <h4 className={styles['login__page-subtitle']}>Введите шестизначный код</h4>
+                    <h4 className={styles['login__page-subtitle']}>Введите код доступа</h4>
                     <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleFormSubmit(event)}
                     className={styles['form']}>
                         <div className={styles.form__item}>

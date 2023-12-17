@@ -1,46 +1,57 @@
-import React, { useState } from 'react';
-// import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { Link } from 'react-router-dom'
-// import { toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import styles from './Header.module.scss'
 import ProfileIcon from 'components/Icons/ProfileIcon';
 import ProfileWindow from 'components/ProfileWindow';
 import { motion, AnimatePresence } from "framer-motion";
-import { useCommon } from 'slices/MainSlice';
+import { useCommon, useUserInfo, useIsUserInfoLoading } from 'slices/MainSlice';
+import Cookies from "universal-cookie";
+
+const cookies = new Cookies();
 
 const Header: React.FC = () => {
     const common = useCommon()
+    const userInfo = useUserInfo();
+    const isUserInfoLoading = useIsUserInfoLoading()
     const [isProfileButtonClicked, setIsProfileButtonClicked] = useState(false)
 
-    // const logout = async () => {
-    //     try {
-    //         const response = await axios(`https://specializedcampbeta.roxmiv.com/api/logout`, {
-    //             method: 'POST',
-    //             withCredentials: true
-    //         })
-    //         toast.success('Вы успешно вышли из систему!')
-    //     } catch(e) {
-    //         throw e
-    //     } finally {
-    //     }
-    // }
+    useEffect(() => {
+        console.log(cookies.get('sessionid'))
+    }, [])
+
+    const logout = async () => {
+        try {
+            await axios(`https://specializedcampbeta.roxmiv.com/api/logout`, {
+                method: 'POST',
+                withCredentials: true
+            })
+            toast.success('Вы успешно вышли из системы!')
+        } catch(e) {
+            throw e
+        } finally {
+        }
+    }
 
     return (
         <div className={styles.header}>
             <div className={styles.header__wrapper}>
-                <span className={styles.header__logo}>{common?.name}</span>
+                {userInfo && !isUserInfoLoading && <span className={styles.header__logo}>{common?.name}</span>}
 
-                <div className={styles.header__blocks}>
+                {userInfo && !isUserInfoLoading ? <div className={styles.header__blocks}>
                     <Link className={styles.header__block} to='/'>Состав Лагеря</Link>
                     <Link className={styles.header__block} to='/buildings'>Размещение</Link>
                     <Link className={styles.header__block} to='/calendar'>Мероприятия</Link>
                 </div>
+                : !isUserInfoLoading && <p className={styles.header__title}>Вход в систему</p>
+                }
 
-                <div className={styles.header__icons}>
+                {userInfo && <div className={styles.header__icons}>
                     <div className={styles['application__icon-wrapper']}>
                         <ProfileIcon onClick={() => setIsProfileButtonClicked(!isProfileButtonClicked)}/>
                     </div>
-                </div>
+                </div>}
                 <AnimatePresence>
                 {isProfileButtonClicked && (
                     <motion.div
@@ -55,8 +66,8 @@ const Header: React.FC = () => {
                     }}
                     >
                     <ProfileWindow
-                        fullname={'Ашуров Георгий'}
-                        onClick={() => {}}
+                        fullname={`${userInfo?.firstName} ${userInfo?.lastName}`}
+                        onClick={() => {logout(); setIsProfileButtonClicked(false)}}
                     />
                     </motion.div>
                 )}

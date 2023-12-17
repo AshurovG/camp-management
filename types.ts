@@ -70,6 +70,12 @@ export type PublicPlaceData = {
     building: RecBuildingData
 }
 
+export type UserInfoData = {
+    id: number;
+    firstName: string;
+    lastName: string;
+}
+
 // API types
 
 export type RecBuildingData = {
