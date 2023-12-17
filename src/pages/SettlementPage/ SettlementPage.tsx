@@ -55,7 +55,6 @@ const BuildingsPage = () => {
         method: 'GET',
         withCredentials: true
       })
-      console.log(response.data)
       dispatch(setBuildingsAction(response.data))
 
       if (!buildingValue) {
@@ -78,7 +77,6 @@ const BuildingsPage = () => {
         withCredentials: true
       })
 
-      console.log(response.data)
       if (response.data.length > 0) {
         getUsersFromRoom(id, response.data[0].id)
         setCurrentRooms(response.data)
@@ -101,7 +99,6 @@ const BuildingsPage = () => {
         withCredentials: true
       })
 
-      console.log(response.data)
       if (response.data.length > 0) {
         setCurrentPlaces(response.data)
         setPlaceValue(response.data[0])
@@ -375,7 +372,6 @@ const BuildingsPage = () => {
       setPlaceValue(response.data)
       toast.success("Помещение успешно добавлено!");
       if (currentPlaces) {
-        console.log(currentPlaces, response.data)
         setCurrentPlaces([...currentPlaces, response.data])
       }
     } catch {
@@ -466,7 +462,6 @@ const BuildingsPage = () => {
     if (isCreateRoomModalOpened) {
       postRoom();
     } else {
-      console.log('put')
       putRoom()
     }
     setNewRoomCapacityValue('')
@@ -480,7 +475,6 @@ const BuildingsPage = () => {
     if (isCreatePlaceModalOpened) {
       postPlace();
     } else {
-      console.log('put')
       putPlace()
     }
     setNewPlaceNameValue('')

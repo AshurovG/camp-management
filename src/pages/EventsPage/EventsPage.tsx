@@ -75,7 +75,6 @@ const EventsPage = () => {
   }
 
   const handleConfirmDeleteButtonClick = () => {
-    console.log('confirm')
   }
 
   const handleAddButtonClick = () => {

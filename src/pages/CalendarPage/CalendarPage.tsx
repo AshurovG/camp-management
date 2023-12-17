@@ -106,7 +106,6 @@ const CalendarPage = () => {
             method: 'GET',
             withCredentials: true
         })
-        console.log(response.data)
         dispatch(setCurrentEventAction({
             id: response.data.id,
             title: response.data.title,
@@ -264,7 +263,7 @@ const CalendarPage = () => {
     } catch (e)  {
       throw e
     } finally {
-      setIsDetailedEventLoading(false)
+      setIsCurrentEventLoading(false)
     }
   }
 
@@ -372,7 +371,6 @@ const CalendarPage = () => {
   const handleEditEventFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const date = moment(currentEvent?.endTime);
-    console.log('было', date)
     if (currentEvent) {
       const startTime = moment(newStartTimeValue, 'HH:mm');
       date.set({
@@ -529,14 +527,13 @@ const CalendarPage = () => {
               text: 'Создать',
               click: function() {
                 setIsCreateEventModalOpened(true)
-                setIsDetailedEventLoading(true)
+                setIsCurrentEventLoading(true)
                 getPlaces()
                 clearData()
               }
             }
            }}
            eventClick={(info) => {
-            console.log('Clicked on event with id: ' + info.event.id);
             setIsModalOpened(true)
             setEventWindowMode('showEvent')
             setSelectedEvent(Number(info.event.id))

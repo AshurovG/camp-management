@@ -65,7 +65,6 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
                 method: 'GET',
                 withCredentials: true
             })
-            console.log(response.data)
             let newArr = []
             if (response.data.length > 0) {
                 newArr = response.data.map((member: RecUserData) => {
