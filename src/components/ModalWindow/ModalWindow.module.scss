@@ -15,6 +15,7 @@
     pointer-events: none;
     transition: .5s;
     z-index: 10;
+    overflow: auto;
 
     &.active {
         opacity: 1;

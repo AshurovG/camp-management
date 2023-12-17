@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import styles from './Header.module.scss'
 import ProfileIcon from 'components/Icons/ProfileIcon';
 import ProfileWindow from 'components/ProfileWindow';
+import BurgerIcon from 'components/Icons/BurgerIcon';
 import { motion, AnimatePresence } from "framer-motion";
 import { useCommon, useUserInfo, useIsUserInfoLoading } from 'slices/MainSlice';
 import Cookies from "universal-cookie";
@@ -16,6 +17,7 @@ const Header: React.FC = () => {
     const userInfo = useUserInfo();
     const isUserInfoLoading = useIsUserInfoLoading()
     const [isProfileButtonClicked, setIsProfileButtonClicked] = useState(false)
+    const [isBurgerMenuOpened, setIsBurgerMenuOpened] = useState(false)
 
     useEffect(() => {
         console.log(cookies.get('sessionid'))
@@ -53,11 +55,38 @@ const Header: React.FC = () => {
                     <Link className={styles.header__block} to='/calendar'>Мероприятия</Link>
                 </div>
 
-                {userInfo && <div className={styles.header__icons}>
+                {/* {userInfo && <div className={styles.header__icons}>
                     <div className={styles['application__icon-wrapper']}>
                         <ProfileIcon onClick={() => setIsProfileButtonClicked(!isProfileButtonClicked)}/>
                     </div>
-                </div>}
+                    {isBurgerMenuOpened === false
+                        ? <BurgerIcon className={styles.burger__icon} color='accent' onClick={() => setIsBurgerMenuOpened(true)} />
+                        : <div className={styles.cancel__icon} onClick={() => setIsBurgerMenuOpened(false)}></div>}
+                    {isBurgerMenuOpened &&
+                    <div className={styles.burger__menu}>
+                        <Link onClick={() => setIsBurgerMenuOpened(false)} className={styles['burger__menu-item']} to={'/'}>Состав лагеря</Link>
+                        <Link onClick={() => setIsBurgerMenuOpened(false)} className={styles['burger__menu-item']} to={`/buildings`}>Размещение</Link>
+                        <Link onClick={() => setIsBurgerMenuOpened(false)} className={styles['burger__menu-item']} to={`/calendar`}>Мероприятия</Link>
+                    </div>}
+                </div>} */}
+
+                <div className={styles.header__icons}>
+                    <div className={styles['application__icon-wrapper']}>
+                        <ProfileIcon onClick={() => setIsProfileButtonClicked(!isProfileButtonClicked)}/>
+                    </div>
+                    {isBurgerMenuOpened === false
+                        ? <BurgerIcon className={styles.burger__icon} color='accent' onClick={() => setIsBurgerMenuOpened(true)} />
+                        : <div className={styles.cancel__icon} onClick={() => setIsBurgerMenuOpened(false)}></div>}
+                    {isBurgerMenuOpened &&
+                    <div className={styles.burger__menu}>
+                        <Link onClick={() => setIsBurgerMenuOpened(false)} className={styles['burger__menu-item']} to={'/'}>Состав лагеря</Link>
+                        <Link onClick={() => setIsBurgerMenuOpened(false)} className={styles['burger__menu-item']} to={`/buildings`}>Размещение</Link>
+                        <Link onClick={() => setIsBurgerMenuOpened(false)} className={styles['burger__menu-item']} to={`/calendar`}>Мероприятия</Link>
+                    </div>}
+                </div>
+
+                
+
                 <AnimatePresence>
                 {isProfileButtonClicked && (
                     <motion.div

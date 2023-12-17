@@ -258,7 +258,7 @@
         }
 
         &-subtitle {
-            font-size: 14px;
+            font-size: 18px;
             margin-bottom: 20px;
         }
 
@@ -294,6 +294,19 @@
             &-common {
                 transform: rotate(90deg);
             }
+        }
+    }
+
+    .modal {
+        &__title {
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        &__btn {
+            width: 120px;
+            font-size: 14px;
         }
     }
 }

@@ -1,3 +1,6 @@
+@import 'styles/variables.scss';
+@import 'styles/mixins.scss';
+
 #root {
   font-family: "Nunito", sans-serif;
   background: #FEFFFF;
@@ -50,7 +53,8 @@ ul {
 
 .fc .fc-col-header-cell-cushion {
   padding: 2px 4px;
-  color: #194f4c;
+  color: $text-brand;
+  text-decoration: none;
 }
 
 .fc-view-harness .fc-view .fc-slats {
@@ -70,7 +74,16 @@ ul {
   background-image: none;
 }
 
+.fc .fc-toolbar-title {
+  font-size: 18px !important;
+ }
+
 .fc-day-grid {
   /* background: #3AAFA9 !important; */
   border: none;
+ }
+
+ .fc-event {
+  white-space: normal;
+  overflow: hidden;
  }

@@ -525,8 +525,8 @@ const GroupsPage = () => {
       <ModalWindow handleBackdropClick={handleCloseUsersWindow} active={isUsersModalWindowOpened}>
         <div className={styles.modal__users}>
           {usersWindowMode === 'show' ? <><h3 className={styles.modal__title}>Список всех участников</h3>
-          {isUsersLoading ? <div className={styles.loader__wrapper}>
-              <Loader className={styles.loader} size='l' />
+          {isUsersLoading ? <div className={styles.bloader__wrapper}>
+              <Loader className={styles.bloader} size='l' />
           </div>
           : <div className={styles['modal__users-list']}>
             <div className={styles.modal__btns}>

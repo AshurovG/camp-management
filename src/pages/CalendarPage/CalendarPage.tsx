@@ -51,6 +51,7 @@ const CalendarPage = () => {
   const [newDateValue, setNewDateValue] = useState('')
   const [isEventsLoading, setIsEventsLoading] = useState(true)
   const [isDetailedEventLoading, setIsDetailedEventLoading] = useState(false)
+  const [isCurrentEventLoading, setIsCurrentEventLoading] = useState(false)
   const [addedUsers, setAddedUsers] = useState<number[]>([])
   const [deletedUsers, setDeletedUsers] = useState<number[]>([])
   const [addedGroups, setAddedGroups] = useState<number[]>([])
@@ -262,6 +263,8 @@ const CalendarPage = () => {
       }
     } catch (e)  {
       throw e
+    } finally {
+      setIsDetailedEventLoading(false)
     }
   }
 
@@ -402,40 +405,45 @@ const CalendarPage = () => {
   }
 
   const handleBackClick = () => {
+    setEventWindowMode('showEvent')
+    setIsModalOpened(false)
     if (isEventsChanged) {
       setIsEventsLoading(true)
       getEvents()
       dispatch(setIsEventsChangedAction(false))
     }
-    setIsModalOpened(false)
     clearData()
   }
 
   const handleAddArrowClick = () => {
-    clearSelectedData()
-    setIsDetailedEventLoading(true)
-    if (addedUsers.length !== 0) {
-      addUsersToEvent()
-    }
-    if (addedGroups.length !== 0) {
-      addGroupsToEvent()
-    }
-    if (addedUsers.length !== 0 || addedGroups.length !== 0) {
-      toast.success("Информация успешно обновлена!");
+    if (addedGroups.length !== 0 || addedUsers.length !== 0) {
+      clearSelectedData()
+      setIsDetailedEventLoading(true)
+      if (addedUsers.length !== 0) {
+        addUsersToEvent()
+      }
+      if (addedGroups.length !== 0) {
+        addGroupsToEvent()
+      }
+      if (addedUsers.length !== 0 || addedGroups.length !== 0) {
+        toast.success("Информация успешно обновлена!");
+      }
     }
   }
 
   const handleDeleteArrowClick = () => {
-    clearSelectedData()
-    setIsDetailedEventLoading(true)
-    if (deletedUsers.length !== 0) {
-      deleteUsersFromEvent()
-    }
-    if (deletedGroups.length !== 0) {
-      deleteGroupsFromEvent()
-    }
-    if (deletedUsers.length !== 0 || deletedGroups.length !== 0) {
-      toast.success("Информация успешно обновлена!");
+    if (deletedGroups.length !== 0 || deletedUsers.length !== 0) {
+      clearSelectedData()
+      setIsDetailedEventLoading(true)
+      if (deletedUsers.length !== 0) {
+        deleteUsersFromEvent()
+      }
+      if (deletedGroups.length !== 0) {
+        deleteGroupsFromEvent()
+      }
+      if (deletedUsers.length !== 0 || deletedGroups.length !== 0) {
+        toast.success("Информация успешно обновлена!");
+      }
     }
   }
 
@@ -521,6 +529,7 @@ const CalendarPage = () => {
               text: 'Создать',
               click: function() {
                 setIsCreateEventModalOpened(true)
+                setIsDetailedEventLoading(true)
                 getPlaces()
                 clearData()
               }
@@ -535,11 +544,15 @@ const CalendarPage = () => {
            eventContent={(currentEvent) => {
             return { html: currentEvent.event.title };
            }}
+           allDaySlot={false}
         />}
        </div>}
      </div>
      <ModalWindow className={styles.modal} handleBackdropClick={handleBackClick} active={isModalOpened}>
-        {eventWindowMode === 'showEvent' && isModalOpened ? <DetailedEventInfo handleDeleteEventButtonClick={() => deleteEvent() } id={selectedEvent} handleEditEventButtonClick={handleEditEventButtonClick} handleShowUsersButtonClick={() => setEventWindowMode('showUsers')} handleEditPlaceButtonClick={handleEditPlaceButtonClick}/>
+        {eventWindowMode === 'showEvent' && isModalOpened && isCurrentEventLoading ? <div className={styles.bloader__wrapper}>
+              <Loader className={styles.bloader} size='l' />
+          </div>
+         : eventWindowMode === 'showEvent' && isModalOpened ? <DetailedEventInfo handleDeleteEventButtonClick={() => deleteEvent() } id={selectedEvent} handleEditEventButtonClick={handleEditEventButtonClick} handleShowUsersButtonClick={() => setEventWindowMode('showUsers')} handleEditPlaceButtonClick={handleEditPlaceButtonClick}/>
         : eventWindowMode === 'editEvent' && isModalOpened ? <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleEditEventFormSubmit(event)}
         className={styles['form']}>
           <h3 className={styles.modal__title}>Заполните данные</h3>
@@ -603,8 +616,8 @@ const CalendarPage = () => {
         </Form>
 
         : eventWindowMode === 'showUsers' ? <div className={styles.modal__lists}>
-          {isDetailedEventLoading ? <div className={styles.loader__wrapper}>
-              <Loader className={styles.loader} size='l' />
+          {isDetailedEventLoading ? <div className={styles.bloader__wrapper}>
+              <Loader className={styles.bloader} size='l' />
           </div>
           : eventWindowMode === 'showUsers' && isModalOpened && <>
           <Button className={styles['modal__lists-btn']} onClick={() => {setEventWindowMode('showEvent')}}>Назад</Button>
@@ -615,7 +628,7 @@ const CalendarPage = () => {
               <p>Выбрано: {addedGroups.length + addedUsers.length}</p>
             </div>
               <div className={styles['modal__groups-btns']}>
-                  <Button onClick={handleAddArrowClick}><ArrowIcon/></Button>
+                  <Button onClick={handleAddArrowClick} className={styles['modal__groups-common']}><ArrowIcon/></Button>
                   <Button onClick={handleDeleteArrowClick} className={styles['modal__groups-reverse']}><ArrowIcon/></Button>
                 </div>
             <div>
@@ -626,7 +639,7 @@ const CalendarPage = () => {
             </>
           }
         </div>
-        : <div>
+        : isModalOpened && <div>
           <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleEditPlaceSubmit(event)}
             className={styles['form']}>
           <div className={styles.form__item}>
@@ -737,3 +750,4 @@ const CalendarPage = () => {
 }
 
 export default CalendarPage
+
