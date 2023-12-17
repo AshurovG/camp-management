@@ -12,14 +12,14 @@ import esLocale from '@fullcalendar/core/locales/ru';
 import { useDispatch } from 'react-redux';
 import { useCommon } from 'slices/MainSlice';
 import axios from 'axios'
-import { RecEventsData, EventsData, RecUserData } from '../../../types';
+import { RecEventsData, EventsData, RecUserData, UserData, RecGroupsData } from '../../../types';
 import { Form } from 'react-bootstrap'
 import Button from 'components/Button';
 import CheckBox from 'components/CheckBox';
 import Loader from 'components/Loader';
 import SearchList from 'components/SearchList';
 import ArrowIcon from 'components/Icons/ArrowIcon';
-import { useCurrentEvent, useIsEventsChanged, useUsersFromEvent, useGroupsFromEvent, setIsEventsChangedAction } from 'slices/EventsSlice';
+import { useCurrentEvent, useIsEventsChanged, useUsersFromEvent, useGroupsFromEvent, setIsEventsChangedAction, setCurrentEventAction, setUsersFromEventAction, setGroupsFromEventAction} from 'slices/EventsSlice';
 import { useUsers, useGroups, setUsersAction, setGroupsAction } from 'slices/GroupsSlice';
 import { toast } from 'react-toastify';
  
@@ -48,6 +48,11 @@ const CalendarPage = () => {
   const [newIsNeedWiteboardValue, setNewIsNeedWhiteboardValue] = useState(false)
   const [newDateValue, setNewDateValue] = useState('')
   const [isEventsLoading, setIsEventsLoading] = useState(true)
+  const [isDetailedEventLoading, setIsDetailedEventLoading] = useState(false)
+  const [addedUsers, setAddedUsers] = useState<number[]>([])
+  const [deletedUsers, setDeletedUsers] = useState<number[]>([])
+  const [addedGroups, setAddedGroups] = useState<number[]>([])
+  const [deletedGroups, setDeletedGroups] = useState<number[]>([])
 
   const clearData = () => {
     setNewTitleValue('')
@@ -56,6 +61,13 @@ const CalendarPage = () => {
     setNewIsNeedComputerValue(false)
     setNewIsNeedScreenValue(false)
     setNewIsNeedWhiteboardValue(false)
+  }
+
+  const clearSelectedData = () => {
+    setAddedGroups([])
+    setAddedUsers([])
+    setDeletedGroups([])
+    setDeletedUsers([])
   }
 
 
@@ -84,6 +96,42 @@ const CalendarPage = () => {
       setIsEventsLoading(false)
     }
   }
+  const getDetailedEvent = async() => {
+    try {
+        const response = await axios(`https://specializedcampbeta.roxmiv.com/api/events/${currentEvent?.id}/detailed`, {
+            method: 'GET',
+            withCredentials: true
+        })
+        console.log(response.data)
+        dispatch(setCurrentEventAction({
+            id: response.data.id,
+            title: response.data.title,
+            startTime: response.data.start_time,
+            endTime: response.data.end_time,
+            place: response.data.place,
+            notification: response.data.notification,
+            isNeedScreen: response.data.is_need_screen,
+            isNeedComputer: response.data.is_need_computer,
+            isNeedWhiteboard: response.data.is_need_whiteboard
+        }))
+
+        const newUsersArr = response.data.users.map((user: RecUserData) => {
+            return {
+                id: user.id,
+                firstName: user.first_name,
+                lastName: user.last_name
+            }
+        })
+        dispatch(setUsersFromEventAction(newUsersArr))
+
+        dispatch(setGroupsFromEventAction(response.data.groups))
+
+    } catch(e) {
+        throw e
+    } finally {
+      setIsDetailedEventLoading(false)
+    }
+}
 
   const putEvent = async (start: string, end: string) => {
     dispatch(setIsEventsChangedAction(true))
@@ -180,6 +228,62 @@ const CalendarPage = () => {
     }
   }
 
+  const addUsersToEvent = async () => {
+    try {
+      await axios(`https://specializedcampbeta.roxmiv.com/api/events/${currentEvent?.id}/add_users`, {
+        method: 'PATCH',
+        data: addedUsers,
+        // withCredentials: true
+      })
+    } catch {
+
+    } finally {
+      await getDetailedEvent()
+    }
+  }
+
+  const deleteUsersFromEvent = async () => {
+    try {
+      await axios(`https://specializedcampbeta.roxmiv.com/api/events/${currentEvent?.id}/remove_users`, {
+        method: 'PATCH',
+        data: deletedUsers,
+        // withCredentials: true
+      })
+    } catch {
+
+    } finally {
+      await getDetailedEvent()
+    }
+  }
+
+  const addGroupsToEvent = async () => {
+    try {
+      await axios(`https://specializedcampbeta.roxmiv.com/api/events/${currentEvent?.id}/add_groups`, {
+        method: 'PATCH',
+        data: addedGroups,
+        // withCredentials: true
+      })
+    } catch {
+
+    } finally {
+      await getDetailedEvent()
+    }
+  }
+
+  const deleteGroupsFromEvent = async () => {
+    try {
+      await axios(`https://specializedcampbeta.roxmiv.com/api/events/${currentEvent?.id}/remove_groups`, {
+        method: 'PATCH',
+        data: deletedGroups,
+        // withCredentials: true
+      })
+    } catch {
+
+    } finally {
+      await getDetailedEvent()
+    }
+  }
+
   React.useEffect(() => {
     getEvents()
     if (users.length === 0) {
@@ -250,11 +354,65 @@ const CalendarPage = () => {
   }
 
   const handleAddArrowClick = () => {
-
+    clearSelectedData()
+    setIsDetailedEventLoading(true)
+    if (addedUsers.length !== 0) {
+      addUsersToEvent()
+    }
+    if (addedGroups.length !== 0) {
+      addGroupsToEvent()
+    }
+    if (addedUsers.length !== 0 || addedGroups.length !== 0) {
+      toast.success("Информация успешно обновлена!");
+    }
+    // getDetailedEvent()
   }
 
   const handleDeleteArrowClick = () => {
+    clearSelectedData()
+    setIsDetailedEventLoading(true)
+    if (deletedUsers.length !== 0) {
+      deleteUsersFromEvent()
+    }
+    if (deletedGroups.length !== 0) {
+      deleteGroupsFromEvent()
+    }
+    if (deletedUsers.length !== 0 || deletedGroups.length !== 0) {
+      toast.success("Информация успешно обновлена!");
+    }
+    // getDetailedEvent()
+  }
 
+  const handleGroupAdd = (id: number) => {
+    if (addedGroups.includes(id)) {
+      setAddedGroups(addedGroups.filter(subgroupId => subgroupId !== id));
+    } else {
+      setAddedGroups([...addedGroups, id]);
+    }
+  };
+  
+  const handleUserAdd = (id: number) => {
+    if (addedUsers.includes(id)) {
+      setAddedUsers(addedUsers.filter(memberId => memberId !== id));
+    } else {
+      setAddedUsers([...addedUsers, id]);
+    }
+  };
+
+  const handleGroupDelete = (id: number) => {
+    if (deletedGroups.includes(id)) {
+      setDeletedGroups(deletedGroups.filter(subgroupId => subgroupId !== id));
+    } else {
+      setDeletedGroups([...deletedGroups, id]);
+    }
+  }
+
+  const handleUserDelete = (id: number) => {
+    if (deletedUsers.includes(id)) {
+      setDeletedUsers(deletedUsers.filter(memberId => memberId !== id));
+    } else {
+      setDeletedUsers([...deletedUsers, id]);
+    }
   }
 
   return (
@@ -351,12 +509,24 @@ const CalendarPage = () => {
         </Form>
 
         : eventWindowMode === 'showUsers' && <div className={styles.modal__groups}>
-            <SearchList withActionBlock onMemberClick={(id) => {id}} members={users} subgroups={groups}/>
+          {isDetailedEventLoading ? <div className={styles.loader__wrapper}>
+              <Loader className={styles.loader} size='l' />
+          </div>
+          : <>
+          <div>
+            <SearchList withActionBlock members={users} subgroups={groups}
+            onMemberClick={handleUserAdd} onSubgroupClick={handleGroupAdd} activeMembers={addedUsers} activeSubgroups={addedGroups}><p>Доступные участники и группы</p></SearchList>
+            <p>Выбрано: {addedGroups.length + addedUsers.length}</p>
+          </div>
             <div className={styles['modal__groups-btns']}>
                 <Button onClick={handleAddArrowClick}><ArrowIcon/></Button>
                 <Button onClick={handleDeleteArrowClick} className={styles['modal__groups-reverse']}><ArrowIcon/></Button>
               </div>
-            <SearchList withActionBlock onMemberClick={(id) => {id}} members={usersFromEvent} subgroups={groupsFromEvent}/>
+          <div>
+            <SearchList withActionBlock members={usersFromEvent} subgroups={groupsFromEvent}  onMemberClick={handleUserDelete} onSubgroupClick={handleGroupDelete} activeMembers={deletedUsers} activeSubgroups={deletedGroups}>Текущее событие</SearchList>
+            <p>Выбрано: {deletedGroups.length + deletedUsers.length}</p>
+          </div>
+          </>}
         </div>
         }
      </ModalWindow>
