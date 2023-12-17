@@ -2,9 +2,9 @@ import React, { useState } from 'react'
 import axios from 'axios';
 import moment from 'moment';
 import 'moment/dist/locale/ru';
-import { toast } from 'react-toastify';
+// import { toast } from 'react-toastify';
 import styles from './DetailedEventInfo.module.scss'
-import { EventsData, RecGroupsData, RecUserData, UserData } from '../../../types';
+import { RecUserData } from '../../../types';
 import EditIcon from 'components/Icons/EditIcon';
 import BasketIcon from 'components/Icons/BasketIcon';
 import Button from 'components/Button';
@@ -19,7 +19,7 @@ export type DetailedInfoProps = {
     handleEditPlaceButtonClick?: () => void;
 };
 
-const DetailedEventInfo: React.FC<DetailedInfoProps> = ({id, handleEditEventButtonClick, handleDeleteEventButtonClick, handleShowUsersButtonClick}) => {
+const DetailedEventInfo: React.FC<DetailedInfoProps> = ({id, handleEditEventButtonClick, handleDeleteEventButtonClick, handleShowUsersButtonClick, handleEditPlaceButtonClick}) => {
     const dispatch = useDispatch()
     const currentEvent = useCurrentEvent()
     // const [currentEvent, setCurrentEvent] = useState<EventsData>()
@@ -92,8 +92,8 @@ const DetailedEventInfo: React.FC<DetailedInfoProps> = ({id, handleEditEventButt
             </div>
             <ul className={styles.detailed__list}>
                <li>Необходимое оборудование: {necessaryEquipment}</li>
-               { currentEvent?.place ? <li className={styles['detailed__list-item-action']}><span>Место проведения: {currentEvent?.place.name} {currentEvent?.place.building.name}</span> <EditIcon/></li>
-               : <li className={styles['detailed__list-item-action']}><span>Место проведения: не установлено</span> <EditIcon/></li>
+               { currentEvent?.place ? <li className={styles['detailed__list-item-action']}><span>Место проведения: {currentEvent?.place.name} {currentEvent?.place.building.name}</span> <EditIcon onClick={handleEditPlaceButtonClick}/></li>
+               : <li className={styles['detailed__list-item-action']}><span>Место проведения: не установлено</span> <EditIcon onClick={handleEditPlaceButtonClick}/></li>
                }
             </ul>
 

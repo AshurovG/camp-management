@@ -16,7 +16,7 @@ import BasketIcon from 'components/Icons/BasketIcon';
 import EditIcon from 'components/Icons/EditIcon';
 import AddButton from 'components/Icons/AddButton';
 import Loader from 'components/Loader';
-import { RecBuildingData, RecGroupsData, RecRoomData, UserData, RecUserData } from '../../../types';
+import { RecBuildingData, RecGroupsData, RecRoomData, UserData, RecUserData, RecPublicPlacesData } from '../../../types';
 
 const BuildingsPage = () => {
   const dispatch = useDispatch()
@@ -24,6 +24,13 @@ const BuildingsPage = () => {
   const [groupValue, setGroupValue] = useState<RecGroupsData>()
   const [buildingValue, setBuildingValue] = useState<RecBuildingData>()
   const [currentRooms, setCurrentRooms] = useState<RecRoomData[]>()
+  const [currentPlaces, setCurrentPlaces] = useState<RecPublicPlacesData[]>()
+  const [newPlaceNameValue, setNewPlaceNameValue] = useState('')
+  const [placeValue, setPlaceValue] = useState<RecPublicPlacesData | null>()
+  const [isCreatePlaceModalOpened, setIsCreatePlaceModalOpened] = useState(false)
+  const [isEditPlaceModalOpened, setIsEditPlaceModalOpened] = useState(false)
+  const [isDeletePlaceModalOpened, setIsDeletePlaceModalOpened] = useState(false)
+  const [isPlacesLoading, setIsPlacesLoading] = useState(false)
   const [usersFromRoom, setUsersFromRoom] = useState<UserData[]>()
   const [roomValue, setRoomValue] = useState<RecRoomData | null>()
   const [newBuildingValue, setNewBuildingValue] = useState('')
@@ -55,7 +62,9 @@ const BuildingsPage = () => {
         setBuildingValue(response.data[0])
       }
       setIsRoomsLoading(true)
+      setIsPlacesLoading(true)
       getRoomsFromBuilding(response.data[0].id)
+      getPlacesFromBuilding(response.data[0].id)
 
     } catch(e) {
       throw e
@@ -80,6 +89,28 @@ const BuildingsPage = () => {
       }
      
       setIsRoomsLoading(false)
+    } catch(e) {
+      throw e
+    }
+  }
+
+  const getPlacesFromBuilding = async (id: number) => {
+    try {
+      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/buildings/${id}/public_places`, {
+        method: 'GET',
+        withCredentials: true
+      })
+
+      console.log(response.data)
+      if (response.data.length > 0) {
+        setCurrentPlaces(response.data)
+        setPlaceValue(response.data[0])
+      } else {
+        setCurrentPlaces([])
+        setPlaceValue(null)
+      }
+     
+      setIsPlacesLoading(false)
     } catch(e) {
       throw e
     }
@@ -232,7 +263,7 @@ const BuildingsPage = () => {
     try {
       await axios(`https://specializedcampbeta.roxmiv.com/api/buildings/${buildingValue?.id}`, {
         method: 'DELETE',
-        withCredentials: true
+        // withCredentials: true
       })
 
       const newArr = buildings.filter((building) => {
@@ -244,6 +275,7 @@ const BuildingsPage = () => {
       if (newArr.length > 0) {
         setBuildingValue(newArr[0])
         getRoomsFromBuilding(newArr[0].id)
+        getPlacesFromBuilding(newArr[0].id)
       }
     } catch(e) {
       throw e
@@ -330,6 +362,78 @@ const BuildingsPage = () => {
     }
   }
 
+  const postPlace = async () => {
+    try {
+      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/buildings/${buildingValue?.id}/public_places`, {
+        method: 'POST',
+        data: {
+          name: newPlaceNameValue
+        },
+        // withCredentials: true
+      })
+
+      setPlaceValue(response.data)
+      toast.success("Помещение успешно добавлено!");
+      if (currentPlaces) {
+        console.log(currentPlaces, response.data)
+        setCurrentPlaces([...currentPlaces, response.data])
+      }
+    } catch {
+      toast.error("Помещение с таким названием уже существует!");
+    }
+  }
+
+  const putPlace = async () => {
+    try {
+      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/buildings/${buildingValue?.id}/public_places/${placeValue?.id}`, {
+        method: 'PUT',
+        data: {
+          name: newPlaceNameValue
+        },
+        // withCredentials: true
+      })
+
+      const updatedPlaces = currentPlaces?.map(place => {
+        if (place.id === placeValue?.id) {
+          return {
+            ...place,
+            name: newPlaceNameValue,
+          };
+        }
+        return place;
+      });
+
+      setCurrentPlaces(updatedPlaces)
+      setPlaceValue(response.data)
+      toast.success("Информация успешно обновлена!");
+    } catch {
+      toast.error("Помещение с таким названием уже существует!");
+    }
+  }
+
+  const deletePlace = async () => {
+    try {
+      await axios(`https://specializedcampbeta.roxmiv.com/api/buildings/${buildingValue?.id}/public_places/${placeValue?.id}`, {
+        method: 'DELETE',
+        // withCredentials: true
+      })
+
+      const newArr = currentPlaces?.filter(place => {
+        return place.id !== placeValue?.id
+      })
+
+      setCurrentPlaces(newArr)
+      if (newArr?.length !== 0 && newArr) {
+        setPlaceValue(newArr[0])
+      } else {
+        setPlaceValue(undefined)
+      }
+      toast.success("Помещение успешно удалено!");
+    } catch {
+
+    }
+  }
+
   React.useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -371,12 +475,26 @@ const BuildingsPage = () => {
     setIsEditRoomModalOpened(false)
   }
 
+  const handlePlaceFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (isCreatePlaceModalOpened) {
+      postPlace();
+    } else {
+      console.log('put')
+      putPlace()
+    }
+    setNewPlaceNameValue('')
+    setIsCreatePlaceModalOpened(false)
+    setIsEditPlaceModalOpened(false)
+  }
+
   const handleBuildingSelect = (eventKey: string | null) => {
     if (eventKey !== null) {
       const selectedBuilding = buildings.find(building => building.id === parseInt(eventKey, 10));
       if (selectedBuilding && selectedBuilding.id !== buildingValue?.id) {
         setBuildingValue(selectedBuilding)
         getRoomsFromBuilding(selectedBuilding.id)
+        getPlacesFromBuilding(selectedBuilding.id)
       }
     }
   };
@@ -389,6 +507,15 @@ const BuildingsPage = () => {
         if (buildingValue) {
           getUsersFromRoom(buildingValue?.id, Number(eventKey))
         }
+      }
+    }
+  };
+
+  const handlePlaceSelect = (eventKey: string | null) => {
+    if (eventKey !== null) {
+      const selectedPlace = currentPlaces?.find(place => place.id === parseInt(eventKey, 10));
+      if (selectedPlace && selectedPlace.id !== placeValue?.id) {
+        setPlaceValue(selectedPlace)
       }
     }
   };
@@ -408,6 +535,13 @@ const BuildingsPage = () => {
     }
   }
 
+  const handleEditPlaceButtonClick = () => {
+    setIsEditPlaceModalOpened(true);
+    if (placeValue) {
+      setNewPlaceNameValue(placeValue.name)
+    }
+  }
+
   const handleDeleteBuildingConfirmClick = () => {
     deleteBuilding();
     clearData(); 
@@ -418,6 +552,12 @@ const BuildingsPage = () => {
     deleteRoom();
     clearData(); 
     setIsDeleteRoomModalOpened(false)
+  }
+
+  const handleDeletePlaceConfirmClick = () => {
+    deletePlace();
+    clearData(); 
+    setIsDeletePlaceModalOpened(false)
   }
 
   // const handleRoomChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -502,50 +642,90 @@ const BuildingsPage = () => {
                   <BasketIcon onClick={() => setIsDeleteBuildingModalOpened(true)}/>
                 </div>
               </div>
-              
-              { roomValue ? <div className={styles.dropdown__wrapper}>
-                <div className={styles.dropdown__content}>
-                  <h4 className={styles['settlement__page-subtitle']}>Комнаты</h4>
-                  <Dropdown className={styles['dropdown']} onSelect={handleRoomSelect}>
-                    <Dropdown.Toggle
-                        className={styles['dropdown__toggle']}
-                        style={{
-                            borderColor: '#000',
-                            backgroundColor: "#fff",
-                            color: '#000',
-                        }}
-                    >   
-                      {roomValue ? <>Комната №</> : <>Комнат нет</>} {roomValue?.number}
-                      <ArrowDownIcon className={styles.dropdown__icon}/>
-                    </Dropdown.Toggle>
-                    {roomValue && <Dropdown.Menu className={styles['dropdown__menu']}>
-                        {currentRooms?.map(room => (
-                            <Dropdown.Item className={styles['dropdown__menu-item']} key={room && room.id} eventKey={room.id}>Комната № {room.number}</Dropdown.Item>
-                        ))}
-                    </Dropdown.Menu>}
-                  </Dropdown>
-                </div>
-                <div className={styles.dropdown__btns}>
-                  <AddButton onClick={() => {setIsCreateRoomModalOpened(true); clearData()}}/>
-                  <EditIcon onClick={handleEditRoomButtonClick}/>
-                  <BasketIcon onClick={() => setIsDeleteRoomModalOpened(true)}/>
-                </div>
-              </div>
-              : !isRoomsLoding && <div>
-                <h4 className={styles['settlement__page-subtitle']}>В этом здании комнаты не добавлены</h4>
-                <div className={styles['settlement__page-dropdowns-empty']}>
-                  <h4 className={styles['settlement__page-subtitle']}>Хотите добавить комнату?</h4>
+              <div className={styles['settlement__page-content-action']}>
+                { placeValue ? <div className={styles.dropdown__wrapper}>
+                  <div className={styles.dropdown__content}>
+                    <h4 className={styles['settlement__page-subtitle']}>Помещения</h4>
+                    <Dropdown className={styles['dropdown']} onSelect={handlePlaceSelect}>
+                      <Dropdown.Toggle
+                          className={styles['dropdown__toggle']}
+                          style={{
+                              borderColor: '#000',
+                              backgroundColor: "#fff",
+                              color: '#000',
+                          }}
+                      >   
+                        {placeValue?.name}
+                        <ArrowDownIcon className={styles.dropdown__icon}/>
+                      </Dropdown.Toggle>
+                      {placeValue && <Dropdown.Menu className={styles['dropdown__menu']}>
+                          {currentPlaces?.map(place => (
+                              <Dropdown.Item className={styles['dropdown__menu-item']} key={place && place.id} eventKey={place.id}>{place.name}</Dropdown.Item>
+                          ))}
+                      </Dropdown.Menu>}
+                    </Dropdown>
+                  </div>
                   <div className={styles.dropdown__btns}>
-                    <AddButton className={styles['settlement__page-dropdowns-btn']} onClick={() => {setIsCreateRoomModalOpened(true); clearData()}}/>
+                    <AddButton onClick={() => {setIsCreatePlaceModalOpened(true); clearData()}}/>
+                    <EditIcon onClick={handleEditPlaceButtonClick}/>
+                    <BasketIcon onClick={() => setIsDeletePlaceModalOpened(true)}/>
                   </div>
                 </div>
-            </div>  
-            }
+                : !isPlacesLoading && <div>
+                  <h4 className={styles['settlement__page-subtitle']}>В этом здании помещения не добавлены</h4>
+                  <div className={styles['settlement__page-dropdowns-empty']}>
+                    <h4 className={styles['settlement__page-subtitle']}>Хотите добавить помещение?</h4>
+                    <div className={styles.dropdown__btns}>
+                      <AddButton className={styles['settlement__page-dropdowns-btn']} onClick={() => {setIsCreatePlaceModalOpened(true); clearData()}}/>
+                    </div>
+                  </div>
+              </div>  
+              }
+              { roomValue ? <div className={styles.dropdown__wrapper}>
+                  <div className={styles.dropdown__content}>
+                    <h4 className={styles['settlement__page-subtitle']}>Комнаты</h4>
+                    <Dropdown className={styles['dropdown']} onSelect={handleRoomSelect}>
+                      <Dropdown.Toggle
+                          className={styles['dropdown__toggle']}
+                          style={{
+                              borderColor: '#000',
+                              backgroundColor: "#fff",
+                              color: '#000',
+                          }}
+                      >   
+                        {roomValue ? <>Комната №</> : <>Комнат нет</>} {roomValue?.number}
+                        <ArrowDownIcon className={styles.dropdown__icon}/>
+                      </Dropdown.Toggle>
+                      {roomValue && <Dropdown.Menu className={styles['dropdown__menu']}>
+                          {currentRooms?.map(room => (
+                              <Dropdown.Item className={styles['dropdown__menu-item']} key={room && room.id} eventKey={room.id}>Комната № {room.number}</Dropdown.Item>
+                          ))}
+                      </Dropdown.Menu>}
+                    </Dropdown>
+                  </div>
+                  <div className={styles.dropdown__btns}>
+                    <AddButton onClick={() => {setIsCreateRoomModalOpened(true); clearData()}}/>
+                    <EditIcon onClick={handleEditRoomButtonClick}/>
+                    <BasketIcon onClick={() => setIsDeleteRoomModalOpened(true)}/>
+                  </div>
+                </div>
+                : !isRoomsLoding && <div>
+                  <h4 className={styles['settlement__page-subtitle']}>В этом здании комнаты не добавлены</h4>
+                  <div className={styles['settlement__page-dropdowns-empty']}>
+                    <h4 className={styles['settlement__page-subtitle']}>Хотите добавить комнату?</h4>
+                    <div className={styles.dropdown__btns}>
+                      <AddButton className={styles['settlement__page-dropdowns-btn']} onClick={() => {setIsCreateRoomModalOpened(true); clearData()}}/>
+                    </div>
+                  </div>
+              </div>  
+              }
+            </div>
             </div>
             {roomValue && !isUsersLoading ? <div className={styles['settlement__page-actions']}>
               <div className={styles['settlement__page-item']}>
                 <h4 className={styles['settlement__page-subtitle']}>Доступные участники</h4>
                 <SearchList onMemberClick={handleUserAdd} activeMembers={addedUsers} areUsersWithoutRooms/>
+                <p>Выбрано: {addedUsers.length}</p>
               </div>
               <div className={styles['settlement__page-actions-btns']}>
                 <Button disabled={usersFromRoom && (usersFromRoom.length + addedUsers.length > roomValue.capacity)} onClick={handleAddUsers}><ArrowIcon/></Button>
@@ -554,6 +734,7 @@ const BuildingsPage = () => {
               <div className={styles['settlement__page-item']}>
                 <h4 className={styles['settlement__page-subtitle']}>Вместимость: {roomValue?.capacity}</h4>
                 <SearchList onMemberClick={handleUserDelete} activeMembers={deletedUsers} members={usersFromRoom}/>
+                <p>Выбрано: {deletedUsers.length}</p>
               </div>
             </div>
             : roomValue && <div className={styles.loader__wrapper}>
@@ -605,6 +786,29 @@ const BuildingsPage = () => {
           <div className={styles['modal__delete-btns']}>
             <Button onClick={handleDeleteRoomConfirmClick} className={styles.modal__btn}>Подтвердить</Button>
             <Button onClick={() => setIsDeleteRoomModalOpened(false)} className={styles.modal__btn}>Закрыть</Button>
+          </div>
+        </ModalWindow>
+
+        <ModalWindow handleBackdropClick={() => {setIsCreatePlaceModalOpened(false); setIsEditPlaceModalOpened(false); newPlaceNameValue && setNewPlaceNameValue('')}}
+        className={styles.modal} active={isCreatePlaceModalOpened || isEditPlaceModalOpened}>
+          <h3 className={styles.modal__title}>Заполните данные</h3>
+          <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handlePlaceFormSubmit(event)}
+          className={styles['form']}>
+            <div className={styles.form__item}>
+              <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => {setNewPlaceNameValue(event.target.value); }} value={newPlaceNameValue} className={styles.form__input} type="text" placeholder="Название*" />
+            </div>
+            <Button disabled={newPlaceNameValue  ? false : true} type='submit'>Сохранить</Button>
+            {isValid ? <p style={{opacity: 0}} className={styles.modal__error}>Поля должны быть числовыми!</p>
+            : <p className={styles.modal__error}>Поля должны быть числовыми!</p>
+          }
+          </Form>
+        </ModalWindow>
+
+        <ModalWindow handleBackdropClick={() => setIsDeletePlaceModalOpened(false)} active={isDeletePlaceModalOpened} className={styles.modal}>
+          <h3 className={styles.modal__title}>Вы уверены, что хотите удалить данное помещение?</h3>
+          <div className={styles['modal__delete-btns']}>
+            <Button onClick={handleDeletePlaceConfirmClick} className={styles.modal__btn}>Подтвердить</Button>
+            <Button onClick={() => setIsDeletePlaceModalOpened(false)} className={styles.modal__btn}>Закрыть</Button>
           </div>
         </ModalWindow>
     </div>

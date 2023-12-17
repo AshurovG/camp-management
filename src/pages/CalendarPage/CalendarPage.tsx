@@ -12,13 +12,14 @@ import esLocale from '@fullcalendar/core/locales/ru';
 import { useDispatch } from 'react-redux';
 import { useCommon } from 'slices/MainSlice';
 import axios from 'axios'
-import { RecEventsData, EventsData, RecUserData, UserData, RecGroupsData } from '../../../types';
-import { Form } from 'react-bootstrap'
+import { RecEventsData, EventsData, RecUserData, PublicPlaceData } from '../../../types';
+import { Form, Dropdown } from 'react-bootstrap'
 import Button from 'components/Button';
 import CheckBox from 'components/CheckBox';
 import Loader from 'components/Loader';
 import SearchList from 'components/SearchList';
 import ArrowIcon from 'components/Icons/ArrowIcon';
+import ArrowDownIcon from 'components/Icons/ArrowDownIcon'
 import { useCurrentEvent, useIsEventsChanged, useUsersFromEvent, useGroupsFromEvent, setIsEventsChangedAction, setCurrentEventAction, setUsersFromEventAction, setGroupsFromEventAction} from 'slices/EventsSlice';
 import { useUsers, useGroups, setUsersAction, setGroupsAction } from 'slices/GroupsSlice';
 import { toast } from 'react-toastify';
@@ -33,13 +34,14 @@ const CalendarPage = () => {
   const groupsFromEvent = useGroupsFromEvent()
   const isEventsChanged = useIsEventsChanged()
   const [events, setEvents] = useState<EventsData[]>()
-  // const [isCreateModalOpened, setIsCreateModalOpened] = useState(false)
+  const [publicPlaces, setPublicPlaces] = useState<PublicPlaceData[]>()
+  const [placeValue, setPlaceValue] = useState<PublicPlaceData | null>()
+  const [isPlaceValueChanged, setIsPlaceValueChanged] = useState(false)
+  // const [newPlaceValue, setNewPlaceValue] = useState<PublicPlaceData | null>(null)
   const [isModalOpened, setIsModalOpened] = useState(false)
   const [isCreateEventModalOpened, setIsCreateEventModalOpened] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState(0)
-  const [eventWindowMode, setEventWindowMode] = useState<'showEvent' | 'editEvent' | 'showUsers'>('showEvent')
-  // const [isShowEvent, setIsShowEvent] = useState(false)
-  // const [isEditEvent, setIsEditEvent] = useState(false)
+  const [eventWindowMode, setEventWindowMode] = useState<'showEvent' | 'editEvent' | 'showUsers' | 'editPlace'>('showEvent')
   const [newStartTimeValue, setNewStartTimeValue] = useState('')
   const [newEndTimeValue, setNewEndTimeValue] = useState('')
   const [newTitleValue, setNewTitleValue] = useState('')
@@ -61,6 +63,7 @@ const CalendarPage = () => {
     setNewIsNeedComputerValue(false)
     setNewIsNeedScreenValue(false)
     setNewIsNeedWhiteboardValue(false)
+    setPlaceValue(null)
   }
 
   const clearSelectedData = () => {
@@ -156,10 +159,24 @@ const CalendarPage = () => {
     }
   }
 
+  const changePlace = async (id: number) => {
+    try {
+      await axios(`https://specializedcampbeta.roxmiv.com/api/events/${id}/change_place`, {
+        method: 'PATCH',
+        data: {
+          id: placeValue?.id,
+        },
+        // withCredentials: true
+      })
+    } catch (e) {
+      throw e
+    }
+  }
+
   const postEvent = async (start: string, end: string) => {
     setIsEventsLoading(true)
     try {
-      await axios('https://specializedcampbeta.roxmiv.com/api/events', {
+      const response =await axios('https://specializedcampbeta.roxmiv.com/api/events', {
         method: 'POST',
         data: {
           title: newTitleValue,
@@ -171,6 +188,11 @@ const CalendarPage = () => {
         },
         // withCredentials: true 
       })
+
+      if (isPlaceValueChanged) {
+        changePlace(response.data.id)
+        setIsPlaceValueChanged(false)
+      }
 
       toast.success('Событие добавлено успешно!')
     } catch(e) {
@@ -224,6 +246,21 @@ const CalendarPage = () => {
       })
       dispatch(setGroupsAction(response.data))
     } catch(e) {
+      throw e
+    }
+  }
+  
+  const getPlaces = async () => {
+    try {
+      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/public_places`, {
+        method: 'GET',
+        withCredentials: true
+      })
+      setPublicPlaces(response.data)
+      if (!currentEvent?.place) {
+        setPlaceValue(response.data[0])
+      }
+    } catch (e)  {
       throw e
     }
   }
@@ -293,7 +330,10 @@ const CalendarPage = () => {
   }, [])
 
   const handleEditEventButtonClick = () => {
+    getPlaces()
+    setPlaceValue(currentEvent?.place)
     setEventWindowMode('editEvent')
+    // setPlaceValue(currentEvent?.place)
     if (currentEvent) {
       setNewTitleValue(currentEvent.title)
       setNewIsNeedComputerValue(currentEvent.isNeedComputer)
@@ -302,6 +342,12 @@ const CalendarPage = () => {
       setNewStartTimeValue(moment(currentEvent.startTime).format('HH:mm'))
       setNewEndTimeValue(moment(currentEvent.endTime).format('HH:mm'))
     }
+  }
+
+  const handleEditPlaceButtonClick = () => {
+    setEventWindowMode('editPlace')
+    getPlaces()
+    setPlaceValue(currentEvent?.place)
   }
 
   const handleCreateEventFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -339,8 +385,20 @@ const CalendarPage = () => {
         second: endTime.second()
        });
        const end = date.toISOString()
+      //  if (isPlaceValueChanged) {
+      //   // changePlace()
+      //   setIsPlaceValueChanged(false)
+      //  }
        putEvent(start, end)
     }
+  }
+
+  const handleEditPlaceSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (currentEvent) {
+      changePlace(currentEvent?.id)
+    }
+    setEventWindowMode('showEvent')
   }
 
   const handleBackClick = () => {
@@ -365,7 +423,6 @@ const CalendarPage = () => {
     if (addedUsers.length !== 0 || addedGroups.length !== 0) {
       toast.success("Информация успешно обновлена!");
     }
-    // getDetailedEvent()
   }
 
   const handleDeleteArrowClick = () => {
@@ -380,7 +437,6 @@ const CalendarPage = () => {
     if (deletedUsers.length !== 0 || deletedGroups.length !== 0) {
       toast.success("Информация успешно обновлена!");
     }
-    // getDetailedEvent()
   }
 
   const handleGroupAdd = (id: number) => {
@@ -414,6 +470,19 @@ const CalendarPage = () => {
       setDeletedUsers([...deletedUsers, id]);
     }
   }
+
+  const handlePlaceSelect = (eventKey: string | null) => {
+    if (eventKey !== null) {
+      const selectedPlace = publicPlaces?.find(place => place.id === parseInt(eventKey, 10));
+      if (selectedPlace && selectedPlace.id !== placeValue?.id) {
+        // setIsDetailedGroupLoading(true)
+        setPlaceValue(selectedPlace)
+      }
+      if (!isPlaceValueChanged) {
+        setIsPlaceValueChanged(true)
+      }
+    }
+  };
 
   return (
     <div className={styles.events__page}>
@@ -452,6 +521,8 @@ const CalendarPage = () => {
               text: 'Создать',
               click: function() {
                 setIsCreateEventModalOpened(true)
+                getPlaces()
+                clearData()
               }
             }
            }}
@@ -461,17 +532,40 @@ const CalendarPage = () => {
             setEventWindowMode('showEvent')
             setSelectedEvent(Number(info.event.id))
            }}
+           eventContent={(currentEvent) => {
+            return { html: currentEvent.event.title };
+           }}
         />}
        </div>}
      </div>
      <ModalWindow className={styles.modal} handleBackdropClick={handleBackClick} active={isModalOpened}>
-        {eventWindowMode === 'showEvent' && isModalOpened ? <DetailedEventInfo handleDeleteEventButtonClick={() => deleteEvent() } id={selectedEvent} handleEditEventButtonClick={handleEditEventButtonClick} handleShowUsersButtonClick={() => setEventWindowMode('showUsers')}/>
+        {eventWindowMode === 'showEvent' && isModalOpened ? <DetailedEventInfo handleDeleteEventButtonClick={() => deleteEvent() } id={selectedEvent} handleEditEventButtonClick={handleEditEventButtonClick} handleShowUsersButtonClick={() => setEventWindowMode('showUsers')} handleEditPlaceButtonClick={handleEditPlaceButtonClick}/>
         : eventWindowMode === 'editEvent' && isModalOpened ? <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleEditEventFormSubmit(event)}
         className={styles['form']}>
           <h3 className={styles.modal__title}>Заполните данные</h3>
           <div className={styles.form__item}>
             <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => {setNewTitleValue(event.target.value)}} value={newTitleValue} className={styles.form__input} type="text" placeholder="Название события*" />
           </div>
+          {/* <div className={styles.form__item}>
+            <Dropdown className={styles['dropdown']} onSelect={handlePlaceSelect}>
+                  <Dropdown.Toggle
+                      className={styles['dropdown__toggle']}
+                      style={{
+                          borderColor: '#000',
+                          backgroundColor: "#fff",
+                          color: '#000',
+                      }}
+                  >   
+                      {placeValue?.name}, {placeValue?.building.name}
+                      <ArrowDownIcon className={styles.dropdown__icon}/>
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu className={styles['dropdown__menu']}>
+                      {publicPlaces?.map(place => (
+                          <Dropdown.Item className={styles['dropdown__menu-item']} key={place.id} eventKey={place.id}>{place.name}, {place.building.name}</Dropdown.Item>
+                      ))}
+                  </Dropdown.Menu>
+              </Dropdown>
+          </div> */}
           <div className={styles.form__item}>
             <Form.Control 
             type="time" 
@@ -508,25 +602,58 @@ const CalendarPage = () => {
           </div>
         </Form>
 
-        : eventWindowMode === 'showUsers' && <div className={styles.modal__groups}>
+        : eventWindowMode === 'showUsers' ? <div className={styles.modal__lists}>
           {isDetailedEventLoading ? <div className={styles.loader__wrapper}>
               <Loader className={styles.loader} size='l' />
           </div>
-          : <>
-          <div>
-            <SearchList withActionBlock members={users} subgroups={groups}
-            onMemberClick={handleUserAdd} onSubgroupClick={handleGroupAdd} activeMembers={addedUsers} activeSubgroups={addedGroups}><p>Доступные участники и группы</p></SearchList>
-            <p>Выбрано: {addedGroups.length + addedUsers.length}</p>
-          </div>
-            <div className={styles['modal__groups-btns']}>
-                <Button onClick={handleAddArrowClick}><ArrowIcon/></Button>
-                <Button onClick={handleDeleteArrowClick} className={styles['modal__groups-reverse']}><ArrowIcon/></Button>
+          : eventWindowMode === 'showUsers' && isModalOpened && <>
+          <Button className={styles['modal__lists-btn']} onClick={() => {setEventWindowMode('showEvent')}}>Назад</Button>
+          <div className={styles.modal__groups}>
+            <div>
+              <SearchList withActionBlock members={users} subgroups={groups}
+              onMemberClick={handleUserAdd} onSubgroupClick={handleGroupAdd} activeMembers={addedUsers} activeSubgroups={addedGroups}><p>Доступные участники и группы</p></SearchList>
+              <p>Выбрано: {addedGroups.length + addedUsers.length}</p>
+            </div>
+              <div className={styles['modal__groups-btns']}>
+                  <Button onClick={handleAddArrowClick}><ArrowIcon/></Button>
+                  <Button onClick={handleDeleteArrowClick} className={styles['modal__groups-reverse']}><ArrowIcon/></Button>
+                </div>
+            <div>
+              <SearchList withActionBlock members={usersFromEvent} subgroups={groupsFromEvent}  onMemberClick={handleUserDelete} onSubgroupClick={handleGroupDelete} activeMembers={deletedUsers} activeSubgroups={deletedGroups}>Текущее событие</SearchList>
+              <p>Выбрано: {deletedGroups.length + deletedUsers.length}</p>
+            </div>
+            </div>
+            </>
+          }
+        </div>
+        : <div>
+          <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleEditPlaceSubmit(event)}
+            className={styles['form']}>
+          <div className={styles.form__item}>
+            <Dropdown className={styles['dropdown']} onSelect={handlePlaceSelect}>
+                  <Dropdown.Toggle
+                      className={styles['dropdown__toggle']}
+                      style={{
+                          borderColor: '#000',
+                          backgroundColor: "#fff",
+                          color: '#000',
+                      }}
+                  >   
+                      {placeValue?.name}, {placeValue?.building.name}
+                      <ArrowDownIcon className={styles.dropdown__icon}/>
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu className={styles['dropdown__menu']}>
+                      {publicPlaces?.map(place => (
+                          <Dropdown.Item className={styles['dropdown__menu-item']} key={place.id} eventKey={place.id}>{place.name}, {place.building.name}</Dropdown.Item>
+                      ))}
+                  </Dropdown.Menu>
+              </Dropdown>
+            </div>
+              <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                <Button className={styles.modal__btn} type='submit'>Сохранить</Button>
+                <Button className={styles.modal__btn} onClick={() => {setEventWindowMode('showEvent')}}>Назад</Button>
               </div>
-          <div>
-            <SearchList withActionBlock members={usersFromEvent} subgroups={groupsFromEvent}  onMemberClick={handleUserDelete} onSubgroupClick={handleGroupDelete} activeMembers={deletedUsers} activeSubgroups={deletedGroups}>Текущее событие</SearchList>
-            <p>Выбрано: {deletedGroups.length + deletedUsers.length}</p>
-          </div>
-          </>}
+            </Form>
         </div>
         }
      </ModalWindow>
@@ -537,6 +664,26 @@ const CalendarPage = () => {
           <h3 className={styles.modal__title}>Заполните данные</h3>
           <div className={styles.form__item}>
             <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => {setNewTitleValue(event.target.value)}} value={newTitleValue} className={styles.form__input} type="text" placeholder="Название события*" />
+          </div>
+          <div className={styles.form__item}>
+            <Dropdown className={styles['dropdown']} onSelect={handlePlaceSelect}>
+                  <Dropdown.Toggle
+                      className={styles['dropdown__toggle']}
+                      style={{
+                          borderColor: '#000',
+                          backgroundColor: "#fff",
+                          color: '#000',
+                      }}
+                  >   
+                      {placeValue?.name}, {placeValue?.building.name}
+                      <ArrowDownIcon className={styles.dropdown__icon}/>
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu className={styles['dropdown__menu']}>
+                      {publicPlaces?.map(place => (
+                          <Dropdown.Item className={styles['dropdown__menu-item']} key={place.id} eventKey={place.id}>{place.name}, {place.building.name}</Dropdown.Item>
+                      ))}
+                  </Dropdown.Menu>
+              </Dropdown>
           </div>
           <div className={styles.form__item}>
           {common && <Form.Control 

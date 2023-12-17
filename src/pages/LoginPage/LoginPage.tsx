@@ -22,18 +22,18 @@ const LoginPage = () => {
         }
     }
 
-    const getUserInfo = async () => {
-        try {
-          const response = await axios(`https://specializedcampbeta.roxmiv.com/api/self`, {
-            method: 'GET',
-            withCredentials: true
-          })
+    // const getUserInfo = async () => {
+    //     try {
+    //       const response = await axios(`https://specializedcampbeta.roxmiv.com/api/self`, {
+    //         method: 'GET',
+    //         withCredentials: true
+    //       })
 
           
-        } catch {
+    //     } catch {
           
-        }
-    }
+    //     }
+    // }
     
 
     const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {

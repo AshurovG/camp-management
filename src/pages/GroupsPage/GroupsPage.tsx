@@ -487,6 +487,7 @@ const GroupsPage = () => {
               <div>
                 <SearchList withActionBlock members={filterUsers(users, detailedGroup.allMembers)} subgroups={filterGroups(groups, detailedGroup.allChildrenGroups)} onSubgroupClick={handleSubgroupAdd} onMemberClick={handleMemberAdd}
                 activeMembers={addedMembers} activeSubgroups={addedSubgroups}/>
+                <p>Выбрано: {addedMembers.length + addedSubgroups.length}</p>
               </div>
               
               <div className={styles['groups__page-detailed-btns']}>
@@ -496,6 +497,7 @@ const GroupsPage = () => {
               <div>
                 <SearchList withActionBlock members={detailedGroup.members} subgroups={detailedGroup.childrenGroups} onSubgroupClick={handleSubgroupDelete} onMemberClick={handleMemberDelete}
                 activeMembers={deletedMembers} activeSubgroups={deletedSubgroups}/>
+                <p>Выбрано: {deletedMembers.length + deletedSubgroups.length}</p>
               </div>
             </div>
           </div>}
@@ -532,6 +534,7 @@ const GroupsPage = () => {
               <AddButton onClick={() => setUsersWindowMode('create')}/>
             </div>
             <SearchList onMemberClick={(id) => {setSelectedUser(id); setUsersWindowMode('detailed')}} allUsers/>
+
           </div>}</>
           : usersWindowMode === 'create' ? <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleUserFormSubmit(event)} className={styles['form']}>
           <h3 className={styles.modal__title}>Заполните данные</h3>

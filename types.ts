@@ -64,6 +64,11 @@ export type CommonData = {
     logo: string
 }
 
+export type PublicPlaceData = {
+    id: number;
+    name: string;
+    building: RecBuildingData
+}
 
 // API types
 
