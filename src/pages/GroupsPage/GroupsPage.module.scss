@@ -9,6 +9,11 @@
         flex-direction: column;
         align-items: center;
         padding-top: 90px;
+        padding-bottom: 50px;
+    }
+
+    &-main {
+        // width: 100%;
     }
 
     &-title {
@@ -57,13 +62,12 @@
     &-text {
         font-size: 18px;
         color: $text-brand;
-        text-align: right;
     }
 }
 
 
 .dropdown {
-    width: 40%;
+    width: 300px;
     min-width: 290px;
 
     &__toggle {
@@ -182,5 +186,144 @@
 
     to {
         transform: rotate((800deg));
+    }
+}
+
+
+
+  
+@include largeTablet {
+    .groups__page {
+        &-wrapper {
+            max-width: 900px;
+        }
+
+        &-info {
+            width: 100%;
+        }
+    }
+}
+  
+@include mediumTablet {
+    .groups__page {
+        &-wrapper {
+            max-width: 800px;
+        }
+
+        &-subtitle {
+            max-width: 100%;
+        }
+
+        &-detailed {
+            gap: 20px;
+        }
+    }
+}
+  
+@include smallTablet {
+    .groups__page {
+        &-wrapper {
+            max-width: 700px;
+        }
+
+        &-subtitle {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+    }
+}
+
+@include mobileLandscape {
+    .groups__page {
+        &-wrapper {
+            max-width: 600px;
+        }
+
+        &-title {
+            font-size: 24px;
+        }
+
+        &-text {
+            text-align: center;
+        }
+
+        &-detailed {
+            flex-direction: column;
+
+            &-btns {
+                flex-direction: row;
+            }
+
+            &-reverse {
+                transform: rotate(270deg);
+            }
+
+            &-common {
+                transform: rotate(90deg);
+            }
+        }
+
+        &-action {
+            &-btns {
+                gap: 10px;
+                font-size: 13px;
+            }
+        }
+    }
+}
+  
+@include mobile {
+    .groups__page {
+        &-wrapper {
+            max-width: 500px;
+        }
+
+        &-action {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        &-detailed {}
+
+        &-action {
+            width: 300px;
+
+            &-btns {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    }
+}
+  
+@include smallMobile {
+    .groups__page {
+        &-wrapper {
+            max-width: 450px;
+        }
+
+        &-main {
+            width: 300px;
+        }
+    }
+}
+  
+@include extraSmallMobile {
+    .groups__page-wrapper {
+      max-width: 380px;
+    }
+}
+  
+@include ultraSmallMobile {
+    .groups__page {
+        &-wrapper {
+            max-width: 330px;
+        }
+    }
+}
+  
+@include tinyMobile {
+    .groups__page-wrapper {
+      max-width: 290px;
     }
 }

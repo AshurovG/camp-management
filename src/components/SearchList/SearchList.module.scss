@@ -2,7 +2,6 @@
 @import 'styles/mixins.scss';
 
 .list {
-    
     &__wrapper {
         background-color: $brand;
         width: 350px;
@@ -30,6 +29,7 @@
         display: flex;
         justify-content: space-between;
         margin-bottom: 20px;
+        gap: 5px;
 
         &-btn {
             width: 110px;
@@ -108,5 +108,43 @@
         top: 50%;
         transform: translateY(-50%);
         right: 3%;
+    }
+}
+
+
+@include mediumTablet {
+    .list {
+        &__wrapper {
+            width: 350px;
+        }
+    }
+}
+
+@include smallTablet {
+    .list {
+        width: 300px;
+        &__wrapper {
+            width: 300px;
+        }
+
+        &__action {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 5px;
+        
+            &-btn {
+                width: 100px;
+                font-size: 13px;
+            }
+        }
+    }
+}
+
+@include mobileLandscape {
+    .list {
+        &__wrapper {
+            height: 180px;
+        }
     }
 }

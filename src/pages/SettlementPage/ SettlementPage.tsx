@@ -608,7 +608,7 @@ const BuildingsPage = () => {
   return (
     <div className={styles.settlement__page}>
         <div className={styles['settlement__page-wrapper']}>
-          <h1 className={styles['settlement__page-title']}>Расселение участников лагеря</h1>
+          <h1 className={styles['settlement__page-title']}>Помещения лагеря и расселение</h1>
           {isLoading ? <div className={styles.loader__wrapper}>
               <Loader className={styles.loader} size='l' />
           </div>
@@ -616,7 +616,7 @@ const BuildingsPage = () => {
             <div className={styles['settlement__page-dropdowns']}>
               <div className={styles.dropdown__wrapper}>
                 <div className={styles.dropdown__content}>
-                  <h4 className={styles['settlement__page-subtitle']}>Группы</h4>
+                  <h4 className={styles['settlement__page-subtitle']}>Здания</h4>
                   <Dropdown className={styles['dropdown']} onSelect={handleBuildingSelect}>
                     <Dropdown.Toggle
                         className={styles['dropdown__toggle']}

@@ -453,7 +453,7 @@ const GroupsPage = () => {
           {(isDetailedGroupLoading || isAllGroupsLoading || isFilteredUsersLoading) ? <div className={styles.loader__wrapper}>
               <Loader className={styles.loader} size='l' />
           </div>
-            :<div>
+            :<div className={styles['groups__page-main']}>
              <h4 className={styles['groups__page-subtitle']}>Выберите группу</h4>
              <div className={styles['groups__page-action']}>
               <Dropdown className={styles['dropdown']} onSelect={handleGroupSelect}>
@@ -482,21 +482,20 @@ const GroupsPage = () => {
               </div>
             </div>
             <h4 className={styles['groups__page-subtitle']}>Здесь вы можете изменять состав группы</h4>
-            <p className={styles['groups__page-text']}>Участники: {detailedGroup.members.length}, Подгруппы: {detailedGroup.childrenGroups.length}</p>
             <div className={styles['groups__page-detailed']}>
               <div>
                 <SearchList withActionBlock members={filterUsers(users, detailedGroup.allMembers)} subgroups={filterGroups(groups, detailedGroup.allChildrenGroups)} onSubgroupClick={handleSubgroupAdd} onMemberClick={handleMemberAdd}
-                activeMembers={addedMembers} activeSubgroups={addedSubgroups}/>
+                activeMembers={addedMembers} activeSubgroups={addedSubgroups}><p className={styles['groups__page-text']}>Доступные участники и группы</p></SearchList>
                 <p>Выбрано: {addedMembers.length + addedSubgroups.length}</p>
               </div>
               
               <div className={styles['groups__page-detailed-btns']}>
-                <Button onClick={handleAddArrowClick}><ArrowIcon/></Button>
+                <Button onClick={handleAddArrowClick} className={styles['groups__page-detailed-common']}><ArrowIcon/></Button>
                 <Button onClick={handleDeleteArrowClick} className={styles['groups__page-detailed-reverse']}><ArrowIcon/></Button>
               </div>
               <div>
                 <SearchList withActionBlock members={detailedGroup.members} subgroups={detailedGroup.childrenGroups} onSubgroupClick={handleSubgroupDelete} onMemberClick={handleMemberDelete}
-                activeMembers={deletedMembers} activeSubgroups={deletedSubgroups}/>
+                activeMembers={deletedMembers} activeSubgroups={deletedSubgroups}> <p className={styles['groups__page-text']}>Участники: {detailedGroup.members.length}, Подгруппы: {detailedGroup.childrenGroups.length}</p></SearchList>
                 <p>Выбрано: {deletedMembers.length + deletedSubgroups.length}</p>
               </div>
             </div>
