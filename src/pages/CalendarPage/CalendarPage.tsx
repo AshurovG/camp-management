@@ -48,6 +48,7 @@ const CalendarPage = () => {
   const [newTitleValue, setNewTitleValue] = useState('')
   const [newIsNeedScreenValue, setNewIsNeedScreenValue] = useState(false)
   const [newIsNeedComputerValue, setNewIsNeedComputerValue] = useState(false)
+  const [isNeedNotification, setIsNeedNotification] = useState(false)
   const [newIsNeedWiteboardValue, setNewIsNeedWhiteboardValue] = useState(false)
   const [newDateValue, setNewDateValue] = useState('')
   const [isEventsLoading, setIsEventsLoading] = useState(true)
@@ -57,6 +58,7 @@ const CalendarPage = () => {
   const [deletedUsers, setDeletedUsers] = useState<number[]>([])
   const [addedGroups, setAddedGroups] = useState<number[]>([])
   const [deletedGroups, setDeletedGroups] = useState<number[]>([])
+  const [currentDate, setCurrentDate] = useState<string>('')
 
   const clearData = () => {
     setNewTitleValue('')
@@ -146,6 +148,7 @@ const CalendarPage = () => {
           title: newTitleValue,
           start_time: start,
           end_time: end,
+          is_need_notification: isNeedNotification,
           is_need_screen: newIsNeedScreenValue,
           is_need_computer: newIsNeedComputerValue,
           is_need_whiteboard: newIsNeedWiteboardValue
@@ -183,6 +186,7 @@ const CalendarPage = () => {
           title: newTitleValue,
           start_time: start,
           end_time: end,
+          is_need_notification: isNeedNotification,
           is_need_screen: newIsNeedScreenValue,
           is_need_computer: newIsNeedComputerValue,
           is_need_whiteboard: newIsNeedWiteboardValue
@@ -325,12 +329,18 @@ const CalendarPage = () => {
   }
 
   React.useEffect(() => {
+    if (common ) {
+      setCurrentDate(common.startDate)
+    }
+
     getEvents()
     if (users.length === 0) {
       getUsers()
       getGroups()
     }
-  }, [])
+    console.log('reload')
+    
+  }, [isEventsChanged])
 
   const handleEditEventButtonClick = () => {
     getPlaces()
@@ -356,6 +366,7 @@ const CalendarPage = () => {
   const handleCreateEventFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const date = moment(newDateValue, 'YYYY-MM-DD');
+    setCurrentDate(newDateValue)
     const startTime = moment(newStartTimeValue, 'HH:mm');
     date.hour(startTime.hour());
     date.minute(startTime.minute());
@@ -502,9 +513,9 @@ const CalendarPage = () => {
        {common && events && <FullCalendar
         height={600}
         plugins={[ dayGridPlugin, timeGridPlugin ]}
-        initialView="timeGridWeek"
+        initialView="timeGridDay"
         locale={esLocale}
-        initialDate={new Date(common?.startDate)} // Начальная дата
+        initialDate={new Date(currentDate)} // Начальная дата
         validRange={{ // Диапазон дат
           start: new Date(common?.startDate), // Минимальная дата
           end: new Date(common?.endDate) // Максимальная дата
@@ -515,6 +526,11 @@ const CalendarPage = () => {
           start: new Date(raw.startTime), // Преобразуйте start_time в объект Date
           end: new Date(raw.endTime), // Преобразуйте end_time в объект Date
          }))}
+         titleFormat={{ // добавьте это свойство
+          month: 'long',
+          year: 'numeric',
+          day: 'numeric'
+         }}
         slotLabelFormat={{ hour: '2-digit', minute: '2-digit' }}
           slotMinTime={'7:00:00'}
           slotMaxTime={'26:00:00'}
@@ -607,6 +623,10 @@ const CalendarPage = () => {
             <p>Нужна доска?</p> 
             <CheckBox className={styles.form__checkbox} checked={newIsNeedWiteboardValue} onChange={() => setNewIsNeedWhiteboardValue(!newIsNeedWiteboardValue)}/>
           </div>
+          <div className={styles.form__item}>
+            <p>Оповещение</p> 
+            <CheckBox className={styles.form__checkbox} checked={isNeedNotification} onChange={() => setIsNeedNotification(!isNeedNotification)}/>
+          </div>
           <div style={{display: 'flex', justifyContent: 'space-between'}}>
             <Button className={styles.modal__btn}  disabled={newTitleValue ? false : true} type='submit'>Сохранить</Button>
             <Button className={styles.modal__btn} onClick={() => {setEventWindowMode('showEvent')}}>Назад</Button>
@@ -650,7 +670,8 @@ const CalendarPage = () => {
                           color: '#000',
                       }}
                   >   
-                      {placeValue?.name}, {placeValue?.building.name}
+                      {placeValue ? <>{placeValue?.name}, {placeValue?.building.name}</>
+                      : <>Выберите помещение</>}
                       <ArrowDownIcon className={styles.dropdown__icon}/>
                   </Dropdown.Toggle>
                   <Dropdown.Menu className={styles['dropdown__menu']}>
@@ -686,7 +707,8 @@ const CalendarPage = () => {
                           color: '#000',
                       }}
                   >   
-                      {placeValue?.name}, {placeValue?.building.name}
+                      {placeValue ? <>{placeValue?.name}, {placeValue?.building.name}</>
+                      : <>Выберите помещение</>}
                       <ArrowDownIcon className={styles.dropdown__icon}/>
                   </Dropdown.Toggle>
                   <Dropdown.Menu className={styles['dropdown__menu']}>
@@ -737,8 +759,12 @@ const CalendarPage = () => {
             <p>Нужна доска?</p> 
             <CheckBox className={styles.form__checkbox} checked={newIsNeedWiteboardValue} onChange={() => setNewIsNeedWhiteboardValue(!newIsNeedWiteboardValue)}/>
           </div>
+          <div className={styles.form__item}>
+            <p>Оповещение</p> 
+            <CheckBox className={styles.form__checkbox} checked={isNeedNotification} onChange={() => setIsNeedNotification(!isNeedNotification)}/>
+          </div>
           <div style={{display: 'flex', justifyContent: 'space-between'}}>
-            <Button style={{width: '100%'}}  disabled={newTitleValue ? false : true} type='submit'>Сохранить</Button>
+            <Button style={{width: '100%'}}  disabled={newTitleValue && placeValue &&  newStartTimeValue && newEndTimeValue && newDateValue ? false : true} type='submit'>Сохранить</Button>
           </div>
         </Form>
         {/* <SearchList onMemberClick={(id) => {setSelectedUser(id); setUsersWindowMode('detailed')}} allUsers/> */}
