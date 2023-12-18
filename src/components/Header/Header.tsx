@@ -9,6 +9,7 @@ import BurgerIcon from 'components/Icons/BurgerIcon';
 import { motion, AnimatePresence } from "framer-motion";
 import { useCommon, useUserInfo, useIsUserInfoLoading } from 'slices/MainSlice';
 import Cookies from "universal-cookie";
+import {API_URL} from 'components/urls';
 
 const cookies = new Cookies();
 
@@ -25,7 +26,7 @@ const Header: React.FC = () => {
 
     const logout = async () => {
         try {
-            await axios(`https://specializedcampbeta.roxmiv.com/api/logout`, {
+            await axios(API_URL + `logout`, {
                 method: 'POST',
                 withCredentials: true
             })

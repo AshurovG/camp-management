@@ -10,6 +10,7 @@ import Button from 'components/Button';
 import BasketIcon from 'components/Icons/BasketIcon';
 import EditIcon from 'components/Icons/EditIcon';
 import Form from 'react-bootstrap/Form';
+import {API_URL} from 'components/urls';
 
 
 export type DetailedInfoProps = {
@@ -34,7 +35,7 @@ const DetailedInfo: React.FC<DetailedInfoProps> = ({id, onBackButtonClick, onDel
 
   const getDetailedUser = async () => {
     try {
-      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/users/${id}/detailed`, {
+      const response = await axios(API_URL + `users/${id}/detailed`, {
         method: 'GET'
       })
       setCurrentUser({
@@ -54,7 +55,7 @@ const DetailedInfo: React.FC<DetailedInfoProps> = ({id, onBackButtonClick, onDel
 
   const putUser = async () => {
     try {
-      await axios(`https://specializedcampbeta.roxmiv.com/api/users/${id}`, {
+      await axios(API_URL + `users/${id}`, {
         method: 'PATCH',
         data: {
           first_name: firstNameValue,
@@ -79,7 +80,7 @@ const DetailedInfo: React.FC<DetailedInfoProps> = ({id, onBackButtonClick, onDel
 
   const deleteUser = async () => {
     try {
-      await axios(`https://specializedcampbeta.roxmiv.com/api/users/${id}`, {
+      await axios(API_URL + API_URL + `users/${id}`, {
         method: 'DELETE'
       })
       toast.success("Участник успешно удален!");
