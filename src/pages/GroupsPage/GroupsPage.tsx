@@ -18,6 +18,7 @@ import SearchList from 'components/SearchList';
 import DetailedInfo from 'components/DetailedInfo';
 import Form from 'react-bootstrap/Form';
 import Loader from 'components/Loader';
+import {API_URL} from 'components/urls';
 
 const GroupsPage = () => {
   const dispatch = useDispatch();
@@ -47,7 +48,7 @@ const GroupsPage = () => {
 
   const getGroups = async () => {
     try {
-      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/groups`, {
+      const response = await axios(API_URL + `groups`, {
         method: 'GET',
         withCredentials: true
       })
@@ -64,7 +65,7 @@ const GroupsPage = () => {
 
   const getUsers = async () => {
     try {
-      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/users`, {
+      const response = await axios(API_URL + `users`, {
         method: 'GET',
         withCredentials: true
       })
@@ -89,7 +90,7 @@ const GroupsPage = () => {
 
   const getDetailedGroup = async (id: number) => {
     try {
-      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${id}/detailed`, {
+      const response = await axios(API_URL + `groups/${id}/detailed`, {
         method: 'GET',
         withCredentials: true
       })
@@ -126,7 +127,7 @@ const GroupsPage = () => {
 
   const postGroup = async () => {
     try {
-      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/groups`, {
+      const response = await axios(API_URL + `groups`, {
         method: 'POST',
         data: {
           "name": newGroupValue
@@ -151,7 +152,7 @@ const GroupsPage = () => {
 
   const putGroup = async () => {
     try {
-      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${groupValue?.id}`, {
+      const response = await axios(API_URL + `groups/${groupValue?.id}`, {
         method: 'PUT',
         data: {
           "name": newGroupValue
@@ -177,7 +178,7 @@ const GroupsPage = () => {
 
   const deleteGroup = async () => {
     try {
-      await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${groupValue?.id}`, {
+      await axios(API_URL + `groups/${groupValue?.id}`, {
         method: 'DELETE',
         withCredentials: true
       })
@@ -201,7 +202,7 @@ const GroupsPage = () => {
 
   const addMembersToGroup = async () => {
     try {
-      await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${groupValue?.id}/add_members`, {
+      await axios(API_URL + `groups/${groupValue?.id}/add_members`, {
         method: 'PATCH',
         data: addedMembers,
         withCredentials: true
@@ -218,7 +219,7 @@ const GroupsPage = () => {
 
   const addSubGroupsToGroup = async () => {
     try {
-      await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${groupValue?.id}/add_children`, {
+      await axios(API_URL + `groups/${groupValue?.id}/add_children`, {
         method: 'PATCH' ,
         data: addedSubgroups,
         withCredentials: true
@@ -235,7 +236,7 @@ const GroupsPage = () => {
 
   const deleteMembers = async () => {
     try {
-      await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${groupValue?.id}/remove_members`, {
+      await axios(API_URL + `groups/${groupValue?.id}/remove_members`, {
         method: 'PATCH',
         data: deletedMembers,
         withCredentials: true
@@ -252,7 +253,7 @@ const GroupsPage = () => {
 
   const deleteSubgroups = async () => {
     try {
-      await axios(`https://specializedcampbeta.roxmiv.com/api/groups/${groupValue?.id}/remove_children`, {
+      await axios(API_URL + `groups/${groupValue?.id}/remove_children`, {
         method: 'PATCH',
         data: deletedSubgroups,
         withCredentials: true
@@ -269,7 +270,7 @@ const GroupsPage = () => {
 
   const postUser = async () => {
     try {
-      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/users`, {
+      const response = await axios(API_URL + `users`, {
         method: 'POST',
         data: {
           first_name: newUserFirstName,

@@ -23,7 +23,8 @@ import ArrowDownIcon from 'components/Icons/ArrowDownIcon'
 import { useCurrentEvent, useIsEventsChanged, useUsersFromEvent, useGroupsFromEvent, setIsEventsChangedAction, setCurrentEventAction, setUsersFromEventAction, setGroupsFromEventAction} from 'slices/EventsSlice';
 import { useUsers, useGroups, setUsersAction, setGroupsAction } from 'slices/GroupsSlice';
 import { toast } from 'react-toastify';
- 
+import {API_URL} from 'components/urls';
+
 const CalendarPage = () => {
   const dispatch = useDispatch()
   const currentEvent = useCurrentEvent()
@@ -77,7 +78,7 @@ const CalendarPage = () => {
 
   const getEvents = async () => {
     try {
-      const response = await axios('https://specializedcampbeta.roxmiv.com/api/events', {
+      const response = await axios(API_URL + 'events', {
         method: 'GET',
         withCredentials: true
       })
@@ -102,7 +103,7 @@ const CalendarPage = () => {
   }
   const getDetailedEvent = async() => {
     try {
-        const response = await axios(`https://specializedcampbeta.roxmiv.com/api/events/${currentEvent?.id}/detailed`, {
+        const response = await axios(API_URL + `events/${currentEvent?.id}/detailed`, {
             method: 'GET',
             withCredentials: true
         })
@@ -139,7 +140,7 @@ const CalendarPage = () => {
   const putEvent = async (start: string, end: string) => {
     dispatch(setIsEventsChangedAction(true))
     try {
-      await axios(`https://specializedcampbeta.roxmiv.com/api/events/${currentEvent?.id}`,{
+      await axios(API_URL + `events/${currentEvent?.id}`,{
         method: 'PATCH',
         data: {
           title: newTitleValue,
@@ -161,7 +162,7 @@ const CalendarPage = () => {
 
   const changePlace = async (id: number) => {
     try {
-      await axios(`https://specializedcampbeta.roxmiv.com/api/events/${id}/change_place`, {
+      await axios(API_URL + `events/${id}/change_place`, {
         method: 'PATCH',
         data: {
           id: placeValue?.id,
@@ -176,7 +177,7 @@ const CalendarPage = () => {
   const postEvent = async (start: string, end: string) => {
     setIsEventsLoading(true)
     try {
-      const response =await axios('https://specializedcampbeta.roxmiv.com/api/events', {
+      const response =await axios(API_URL + 'events', {
         method: 'POST',
         data: {
           title: newTitleValue,
@@ -206,7 +207,7 @@ const CalendarPage = () => {
   const deleteEvent = async () => {
     setIsEventsLoading(true)
     try {
-        await axios(`https://specializedcampbeta.roxmiv.com/api/events/${currentEvent?.id}`, {
+        await axios(API_URL + `events/${currentEvent?.id}`, {
         method: 'DELETE',
         })
         toast.success('Событие удалено успешно!')
@@ -220,7 +221,7 @@ const CalendarPage = () => {
 
   const getUsers = async () => {
     try {
-      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/users`, {
+      const response = await axios(API_URL + `users`, {
         method: 'GET',
         withCredentials: true
       })
@@ -240,7 +241,7 @@ const CalendarPage = () => {
 
   const getGroups = async () => {
     try {
-      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/groups`, {
+      const response = await axios(API_URL + `groups`, {
         method: 'GET',
         withCredentials: true
       })
@@ -252,7 +253,7 @@ const CalendarPage = () => {
   
   const getPlaces = async () => {
     try {
-      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/public_places`, {
+      const response = await axios(API_URL + `public_places`, {
         method: 'GET',
         withCredentials: true
       })
@@ -269,7 +270,7 @@ const CalendarPage = () => {
 
   const addUsersToEvent = async () => {
     try {
-      await axios(`https://specializedcampbeta.roxmiv.com/api/events/${currentEvent?.id}/add_users`, {
+      await axios(API_URL + `events/${currentEvent?.id}/add_users`, {
         method: 'PATCH',
         data: addedUsers,
         // withCredentials: true
@@ -283,7 +284,7 @@ const CalendarPage = () => {
 
   const deleteUsersFromEvent = async () => {
     try {
-      await axios(`https://specializedcampbeta.roxmiv.com/api/events/${currentEvent?.id}/remove_users`, {
+      await axios(API_URL + `events/${currentEvent?.id}/remove_users`, {
         method: 'PATCH',
         data: deletedUsers,
         // withCredentials: true
@@ -297,7 +298,7 @@ const CalendarPage = () => {
 
   const addGroupsToEvent = async () => {
     try {
-      await axios(`https://specializedcampbeta.roxmiv.com/api/events/${currentEvent?.id}/add_groups`, {
+      await axios(API_URL + `events/${currentEvent?.id}/add_groups`, {
         method: 'PATCH',
         data: addedGroups,
         // withCredentials: true
@@ -311,7 +312,7 @@ const CalendarPage = () => {
 
   const deleteGroupsFromEvent = async () => {
     try {
-      await axios(`https://specializedcampbeta.roxmiv.com/api/events/${currentEvent?.id}/remove_groups`, {
+      await axios(API_URL + `events/${currentEvent?.id}/remove_groups`, {
         method: 'PATCH',
         data: deletedGroups,
         // withCredentials: true

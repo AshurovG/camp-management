@@ -12,6 +12,7 @@ import LoginPage from 'pages/LoginPage';
 import 'bootstrap/dist/css/bootstrap.css';
 import axios from 'axios';
 import React from 'react';
+import {API_URL} from 'components/urls';
 // import Loader from 'components/Loader';
 
 function App() {
@@ -21,7 +22,7 @@ function App() {
   // const common = useCommon()
   const getUserInfo = async () => {
     try {
-      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/self`, {
+      const response = await axios(API_URL + `self`, {
         method: 'GET',
         withCredentials: true
       })
@@ -40,7 +41,7 @@ function App() {
 
   const getCommonInfo = async () => {
     try {
-      const response = await axios(`https://specializedcampbeta.roxmiv.com/api/common/info`, {
+      const response = await axios(API_URL + `common/info`, {
         method: 'GET',
         withCredentials: true
       })

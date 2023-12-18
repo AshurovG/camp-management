@@ -7,6 +7,7 @@ import Button from 'components/Button'
 import { useDispatch } from 'react-redux';
 import { setUserInfoAction } from 'slices/MainSlice';
 import { useNavigate } from 'react-router-dom';
+import {API_URL} from 'components/urls';
 
 const LoginPage = () => {
     const [passwordValue, setPasswordValue] = useState('')
@@ -15,7 +16,7 @@ const LoginPage = () => {
 
     const login = async () => {
         try {
-            await axios(`https://specializedcampbeta.roxmiv.com/api/login`, {
+            await axios(API_URL + `login`, {
                 method: 'POST',
                 data: {code: passwordValue},
                 withCredentials: true
@@ -31,7 +32,7 @@ const LoginPage = () => {
 
     const getUserInfo = async () => {
         try {
-          const response = await axios(`https://specializedcampbeta.roxmiv.com/api/self`, {
+          const response = await axios(API_URL + `self`, {
             method: 'GET',
             withCredentials: true
           })
