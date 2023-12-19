@@ -171,8 +171,12 @@ const CalendarPage = () => {
         },
         // withCredentials: true
       })
+
+      toast.success('Информация успешно обновлена!')
     } catch (e) {
       throw e
+    } finally {
+      getDetailedEvent()
     }
   }
 
