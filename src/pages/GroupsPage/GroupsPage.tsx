@@ -49,8 +49,7 @@ const GroupsPage = () => {
   const getGroups = async () => {
     try {
       const response = await axios(API_URL + `groups`, {
-        method: 'GET',
-        withCredentials: true
+        method: 'GET'
       })
       dispatch(setGroupsAction(response.data))
       if (!groupValue) {
@@ -66,8 +65,7 @@ const GroupsPage = () => {
   const getUsers = async () => {
     try {
       const response = await axios(API_URL + `users`, {
-        method: 'GET',
-        withCredentials: true
+        method: 'GET'
       })
 
       const newUsersArr = response.data.map((raw: RecUserData) => {
@@ -91,8 +89,7 @@ const GroupsPage = () => {
   const getDetailedGroup = async (id: number) => {
     try {
       const response = await axios(API_URL + `groups/${id}/detailed`, {
-        method: 'GET',
-        withCredentials: true
+        method: 'GET'
       })
 
       const newMembersArr = response.data.members.map((raw: RecUserData) => {
@@ -131,8 +128,7 @@ const GroupsPage = () => {
         method: 'POST',
         data: {
           "name": newGroupValue
-        },
-        withCredentials: true
+        }
       })
     setGroupValue(response.data)
     getGroups()
@@ -156,8 +152,7 @@ const GroupsPage = () => {
         method: 'PUT',
         data: {
           "name": newGroupValue
-        },
-        withCredentials: true
+        }
       })
       const updatedGroups = groups.map(group => {
         if (group.id === groupValue?.id) {
@@ -179,8 +174,7 @@ const GroupsPage = () => {
   const deleteGroup = async () => {
     try {
       await axios(API_URL + `groups/${groupValue?.id}`, {
-        method: 'DELETE',
-        withCredentials: true
+        method: 'DELETE'
       })
       if (groups.length > 0 && groupValue?.id !== groups[0].id) {
         setGroupValue(groups[0])
@@ -204,8 +198,7 @@ const GroupsPage = () => {
     try {
       await axios(API_URL + `groups/${groupValue?.id}/add_members`, {
         method: 'PATCH',
-        data: addedMembers,
-        withCredentials: true
+        data: addedMembers
       })
     } catch(e) {
       throw e
@@ -221,8 +214,7 @@ const GroupsPage = () => {
     try {
       await axios(API_URL + `groups/${groupValue?.id}/add_children`, {
         method: 'PATCH' ,
-        data: addedSubgroups,
-        withCredentials: true
+        data: addedSubgroups
       })
     } catch(e) {
       throw e
@@ -238,8 +230,7 @@ const GroupsPage = () => {
     try {
       await axios(API_URL + `groups/${groupValue?.id}/remove_members`, {
         method: 'PATCH',
-        data: deletedMembers,
-        withCredentials: true
+        data: deletedMembers
       })
     } catch(e) {
       throw e
@@ -255,8 +246,7 @@ const GroupsPage = () => {
     try {
       await axios(API_URL + `groups/${groupValue?.id}/remove_children`, {
         method: 'PATCH',
-        data: deletedSubgroups,
-        withCredentials: true
+        data: deletedSubgroups
       })
     } catch(e) {
       throw e
@@ -275,8 +265,7 @@ const GroupsPage = () => {
         data: {
           first_name: newUserFirstName,
           last_name: newUserLastName
-        },
-        withCredentials: true
+        }
       })
       dispatch(setUsersAction([...users, {
         id: response.data.id,

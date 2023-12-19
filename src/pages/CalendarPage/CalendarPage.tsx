@@ -81,8 +81,7 @@ const CalendarPage = () => {
   const getEvents = async () => {
     try {
       const response = await axios(API_URL + 'events', {
-        method: 'GET',
-        withCredentials: true
+        method: 'GET'
       })
       const newArr = response.data.map((raw: RecEventsData) => {
         return {
@@ -106,8 +105,7 @@ const CalendarPage = () => {
   const getDetailedEvent = async() => {
     try {
         const response = await axios(API_URL + `events/${currentEvent?.id}/detailed`, {
-            method: 'GET',
-            withCredentials: true
+            method: 'GET'
         })
         dispatch(setCurrentEventAction({
             id: response.data.id,
@@ -153,7 +151,6 @@ const CalendarPage = () => {
           is_need_computer: newIsNeedComputerValue,
           is_need_whiteboard: newIsNeedWiteboardValue
         },
-        // withCredentials: true
       })
       toast.success('Информация успешно обновлена!')
     } catch(e) {
@@ -169,8 +166,7 @@ const CalendarPage = () => {
         method: 'PATCH',
         data: {
           id: placeValue?.id,
-        },
-        // withCredentials: true
+        }
       })
     } catch (e) {
       throw e
@@ -190,8 +186,7 @@ const CalendarPage = () => {
           is_need_screen: newIsNeedScreenValue,
           is_need_computer: newIsNeedComputerValue,
           is_need_whiteboard: newIsNeedWiteboardValue
-        },
-        // withCredentials: true 
+        }
       })
 
       if (isPlaceValueChanged) {
@@ -226,8 +221,7 @@ const CalendarPage = () => {
   const getUsers = async () => {
     try {
       const response = await axios(API_URL + `users`, {
-        method: 'GET',
-        withCredentials: true
+        method: 'GET'
       })
 
       const newUsersArr = response.data.map((raw: RecUserData) => {
@@ -246,8 +240,7 @@ const CalendarPage = () => {
   const getGroups = async () => {
     try {
       const response = await axios(API_URL + `groups`, {
-        method: 'GET',
-        withCredentials: true
+        method: 'GET'
       })
       dispatch(setGroupsAction(response.data))
     } catch(e) {
@@ -258,8 +251,7 @@ const CalendarPage = () => {
   const getPlaces = async () => {
     try {
       const response = await axios(API_URL + `public_places`, {
-        method: 'GET',
-        withCredentials: true
+        method: 'GET'
       })
       setPublicPlaces(response.data)
       if (!currentEvent?.place) {
@@ -276,8 +268,7 @@ const CalendarPage = () => {
     try {
       await axios(API_URL + `events/${currentEvent?.id}/add_users`, {
         method: 'PATCH',
-        data: addedUsers,
-        // withCredentials: true
+        data: addedUsers
       })
     } catch {
 
@@ -290,8 +281,7 @@ const CalendarPage = () => {
     try {
       await axios(API_URL + `events/${currentEvent?.id}/remove_users`, {
         method: 'PATCH',
-        data: deletedUsers,
-        // withCredentials: true
+        data: deletedUsers
       })
     } catch {
 
@@ -304,8 +294,7 @@ const CalendarPage = () => {
     try {
       await axios(API_URL + `events/${currentEvent?.id}/add_groups`, {
         method: 'PATCH',
-        data: addedGroups,
-        // withCredentials: true
+        data: addedGroups
       })
     } catch {
 
@@ -318,8 +307,7 @@ const CalendarPage = () => {
     try {
       await axios(API_URL + `events/${currentEvent?.id}/remove_groups`, {
         method: 'PATCH',
-        data: deletedGroups,
-        // withCredentials: true
+        data: deletedGroups
       })
     } catch {
 
