@@ -16,7 +16,7 @@ import {API_URL} from 'components/urls';
 import {getCookie} from "../components/get_cookie";
 // import Loader from 'components/Loader';
 
-function CommonInfo () {
+function CommonInfo (): React.ReactNode {
     const navigate = useNavigate();
     const dispatch = useDispatch()
     axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
@@ -84,6 +84,8 @@ function CommonInfo () {
         );
         getCommonInfo()
     }, [])
+
+    return null
 }
 
 function App() {
