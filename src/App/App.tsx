@@ -54,6 +54,7 @@ function CommonInfo () {
                 color: response.data.color,
                 logo: response.data.logo
             }))
+            document.title = response.data.name;
 
             axios.interceptors.request.use(
                 config => {
@@ -66,7 +67,7 @@ function CommonInfo () {
             );
             getUserInfo();
         } catch {
-
+          
         }
     }
 
