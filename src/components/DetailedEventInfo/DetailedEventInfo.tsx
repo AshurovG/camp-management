@@ -29,10 +29,8 @@ const DetailedEventInfo: React.FC<DetailedInfoProps> = ({id, handleEditEventButt
     const getDetailedEvent = async() => {
         try {
             const response = await axios(API_URL + `events/${id}/detailed`, {
-                method: 'GET',
-                withCredentials: true
+                method: 'GET'
             })
-            console.log(response.data)
             dispatch(setCurrentEventAction({
                 id: response.data.id,
                 title: response.data.title,
@@ -79,7 +77,6 @@ const DetailedEventInfo: React.FC<DetailedInfoProps> = ({id, handleEditEventButt
 
     React.useEffect(() => {
         getDetailedEvent();
-        console.log('visible')
       }, [])
 
     return (

@@ -63,8 +63,7 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
     const getUsersFromGroup = async (id: number) => {
         try {
             const response = await axios(API_URL + `groups/${id}/members/without_room`, {
-                method: 'GET',
-                withCredentials: true
+                method: 'GET'
             })
             let newArr = []
             if (response.data.length > 0) {

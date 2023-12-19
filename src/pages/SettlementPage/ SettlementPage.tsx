@@ -53,8 +53,7 @@ const BuildingsPage = () => {
   const getBuildings = async () => {
     try {
       const response = await axios(API_URL + 'buildings', {
-        method: 'GET',
-        withCredentials: true
+        method: 'GET'
       })
       dispatch(setBuildingsAction(response.data))
 
@@ -74,8 +73,7 @@ const BuildingsPage = () => {
   const getRoomsFromBuilding = async (id: number) => {
     try {
       const response = await axios(API_URL + `buildings/${id}/rooms`, {
-        method: 'GET',
-        withCredentials: true
+        method: 'GET'
       })
 
       if (response.data.length > 0) {
@@ -96,8 +94,7 @@ const BuildingsPage = () => {
   const getPlacesFromBuilding = async (id: number) => {
     try {
       const response = await axios(API_URL + `buildings/${id}/public_places`, {
-        method: 'GET',
-        withCredentials: true
+        method: 'GET'
       })
 
       if (response.data.length > 0) {
@@ -117,8 +114,7 @@ const BuildingsPage = () => {
   const getUsersWithoutRoom = async () => {
     try {
       const response = await axios(API_URL + `users/without_rooms`, {
-        method: 'GET',
-        withCredentials: true
+        method: 'GET'
       })
 
       const newArr = response.data.map((user: RecUserData) => {
@@ -139,8 +135,7 @@ const BuildingsPage = () => {
   const getUsersFromRoom = async (buildingId: number, roomId: number) => {
     try {
       const response = await axios(API_URL + `buildings/${buildingId}/rooms/${roomId}/users`, {
-        method: 'GET',
-        withCredentials: true
+        method: 'GET'
       })
 
       const newArr = response.data.map((row: RecUserData) => {
@@ -164,8 +159,7 @@ const BuildingsPage = () => {
     try {
       await axios(API_URL + `buildings/${buildingValue?.id}/rooms/${roomValue?.id}/add_users`, {
         method: 'PATCH',
-        data: addedUsers,
-        withCredentials: true
+        data: addedUsers
       })
       clearData()
     } catch {
@@ -183,8 +177,7 @@ const BuildingsPage = () => {
     try {
       await axios(API_URL + `buildings/${buildingValue?.id}/rooms/${roomValue?.id}/remove_users`, {
         method: 'PATCH',
-        data: deletedUsers,
-        withCredentials: true
+        data: deletedUsers
       })
       clearData()
     } catch {
@@ -201,8 +194,7 @@ const BuildingsPage = () => {
   const getGroups = async () => {
     try {
       const response = await axios(API_URL + `groups`, {
-        method: 'GET',
-        withCredentials: true
+        method: 'GET'
       })
       dispatch(setGroupsAction(response.data))
       if (!groupValue) {
@@ -219,8 +211,7 @@ const BuildingsPage = () => {
         method: 'POST',
         data: {
           "name": newBuildingValue
-        },
-        withCredentials: true
+        }
       })
 
       dispatch(setBuildingsAction([...buildings, response.data]))
@@ -236,8 +227,7 @@ const BuildingsPage = () => {
         method: 'PUT',
         data: {
           "name": newBuildingValue
-        },
-        withCredentials: true
+        }
       })
 
       const updatedBuildings = buildings.map(building => {
@@ -260,8 +250,7 @@ const BuildingsPage = () => {
   const deleteBuilding = async () => {
     try {
       await axios(API_URL + `buildings/${buildingValue?.id}`, {
-        method: 'DELETE',
-        // withCredentials: true
+        method: 'DELETE'
       })
 
       const newArr = buildings.filter((building) => {
@@ -287,8 +276,7 @@ const BuildingsPage = () => {
         data: {
           number: Number(newRoomNumberValue),
           capacity: Number(newRoomCapacityValue)
-        },
-        withCredentials: true
+        }
       })
 
       setRoomValue(response.data)
@@ -311,8 +299,7 @@ const BuildingsPage = () => {
         data: {
           number: Number(newRoomNumberValue),
           capacity: Number(newRoomCapacityValue)
-        },
-        withCredentials: true
+        }
       })
 
       const updatedRooms = currentRooms?.map(room => {
@@ -337,8 +324,7 @@ const BuildingsPage = () => {
   const deleteRoom = async () => {
     try {
       await axios(API_URL + `buildings/${buildingValue?.id}/rooms/${roomValue?.id}`, {
-        method: 'DELETE',
-        withCredentials: true
+        method: 'DELETE'
       })
 
       const newArr = currentRooms?.filter(room => {
@@ -366,8 +352,7 @@ const BuildingsPage = () => {
         method: 'POST',
         data: {
           name: newPlaceNameValue
-        },
-        // withCredentials: true
+        }
       })
 
       setPlaceValue(response.data)
@@ -386,8 +371,7 @@ const BuildingsPage = () => {
         method: 'PUT',
         data: {
           name: newPlaceNameValue
-        },
-        // withCredentials: true
+        }
       })
 
       const updatedPlaces = currentPlaces?.map(place => {
@@ -411,8 +395,7 @@ const BuildingsPage = () => {
   const deletePlace = async () => {
     try {
       await axios(API_URL + `buildings/${buildingValue?.id}/public_places/${placeValue?.id}`, {
-        method: 'DELETE',
-        // withCredentials: true
+        method: 'DELETE'
       })
 
       const newArr = currentPlaces?.filter(place => {
