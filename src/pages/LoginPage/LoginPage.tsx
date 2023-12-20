@@ -5,47 +5,31 @@ import styles from './LoginPage.module.scss'
 import {Form} from 'react-bootstrap'
 import Button from 'components/Button'
 import { useDispatch } from 'react-redux';
-import { setUserInfoAction } from 'slices/MainSlice';
+import {setUserInfoAction, useUserInfo} from 'slices/MainSlice';
 import { useNavigate } from 'react-router-dom';
+import {API_URL} from 'components/urls';
 
 const LoginPage = () => {
     const [passwordValue, setPasswordValue] = useState('')
     const dispatch = useDispatch()
     const navigate = useNavigate();
-
     const login = async () => {
         try {
-            await axios(`https://specializedcampbeta.roxmiv.com/api/login`, {
+            const response = await axios(API_URL + `login`, {
                 method: 'POST',
-                data: {code: passwordValue},
-                withCredentials: true
+                data: {code: passwordValue}
             })
+            dispatch(setUserInfoAction({
+                id: response.data.id,
+                firstName: response.data.first_name,
+                lastName: response.data.last_name
+            }))
             toast.success('Вы успешно вошли в систему!')
-            navigate('/')
+            navigate('/groups')
         } catch {
             toast.error('Неверный код!')
-        } finally {
-            getUserInfo()
         }
     }
-
-    const getUserInfo = async () => {
-        try {
-          const response = await axios(`https://specializedcampbeta.roxmiv.com/api/self`, {
-            method: 'GET',
-            withCredentials: true
-          })
-    
-          dispatch(setUserInfoAction({
-            id: response.data.id,
-            firstName: response.data.first_name,
-            lastName: response.data.last_name
-          }))
-        } catch {
-          
-        }
-    }
-    
 
     const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()

@@ -1,35 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 import { toast } from 'react-toastify';
 import styles from './Header.module.scss'
 import ProfileIcon from 'components/Icons/ProfileIcon';
 import ProfileWindow from 'components/ProfileWindow';
 import BurgerIcon from 'components/Icons/BurgerIcon';
 import { motion, AnimatePresence } from "framer-motion";
-import { useCommon, useUserInfo, useIsUserInfoLoading } from 'slices/MainSlice';
-import Cookies from "universal-cookie";
+import {useCommon, useUserInfo, useIsUserInfoLoading, setUserInfoNullAction} from 'slices/MainSlice';
+import {API_URL} from 'components/urls';
 
-const cookies = new Cookies();
 
 const Header: React.FC = () => {
+    const navigate = useNavigate();
     const common = useCommon()
     const userInfo = useUserInfo();
     const isUserInfoLoading = useIsUserInfoLoading()
     const [isProfileButtonClicked, setIsProfileButtonClicked] = useState(false)
     const [isBurgerMenuOpened, setIsBurgerMenuOpened] = useState(false)
 
-    useEffect(() => {
-        console.log(cookies.get('sessionid'))
-    }, [])
-
     const logout = async () => {
         try {
-            await axios(`https://specializedcampbeta.roxmiv.com/api/logout`, {
-                method: 'POST',
-                withCredentials: true
+            await axios(API_URL + `logout`, {
+                method: 'POST'
             })
+            setUserInfoNullAction();
             toast.success('Вы успешно вышли из системы!')
+            navigate('/login');
         } catch(e) {
             throw e
         } finally {
@@ -50,7 +47,7 @@ const Header: React.FC = () => {
                 } */}
 
                 <div className={styles.header__blocks}>
-                    <Link className={styles.header__block} to='/'>Состав Лагеря</Link>
+                    <Link className={styles.header__block} to='/groups'>Состав Лагеря</Link>
                     <Link className={styles.header__block} to='/buildings'>Размещение</Link>
                     <Link className={styles.header__block} to='/calendar'>Мероприятия</Link>
                 </div>

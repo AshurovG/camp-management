@@ -22,6 +22,9 @@ const dataSlice = createSlice({
     setUserInfo(state, action: PayloadAction<UserInfoData>) {
       state.userInfo = action.payload;
     },
+    setUserInfoNull(state) {
+      state.userInfo = null;
+    },
     setIsUserInfoLoading(state, action: PayloadAction<boolean>) {
       state.isUserInfoLoading = action.payload;
     },
@@ -40,6 +43,7 @@ export const useIsUserInfoLoading = () =>
 export const {
   setCommon: setCommonAction,
   setUserInfo: setUserInfoAction,
+  setUserInfoNull: setUserInfoNullAction,
   setIsUserInfoLoading: setIsUserInfoLoadingAction
 } = dataSlice.actions;
 

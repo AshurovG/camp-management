@@ -19,7 +19,8 @@ const parseTsConfigPaths = (paths: Record<string, string[]>): Record<string, str
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  server: { port: 3000 },
+  // server: { port: 3000 },
+  server: { port: 3000, host: '127.0.0.1' },
   base: "camp-management",
   plugins: [react()],
   resolve: {

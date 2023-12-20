@@ -10,6 +10,7 @@ import BasketIcon from 'components/Icons/BasketIcon';
 import Button from 'components/Button';
 import { useDispatch } from 'react-redux';
 import { useCurrentEvent, setCurrentEventAction, setUsersFromEventAction, setGroupsFromEventAction } from 'slices/EventsSlice';
+import {API_URL} from 'components/urls';
 
 export type DetailedInfoProps = {
     id: number;
@@ -27,11 +28,9 @@ const DetailedEventInfo: React.FC<DetailedInfoProps> = ({id, handleEditEventButt
 
     const getDetailedEvent = async() => {
         try {
-            const response = await axios(`https://specializedcampbeta.roxmiv.com/api/events/${id}/detailed`, {
-                method: 'GET',
-                withCredentials: true
+            const response = await axios(API_URL + `events/${id}/detailed`, {
+                method: 'GET'
             })
-            console.log(response.data)
             dispatch(setCurrentEventAction({
                 id: response.data.id,
                 title: response.data.title,
@@ -78,7 +77,6 @@ const DetailedEventInfo: React.FC<DetailedInfoProps> = ({id, handleEditEventButt
 
     React.useEffect(() => {
         getDetailedEvent();
-        console.log('visible')
       }, [])
 
     return (
