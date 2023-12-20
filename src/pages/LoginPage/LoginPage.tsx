@@ -5,7 +5,7 @@ import styles from './LoginPage.module.scss'
 import {Form} from 'react-bootstrap'
 import Button from 'components/Button'
 import { useDispatch } from 'react-redux';
-import {setUserInfoAction, useUserInfo} from 'slices/MainSlice';
+import {setUserInfoAction} from 'slices/MainSlice';
 import { useNavigate } from 'react-router-dom';
 import {API_URL} from 'components/urls';
 
