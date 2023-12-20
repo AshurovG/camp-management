@@ -19,9 +19,10 @@ import {getCookie} from "../components/get_cookie";
 function CommonInfo (): React.ReactNode {
     const navigate = useNavigate();
     const dispatch = useDispatch()
-    axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
+    axios.defaults.xsrfHeaderName = "x-csrftoken";
     axios.defaults.xsrfCookieName = "csrftoken";
     axios.defaults.withCredentials = true;
+    let token = undefined;
 
     const getUserInfo = async () => {
         try {
@@ -58,7 +59,7 @@ function CommonInfo (): React.ReactNode {
 
             axios.interceptors.request.use(
                 config => {
-                    config.headers['X-CSRFTOKEN'] = getCookie('csrftoken');
+                    config.headers['X-CSRFTOKEN'] = token;
                     return config;
                 },
                 error => {
@@ -74,6 +75,10 @@ function CommonInfo (): React.ReactNode {
     React.useEffect(() => {
         axios.interceptors.response.use(
             response => {
+                const new_token = getCookie('csrftoken') || response.headers.get('X-Token');
+                if (new_token) {
+                    token = new_token;
+                }
                 return response;
             },
             async error => {

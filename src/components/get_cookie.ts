@@ -1,4 +1,4 @@
- export function getCookie(name: string): string | null {
+ export function getCookie(name: string): string | undefined {
      const nameLenPlus = (name.length + 1);
      return document.cookie
          .split(';')
@@ -8,5 +8,5 @@
          })
          .map(cookie => {
              return decodeURIComponent(cookie.substring(nameLenPlus));
-         })[0] || null;
+         })[0] || undefined;
  }
