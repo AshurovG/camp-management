@@ -67,6 +67,7 @@ const CalendarPage = () => {
     setNewIsNeedComputerValue(false)
     setNewIsNeedScreenValue(false)
     setNewIsNeedWhiteboardValue(false)
+    setIsNeedNotification(false)
     setPlaceValue(null)
   }
 
@@ -146,7 +147,7 @@ const CalendarPage = () => {
           title: newTitleValue,
           start_time: start,
           end_time: end,
-          is_need_notification: isNeedNotification,
+          notification: isNeedNotification,
           is_need_screen: newIsNeedScreenValue,
           is_need_computer: newIsNeedComputerValue,
           is_need_whiteboard: newIsNeedWiteboardValue
@@ -182,7 +183,7 @@ const CalendarPage = () => {
           title: newTitleValue,
           start_time: start,
           end_time: end,
-          is_need_notification: isNeedNotification,
+          notification: isNeedNotification,
           is_need_screen: newIsNeedScreenValue,
           is_need_computer: newIsNeedComputerValue,
           is_need_whiteboard: newIsNeedWiteboardValue
@@ -337,6 +338,7 @@ const CalendarPage = () => {
     // setPlaceValue(currentEvent?.place)
     if (currentEvent) {
       setNewTitleValue(currentEvent.title)
+      setIsNeedNotification(currentEvent.notification)
       setNewIsNeedComputerValue(currentEvent.isNeedComputer)
       setNewIsNeedScreenValue(currentEvent.isNeedScreen)
       setNewIsNeedWhiteboardValue(currentEvent.isNeedWhiteboard)
@@ -358,12 +360,12 @@ const CalendarPage = () => {
     const startTime = moment(newStartTimeValue, 'HH:mm');
     date.hour(startTime.hour());
     date.minute(startTime.minute());
-    const start = date.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+    const start = date.format('YYYY-MM-DDTHH:mm:ss');
 
     const endTIme = moment(newEndTimeValue, 'HH:mm');
     date.hour(endTIme.hour());
     date.minute(endTIme.minute());
-    const end = date.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+    const end = date.format('YYYY-MM-DDTHH:mm:ss');
     
     postEvent(start, end)
   }
@@ -378,14 +380,14 @@ const CalendarPage = () => {
         minute: startTime.minute(),
         second: startTime.second()
        });
-      const start = date.toISOString()
+      const start = date.format('YYYY-MM-DDTHH:mm:ss')
       const endTime = moment(newEndTimeValue, 'HH:mm');
       date.set({
         hour: endTime.hour(),
         minute: endTime.minute(),
         second: endTime.second()
        });
-       const end = date.toISOString()
+       const end = date.format('YYYY-MM-DDTHH:mm:ss')
       //  if (isPlaceValueChanged) {
       //   // changePlace()
       //   setIsPlaceValueChanged(false)
@@ -599,6 +601,10 @@ const CalendarPage = () => {
             placeholder="Время завершения*" 
             />
           </div>
+          <div className={styles.form__item}>
+            <p>Оповещение</p>
+            <CheckBox className={styles.form__checkbox} checked={isNeedNotification} onChange={() => setIsNeedNotification(!isNeedNotification)}/>
+          </div>
           <div className={`${styles.form__item} ${styles['form__item-choose']}`}>
             <p>Нужен экран?</p> 
             <CheckBox className={styles.form__checkbox} checked={newIsNeedScreenValue} onChange={() => setNewIsNeedScreenValue(!newIsNeedScreenValue)}/>
@@ -610,10 +616,6 @@ const CalendarPage = () => {
           <div className={styles.form__item}>
             <p>Нужна доска?</p> 
             <CheckBox className={styles.form__checkbox} checked={newIsNeedWiteboardValue} onChange={() => setNewIsNeedWhiteboardValue(!newIsNeedWiteboardValue)}/>
-          </div>
-          <div className={styles.form__item}>
-            <p>Оповещение</p> 
-            <CheckBox className={styles.form__checkbox} checked={isNeedNotification} onChange={() => setIsNeedNotification(!isNeedNotification)}/>
           </div>
           <div style={{display: 'flex', justifyContent: 'space-between'}}>
             <Button className={styles.modal__btn}  disabled={newTitleValue ? false : true} type='submit'>Сохранить</Button>
@@ -719,7 +721,7 @@ const CalendarPage = () => {
           </div>
           <div className={styles.form__item}>
             <Form.Control 
-              type="time" 
+              type="time"
               value={ newStartTimeValue} 
               onChange={(event) => setNewStartTimeValue(event.target.value)} 
               className={styles.form__input} 
@@ -735,6 +737,10 @@ const CalendarPage = () => {
             placeholder="Время окончания*" 
           />
 
+          <div className={styles.form__item}>
+            <p>Оповещение</p>
+            <CheckBox className={styles.form__checkbox} checked={isNeedNotification} onChange={() => setIsNeedNotification(!isNeedNotification)}/>
+          </div>
           <div className={`${styles.form__item} ${styles['form__item-choose']}`}>
             <p>Нужен экран?</p> 
             <CheckBox className={styles.form__checkbox} checked={newIsNeedScreenValue} onChange={() => setNewIsNeedScreenValue(!newIsNeedScreenValue)}/>
@@ -746,10 +752,6 @@ const CalendarPage = () => {
           <div className={styles.form__item}>
             <p>Нужна доска?</p> 
             <CheckBox className={styles.form__checkbox} checked={newIsNeedWiteboardValue} onChange={() => setNewIsNeedWhiteboardValue(!newIsNeedWiteboardValue)}/>
-          </div>
-          <div className={styles.form__item}>
-            <p>Оповещение</p> 
-            <CheckBox className={styles.form__checkbox} checked={isNeedNotification} onChange={() => setIsNeedNotification(!isNeedNotification)}/>
           </div>
           <div style={{display: 'flex', justifyContent: 'space-between'}}>
             <Button style={{width: '100%'}}  disabled={newTitleValue && placeValue &&  newStartTimeValue && newEndTimeValue && newDateValue ? false : true} type='submit'>Сохранить</Button>
