@@ -10,7 +10,7 @@ import CalendarPage from 'pages/CalendarPage'
 import SettlementPage from 'pages/SettlementPage'
 import LoginPage from 'pages/LoginPage';
 import 'bootstrap/dist/css/bootstrap.css';
-import axios from 'axios';
+import axios, {AxiosHeaders} from 'axios';
 import React from 'react';
 import {API_URL} from 'components/urls';
 import {getCookie} from "../components/get_cookie";
@@ -22,7 +22,7 @@ function CommonInfo (): React.ReactNode {
     axios.defaults.xsrfHeaderName = "x-csrftoken";
     axios.defaults.xsrfCookieName = "csrftoken";
     axios.defaults.withCredentials = true;
-    let token = undefined;
+    let token: string|undefined = undefined;
 
     const getUserInfo = async () => {
         try {
@@ -75,7 +75,10 @@ function CommonInfo (): React.ReactNode {
     React.useEffect(() => {
         axios.interceptors.response.use(
             response => {
-                const new_token = getCookie('csrftoken') || response.headers.get('X-Token');
+                let new_token = getCookie('csrftoken');
+                if (!new_token && response.headers instanceof AxiosHeaders && response.headers.has('X-Token')) {
+                    new_token = response.headers.get('X-Token')?.toString();
+                }
                 if (new_token) {
                     token = new_token;
                 }

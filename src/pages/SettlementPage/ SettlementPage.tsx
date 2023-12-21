@@ -4,7 +4,7 @@ import axios from 'axios'
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { useBuildings, setBuildingsAction } from 'slices/BuildingsSlice';
-import { setGroupsAction, setUsersWithoutRoomAction } from 'slices/GroupsSlice';
+import { setGroupsAction, setUsersWithoutRoomAction, useUsers, useUsersWithoutRoom } from 'slices/GroupsSlice';
 import Button from 'components/Button';
 import Form from 'react-bootstrap/Form';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -22,6 +22,7 @@ import {API_URL} from 'components/urls';
 const BuildingsPage = () => {
   const dispatch = useDispatch()
   const buildings = useBuildings()
+  const usersWithoutRoom = useUsersWithoutRoom()
   const [groupValue, setGroupValue] = useState<RecGroupsData>()
   const [buildingValue, setBuildingValue] = useState<RecBuildingData>()
   const [currentRooms, setCurrentRooms] = useState<RecRoomData[]>()
@@ -112,6 +113,7 @@ const BuildingsPage = () => {
   }
 
   const getUsersWithoutRoom = async () => {
+    // setIsLoading(true)
     try {
       const response = await axios(API_URL + `users/without_rooms`, {
         method: 'GET'
@@ -166,10 +168,16 @@ const BuildingsPage = () => {
 
     } finally {
         toast.success("Информация о комнате успешно обновлена!");
-        getUsersWithoutRoom()
-        if (buildingValue && roomValue) {
-          getUsersFromRoom(buildingValue.id, roomValue.id)
-        }
+        // getUsersWithoutRoom()
+        // if (buildingValue && roomValue) {
+        //   getUsersFromRoom(buildingValue.id, roomValue.id)
+        // }
+        await Promise.all([
+          getUsersWithoutRoom(),
+          buildingValue && roomValue ? getUsersFromRoom(buildingValue.id, roomValue.id) : null
+        ]);
+        
+        setIsLoading(false);
     }
   }
 
@@ -281,6 +289,7 @@ const BuildingsPage = () => {
 
       setRoomValue(response.data)
       if (buildingValue) {
+        console.log('if building value...')
         getUsersFromRoom(buildingValue?.id, response.data.id)
       }
       toast.success("Комната успешно добавлена!");
@@ -477,17 +486,19 @@ const BuildingsPage = () => {
     }
   };
 
-  const handleRoomSelect = (eventKey: string | null) => {
+  const handleRoomSelect = async (eventKey: string | null) => {
     if (eventKey !== null) {
       const selectedRoom = currentRooms?.find(room => room.id === parseInt(eventKey, 10));
       if (selectedRoom && selectedRoom.id !== roomValue?.id) {
         setRoomValue(selectedRoom)
         if (buildingValue) {
-          getUsersFromRoom(buildingValue?.id, Number(eventKey))
+          setIsLoading(true); // Установка состояния загрузки в true перед началом запроса
+          await getUsersFromRoom(buildingValue?.id, Number(eventKey)); // Ожидание завершения запроса
+          setIsLoading(false); // Установка состояния загрузки в false после завершения запроса
         }
       }
     }
-  };
+   };
 
   const handlePlaceSelect = (eventKey: string | null) => {
     if (eventKey !== null) {
@@ -701,7 +712,7 @@ const BuildingsPage = () => {
             {roomValue && !isUsersLoading ? <div className={styles['settlement__page-actions']}>
               <div className={styles['settlement__page-item']}>
                 <h4 className={styles['settlement__page-subtitle']}>Доступные участники</h4>
-                <SearchList onMemberClick={handleUserAdd} activeMembers={addedUsers} areUsersWithoutRooms/>
+                <SearchList onMemberClick={handleUserAdd} activeMembers={addedUsers} areUsersWithoutRooms members={usersWithoutRoom}/>
                 <p>Выбрано: {addedUsers.length}</p>
               </div>
               <div className={styles['settlement__page-actions-btns']}>

@@ -20,10 +20,54 @@ import Loader from 'components/Loader';
 import SearchList from 'components/SearchList';
 import ArrowIcon from 'components/Icons/ArrowIcon';
 import ArrowDownIcon from 'components/Icons/ArrowDownIcon'
+import ColorPalette from 'components/ColorPalette';
 import { useCurrentEvent, useIsEventsChanged, useUsersFromEvent, useGroupsFromEvent, setIsEventsChangedAction, setCurrentEventAction, setUsersFromEventAction, setGroupsFromEventAction} from 'slices/EventsSlice';
 import { useUsers, useGroups, setUsersAction, setGroupsAction } from 'slices/GroupsSlice';
 import { toast } from 'react-toastify';
 import {API_URL} from 'components/urls';
+
+const colors = [
+  {
+    key: 'blue',
+    value: '#00BFFF'
+  },
+  {
+    key: 'darkBlue',
+    value: '#4169e1'
+  },
+  {
+    key: 'red',
+    value: '#FF0013'
+  },
+  {
+    key: 'orange',
+    value: '#FF4F00'
+  },
+  {
+    key: 'yellow',
+    value: '#FFF000'
+  },
+  {
+    key: 'lime',
+    value: '#00FF00'
+  },
+  {
+    key: 'green',
+    value: '#008000'
+  },
+  {
+    key: 'purple',
+    value: '#6F2DA8'
+  },
+  {
+    key: 'pink',
+    value: '#E4A0F7'
+  },
+  {
+    key: 'gray',
+    value: '#808080'
+  },
+]
 
 const CalendarPage = () => {
   const dispatch = useDispatch()
@@ -67,6 +111,7 @@ const CalendarPage = () => {
     setNewIsNeedComputerValue(false)
     setNewIsNeedScreenValue(false)
     setNewIsNeedWhiteboardValue(false)
+    setIsNeedNotification(false)
     setPlaceValue(null)
   }
 
@@ -92,9 +137,11 @@ const CalendarPage = () => {
           notification: raw.notification,
           isNeedScreen: raw.is_need_screen,
           isNeedComputer: raw.is_need_computer,
-          isNeedWhiteboard: raw.is_need_whiteboard
+          isNeedWhiteboard: raw.is_need_whiteboard,
+          color: raw.color ? raw.color : '#4169e1'
         }
       })
+      console.log(newArr)
       setEvents(newArr)
     } catch(e) {
       throw e
@@ -116,7 +163,9 @@ const CalendarPage = () => {
             notification: response.data.notification,
             isNeedScreen: response.data.is_need_screen,
             isNeedComputer: response.data.is_need_computer,
-            isNeedWhiteboard: response.data.is_need_whiteboard
+            isNeedWhiteboard: response.data.is_need_whiteboard,
+            // color: response.data.color ? '': '#4169e1'
+            color: response.data.color !== '' ? 'red' : 'blue' 
         }))
 
         const newUsersArr = response.data.users.map((user: RecUserData) => {
@@ -146,7 +195,7 @@ const CalendarPage = () => {
           title: newTitleValue,
           start_time: start,
           end_time: end,
-          is_need_notification: isNeedNotification,
+          notification: isNeedNotification,
           is_need_screen: newIsNeedScreenValue,
           is_need_computer: newIsNeedComputerValue,
           is_need_whiteboard: newIsNeedWiteboardValue
@@ -186,7 +235,7 @@ const CalendarPage = () => {
           title: newTitleValue,
           start_time: start,
           end_time: end,
-          is_need_notification: isNeedNotification,
+          notification: isNeedNotification,
           is_need_screen: newIsNeedScreenValue,
           is_need_computer: newIsNeedComputerValue,
           is_need_whiteboard: newIsNeedWiteboardValue
@@ -341,6 +390,7 @@ const CalendarPage = () => {
     // setPlaceValue(currentEvent?.place)
     if (currentEvent) {
       setNewTitleValue(currentEvent.title)
+      setIsNeedNotification(currentEvent.notification)
       setNewIsNeedComputerValue(currentEvent.isNeedComputer)
       setNewIsNeedScreenValue(currentEvent.isNeedScreen)
       setNewIsNeedWhiteboardValue(currentEvent.isNeedWhiteboard)
@@ -362,12 +412,12 @@ const CalendarPage = () => {
     const startTime = moment(newStartTimeValue, 'HH:mm');
     date.hour(startTime.hour());
     date.minute(startTime.minute());
-    const start = date.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+    const start = date.format('YYYY-MM-DDTHH:mm:ss');
 
     const endTIme = moment(newEndTimeValue, 'HH:mm');
     date.hour(endTIme.hour());
     date.minute(endTIme.minute());
-    const end = date.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+    const end = date.format('YYYY-MM-DDTHH:mm:ss');
     
     postEvent(start, end)
   }
@@ -382,14 +432,14 @@ const CalendarPage = () => {
         minute: startTime.minute(),
         second: startTime.second()
        });
-      const start = date.toISOString()
+      const start = date.format('YYYY-MM-DDTHH:mm:ss')
       const endTime = moment(newEndTimeValue, 'HH:mm');
       date.set({
         hour: endTime.hour(),
         minute: endTime.minute(),
         second: endTime.second()
        });
-       const end = date.toISOString()
+       const end = date.format('YYYY-MM-DDTHH:mm:ss')
       //  if (isPlaceValueChanged) {
       //   // changePlace()
       //   setIsPlaceValueChanged(false)
@@ -498,6 +548,7 @@ const CalendarPage = () => {
     <div className={styles.events__page}>
      <div className={styles['events__page-wrapper']}>
        <h1 className={styles['events__page-title']}>Календарь мероприятий</h1>
+       {/* <ColorPalette className={styles['colors']} colors={colors}></ColorPalette> */}
        {isEventsLoading ? <div className={styles.loader__wrapper}>
               <Loader className={styles.loader} size='l' />
           </div>
@@ -513,19 +564,20 @@ const CalendarPage = () => {
           end: new Date(common?.endDate) // Максимальная дата
         }}
         events={events.map(raw => ({
-          id: raw.id.toString(), // Преобразуйте id в строку
-          title: raw.title,
-          start: new Date(raw.startTime), // Преобразуйте start_time в объект Date
-          end: new Date(raw.endTime), // Преобразуйте end_time в объект Date
-         }))}
+          id: raw.id.toString(),
+          title: `${raw.notification ? '🔔' : '🔕'} ${raw.title}`,
+          start: new Date(raw.startTime),
+          end: new Date(raw.endTime),
+          backgroundColor: raw.color, // Добавьте это свойство
+        }))}
          titleFormat={{ // добавьте это свойство
           month: 'long',
           year: 'numeric',
           day: 'numeric'
          }}
         slotLabelFormat={{ hour: '2-digit', minute: '2-digit' }}
-          slotMinTime={'7:00:00'}
-          slotMaxTime={'26:00:00'}
+          slotMinTime={'6:00:00'}
+          slotMaxTime={'24:00:00'}
           headerToolbar={{
             left: 'title',
             center: '',
@@ -565,26 +617,6 @@ const CalendarPage = () => {
           <div className={styles.form__item}>
             <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => {setNewTitleValue(event.target.value)}} value={newTitleValue} className={styles.form__input} type="text" placeholder="Название события*" />
           </div>
-          {/* <div className={styles.form__item}>
-            <Dropdown className={styles['dropdown']} onSelect={handlePlaceSelect}>
-                  <Dropdown.Toggle
-                      className={styles['dropdown__toggle']}
-                      style={{
-                          borderColor: '#000',
-                          backgroundColor: "#fff",
-                          color: '#000',
-                      }}
-                  >   
-                      {placeValue?.name}, {placeValue?.building.name}
-                      <ArrowDownIcon className={styles.dropdown__icon}/>
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu className={styles['dropdown__menu']}>
-                      {publicPlaces?.map(place => (
-                          <Dropdown.Item className={styles['dropdown__menu-item']} key={place.id} eventKey={place.id}>{place.name}, {place.building.name}</Dropdown.Item>
-                      ))}
-                  </Dropdown.Menu>
-              </Dropdown>
-          </div> */}
           <div className={styles.form__item}>
             <Form.Control 
             type="time" 
@@ -603,6 +635,10 @@ const CalendarPage = () => {
             placeholder="Время завершения*" 
             />
           </div>
+          <div className={styles.form__item}>
+            <p>Оповещение</p>
+            <CheckBox className={styles.form__checkbox} checked={isNeedNotification} onChange={() => setIsNeedNotification(!isNeedNotification)}/>
+          </div>
           <div className={`${styles.form__item} ${styles['form__item-choose']}`}>
             <p>Нужен экран?</p> 
             <CheckBox className={styles.form__checkbox} checked={newIsNeedScreenValue} onChange={() => setNewIsNeedScreenValue(!newIsNeedScreenValue)}/>
@@ -614,10 +650,6 @@ const CalendarPage = () => {
           <div className={styles.form__item}>
             <p>Нужна доска?</p> 
             <CheckBox className={styles.form__checkbox} checked={newIsNeedWiteboardValue} onChange={() => setNewIsNeedWhiteboardValue(!newIsNeedWiteboardValue)}/>
-          </div>
-          <div className={styles.form__item}>
-            <p>Оповещение</p> 
-            <CheckBox className={styles.form__checkbox} checked={isNeedNotification} onChange={() => setIsNeedNotification(!isNeedNotification)}/>
           </div>
           <div style={{display: 'flex', justifyContent: 'space-between'}}>
             <Button className={styles.modal__btn}  disabled={newTitleValue ? false : true} type='submit'>Сохранить</Button>
@@ -723,7 +755,7 @@ const CalendarPage = () => {
           </div>
           <div className={styles.form__item}>
             <Form.Control 
-              type="time" 
+              type="time"
               value={ newStartTimeValue} 
               onChange={(event) => setNewStartTimeValue(event.target.value)} 
               className={styles.form__input} 
@@ -739,6 +771,10 @@ const CalendarPage = () => {
             placeholder="Время окончания*" 
           />
 
+          <div className={styles.form__item}>
+            <p>Оповещение</p>
+            <CheckBox className={styles.form__checkbox} checked={isNeedNotification} onChange={() => setIsNeedNotification(!isNeedNotification)}/>
+          </div>
           <div className={`${styles.form__item} ${styles['form__item-choose']}`}>
             <p>Нужен экран?</p> 
             <CheckBox className={styles.form__checkbox} checked={newIsNeedScreenValue} onChange={() => setNewIsNeedScreenValue(!newIsNeedScreenValue)}/>
@@ -750,10 +786,6 @@ const CalendarPage = () => {
           <div className={styles.form__item}>
             <p>Нужна доска?</p> 
             <CheckBox className={styles.form__checkbox} checked={newIsNeedWiteboardValue} onChange={() => setNewIsNeedWhiteboardValue(!newIsNeedWiteboardValue)}/>
-          </div>
-          <div className={styles.form__item}>
-            <p>Оповещение</p> 
-            <CheckBox className={styles.form__checkbox} checked={isNeedNotification} onChange={() => setIsNeedNotification(!isNeedNotification)}/>
           </div>
           <div style={{display: 'flex', justifyContent: 'space-between'}}>
             <Button style={{width: '100%'}}  disabled={newTitleValue && placeValue &&  newStartTimeValue && newEndTimeValue && newDateValue ? false : true} type='submit'>Сохранить</Button>
