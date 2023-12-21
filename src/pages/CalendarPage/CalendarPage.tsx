@@ -95,9 +95,11 @@ const CalendarPage = () => {
   const [isNeedNotification, setIsNeedNotification] = useState(false)
   const [newIsNeedWiteboardValue, setNewIsNeedWhiteboardValue] = useState(false)
   const [newDateValue, setNewDateValue] = useState('')
+  const [newColorValue, setNewColorValue] = useState('#4169e1')
   const [isEventsLoading, setIsEventsLoading] = useState(true)
   const [isDetailedEventLoading, setIsDetailedEventLoading] = useState(false)
   const [isCurrentEventLoading, setIsCurrentEventLoading] = useState(false)
+  const [isColorMenuOpened, setIsColorMenuOpened] = useState(false)
   const [addedUsers, setAddedUsers] = useState<number[]>([])
   const [deletedUsers, setDeletedUsers] = useState<number[]>([])
   const [addedGroups, setAddedGroups] = useState<number[]>([])
@@ -238,7 +240,8 @@ const CalendarPage = () => {
           notification: isNeedNotification,
           is_need_screen: newIsNeedScreenValue,
           is_need_computer: newIsNeedComputerValue,
-          is_need_whiteboard: newIsNeedWiteboardValue
+          is_need_whiteboard: newIsNeedWiteboardValue,
+          color: newColorValue
         }
       })
 
@@ -544,11 +547,15 @@ const CalendarPage = () => {
     }
   };
 
+  const handleColorValueChange = (colorValue: string) => {
+    setNewColorValue(colorValue)
+    setIsColorMenuOpened(false)
+  }
+
   return (
     <div className={styles.events__page}>
      <div className={styles['events__page-wrapper']}>
        <h1 className={styles['events__page-title']}>Календарь мероприятий</h1>
-       {/* <ColorPalette className={styles['colors']} colors={colors}></ColorPalette> */}
        {isEventsLoading ? <div className={styles.loader__wrapper}>
               <Loader className={styles.loader} size='l' />
           </div>
@@ -771,6 +778,12 @@ const CalendarPage = () => {
             placeholder="Время окончания*" 
           />
 
+
+          <div className={styles.form__item}>
+            <p>В какой цвет покрасить?</p>
+            <div style={{backgroundColor: newColorValue}} onClick={() => setIsColorMenuOpened(!isColorMenuOpened)}  className={styles.form__color}></div>
+          </div>
+          {isColorMenuOpened && <ColorPalette className={styles.form__colors} colors={colors} onClick={handleColorValueChange}></ColorPalette>}
           <div className={styles.form__item}>
             <p>Оповещение</p>
             <CheckBox className={styles.form__checkbox} checked={isNeedNotification} onChange={() => setIsNeedNotification(!isNeedNotification)}/>
