@@ -119,9 +119,9 @@ const SearchList: React.FC<ListProps> = ({allUsers, subgroups, members, onMember
             memberSearch(users)
         }
 
-        if (areUsersWithoutRooms && inputValue) {
-            memberSearch(usersFromSelectedGroup)
-        }
+        // if (areUsersWithoutRooms && inputValue) {
+        //     memberSearch(usersFromSelectedGroup)
+        // }
 
     }, [inputValue])
 

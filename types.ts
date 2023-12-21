@@ -19,7 +19,8 @@ export type EventsData = {
     notification: boolean,
     isNeedScreen: boolean,
     isNeedComputer: boolean,
-    isNeedWhiteboard: boolean
+    isNeedWhiteboard: boolean,
+    color: string
 }
 
 export type DayData = {
@@ -76,6 +77,11 @@ export type UserInfoData = {
     lastName: string;
 }
 
+export type ColorData = {
+    key: string,
+    value: string
+}
+
 // API types
 
 export type RecBuildingData = {
@@ -120,5 +126,6 @@ export type RecEventsData = {
     notification: boolean,
     is_need_screen: boolean,
     is_need_computer: boolean,
-    is_need_whiteboard: boolean
+    is_need_whiteboard: boolean,
+    color: string
 }

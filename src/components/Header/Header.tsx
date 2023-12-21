@@ -8,10 +8,8 @@ import ProfileWindow from 'components/ProfileWindow';
 import BurgerIcon from 'components/Icons/BurgerIcon';
 import { motion, AnimatePresence } from "framer-motion";
 import {useCommon, useUserInfo, useIsUserInfoLoading, setUserInfoNullAction} from 'slices/MainSlice';
-import Cookies from "universal-cookie";
 import {API_URL} from 'components/urls';
 
-const cookies = new Cookies();
 
 const Header: React.FC = () => {
     const navigate = useNavigate();
@@ -20,10 +18,6 @@ const Header: React.FC = () => {
     const isUserInfoLoading = useIsUserInfoLoading()
     const [isProfileButtonClicked, setIsProfileButtonClicked] = useState(false)
     const [isBurgerMenuOpened, setIsBurgerMenuOpened] = useState(false)
-
-    useEffect(() => {
-        console.log(cookies.get('sessionid'))
-    }, [])
 
     const logout = async () => {
         try {

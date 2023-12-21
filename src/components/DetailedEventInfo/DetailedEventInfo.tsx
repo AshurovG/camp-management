@@ -89,7 +89,7 @@ const DetailedEventInfo: React.FC<DetailedInfoProps> = ({id, handleEditEventButt
                 <Button onClick={handleShowUsersButtonClick}>Участники</Button>
             </div>
             <ul className={styles.detailed__list}>
-               <li>Необходимое оборудование: {necessaryEquipment}</li>
+               {(currentEvent?.isNeedComputer || currentEvent?.isNeedScreen || currentEvent?.isNeedWhiteboard) && <li>Необходимое оборудование: {necessaryEquipment}</li>}
                { currentEvent?.place ? <li className={styles['detailed__list-item-action']}><span>Место проведения: {currentEvent?.place.name} {currentEvent?.place.building.name}</span> <EditIcon onClick={handleEditPlaceButtonClick}/></li>
                : <li className={styles['detailed__list-item-action']}><span>Место проведения: не установлено</span> <EditIcon onClick={handleEditPlaceButtonClick}/></li>
                }

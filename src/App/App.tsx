@@ -103,6 +103,7 @@ function App() {
     <div className='app'>
       <HashRouter>
         <CommonInfo />
+        <>
         <Header></Header>
         {/* {isUserInfoLoading ? <div className={styles.loader__wrapper}>
               <Loader className={styles.loader} size='l' />
@@ -122,6 +123,7 @@ function App() {
             </>
             }
           </Routes>
+          </>
         {/* </div>} */}
       </HashRouter>
       <ToastContainer autoClose={1000} pauseOnHover={false} />
