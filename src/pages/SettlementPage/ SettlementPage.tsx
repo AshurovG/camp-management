@@ -4,7 +4,7 @@ import axios from 'axios'
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { useBuildings, setBuildingsAction } from 'slices/BuildingsSlice';
-import { setGroupsAction, setUsersWithoutRoomAction, useUsersWithoutRoom } from 'slices/GroupsSlice';
+import { setGroupsAction, setUsersWithoutRoomAction, useUsers, useUsersWithoutRoom } from 'slices/GroupsSlice';
 import Button from 'components/Button';
 import Form from 'react-bootstrap/Form';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -133,7 +133,7 @@ const BuildingsPage = () => {
     }
   }
 
-  const  getUsersFromRoom = async (buildingId: number, roomId: number) => {
+  const getUsersFromRoom = async (buildingId: number, roomId: number) => {
     try {
       const response = await axios(API_URL + `buildings/${buildingId}/rooms/${roomId}/users`, {
         method: 'GET'
@@ -146,6 +146,8 @@ const BuildingsPage = () => {
           lastName: row.last_name
         }
       })
+
+      console.log('запрос пользователей из комнат', newArr)
 
       setUsersFromRoom(newArr)
 
@@ -339,16 +341,22 @@ const BuildingsPage = () => {
       setCurrentRooms(newArr)
       if (newArr?.length !== 0 && newArr) {
         setRoomValue(newArr[0])
-        if (buildingValue) {
+        if (buildingValue && roomValue) {
+          setIsUsersLoading(true)
           getUsersFromRoom(buildingValue.id, newArr[0].id)
-          getUsersWithoutRoom()
+          // getUsersFromRoom(buildingValue.id, roomValue.id)
         }
       } else {
         setRoomValue(undefined)
       }
       toast.success("Комната успешно удалена!");
-    } catch (e) {
-      throw e
+    } catch {
+
+    } finally {
+      // if (buildingValue?.id && roomValue?.id) {
+      //   setIsUsersLoading(true)
+      //   getUsersFromRoom(buildingValue.id, roomValue.id)
+      // }
     }
   }
 
