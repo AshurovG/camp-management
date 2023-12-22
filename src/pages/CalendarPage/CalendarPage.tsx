@@ -401,11 +401,6 @@ const CalendarPage = () => {
     }
   }, [currentEvent])
 
-  // React.useEffect(() => {
-  //   // setNewDateValue(currentDate)
-  //   setNewDateValue(currentDate)
-  // }, [currentDate])
-
 
   const handleEditEventButtonClick = () => {
     const date = moment(newDateValue, 'YYYY-MM-DD');
@@ -433,7 +428,7 @@ const CalendarPage = () => {
   const handleCreateEventFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const date = moment(newDateValue, 'YYYY-MM-DD');
-    // setCurrentDate(newDateValue)
+    console.log(newDateValue)
     const startTime = moment(newStartTimeValue, 'HH:mm');
     date.hour(startTime.hour());
     date.minute(startTime.minute());
@@ -619,6 +614,7 @@ const CalendarPage = () => {
               text: 'Создать',
               click: function() {
                 setIsCreateEventModalOpened(true)
+                setNewDateValue(currentDate)
                 setIsCurrentEventLoading(true)
                 getPlaces()
                 clearData()
@@ -641,7 +637,7 @@ const CalendarPage = () => {
             if (!isNaN(Date.parse(current.toString()))) {
             formattedDate = current.toISOString().substring(0,10);
             console.log('currentDate isss', current);
-            setNewDateValue(formattedDate);
+            // setNewDateValue(formattedDate);
             setCurrentDate(formattedDate)
             } else {
             console.log('Invalid date: ', current);
