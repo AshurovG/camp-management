@@ -43,6 +43,7 @@ const DetailedEventInfo: React.FC<DetailedInfoProps> = ({id, handleEditEventButt
                 isNeedWhiteboard: response.data.is_need_whiteboard,
                 color: response.data.color
             }))
+            console.log('color is   s s  s', response.data.color)
 
             const newUsersArr = response.data.users.map((user: RecUserData) => {
                 return {
