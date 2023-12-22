@@ -104,7 +104,7 @@ function App() {
       <HashRouter>
         <CommonInfo />
         <>
-        <Header></Header>
+        {userInfo && <Header></Header>}
         {/* {isUserInfoLoading ? <div className={styles.loader__wrapper}>
               <Loader className={styles.loader} size='l' />
           </div>

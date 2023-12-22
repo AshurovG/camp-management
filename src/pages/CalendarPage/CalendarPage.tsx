@@ -92,7 +92,7 @@ const CalendarPage = () => {
   const [newTitleValue, setNewTitleValue] = useState('')
   const [newIsNeedScreenValue, setNewIsNeedScreenValue] = useState(false)
   const [newIsNeedComputerValue, setNewIsNeedComputerValue] = useState(false)
-  const [isNeedNotification, setIsNeedNotification] = useState(false)
+  const [isNeedNotification, setIsNeedNotification] = useState(true)
   const [newIsNeedWiteboardValue, setNewIsNeedWhiteboardValue] = useState(false)
   const [newDateValue, setNewDateValue] = useState('')
   const [newColorValue, setNewColorValue] = useState('#4169e1')
@@ -114,7 +114,7 @@ const CalendarPage = () => {
     setNewIsNeedComputerValue(false)
     setNewIsNeedScreenValue(false)
     setNewIsNeedWhiteboardValue(false)
-    setIsNeedNotification(false)
+    setIsNeedNotification(true)
     setPlaceValue(null)
     setNewColorValue('#4169e1')
   }
@@ -381,7 +381,7 @@ const CalendarPage = () => {
 
   React.useEffect(() => {
     if (common) {
-      setCurrentDate(common.startDate)
+      // setCurrentDate(common.startDate)
       console.log('common', common.startDate)
     }
 
@@ -404,6 +404,10 @@ const CalendarPage = () => {
     }
     
   }, [currentEvent])
+
+  React.useEffect(() => {
+    console.log('newDateValue dfdfdfdf', newDateValue)
+  }, [newDateValue])
 
 
   const handleEditEventButtonClick = () => {
@@ -620,6 +624,7 @@ const CalendarPage = () => {
               click: function() {
                 setIsCreateEventModalOpened(true)
                 setIsCurrentEventLoading(true)
+                setNewDateValue(new Date(currentDate).toLocaleDateString('ru-RU'))
                 getPlaces()
                 clearData()
               }
@@ -634,6 +639,11 @@ const CalendarPage = () => {
             return { html: currentEvent.event.title };
            }}
            allDaySlot={false}
+           datesSet={(dateInfo) => {
+            const formattedStartDate = dateInfo.start.toLocaleDateString('ru-RU'); // Преобразование даты в строку формата "день.месяц.год"
+            // setNewDateValue(formattedStartDate);
+            console.log('formattedStartDate', formattedStartDate)
+           }}
         />}
        </div>}
      </div>

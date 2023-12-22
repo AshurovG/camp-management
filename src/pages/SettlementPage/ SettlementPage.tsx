@@ -113,7 +113,6 @@ const BuildingsPage = () => {
   }
 
   const getUsersWithoutRoom = async () => {
-    // setIsLoading(true)
     try {
       const response = await axios(API_URL + `users/without_rooms`, {
         method: 'GET'
@@ -134,7 +133,7 @@ const BuildingsPage = () => {
     }
   }
 
-  const getUsersFromRoom = async (buildingId: number, roomId: number) => {
+  const  getUsersFromRoom = async (buildingId: number, roomId: number) => {
     try {
       const response = await axios(API_URL + `buildings/${buildingId}/rooms/${roomId}/users`, {
         method: 'GET'
@@ -147,6 +146,8 @@ const BuildingsPage = () => {
           lastName: row.last_name
         }
       })
+
+      console.log('запрос пользователей из комнат', newArr)
 
       setUsersFromRoom(newArr)
 
@@ -168,10 +169,6 @@ const BuildingsPage = () => {
 
     } finally {
         toast.success("Информация о комнате успешно обновлена!");
-        // getUsersWithoutRoom()
-        // if (buildingValue && roomValue) {
-        //   getUsersFromRoom(buildingValue.id, roomValue.id)
-        // }
         await Promise.all([
           getUsersWithoutRoom(),
           buildingValue && roomValue ? getUsersFromRoom(buildingValue.id, roomValue.id) : null
@@ -289,8 +286,9 @@ const BuildingsPage = () => {
 
       setRoomValue(response.data)
       if (buildingValue) {
-        console.log('if building value...')
+        setIsUsersLoading(true)
         getUsersFromRoom(buildingValue?.id, response.data.id)
+        getUsersWithoutRoom()
       }
       toast.success("Комната успешно добавлена!");
       if (currentRooms) {
@@ -345,6 +343,7 @@ const BuildingsPage = () => {
         setRoomValue(newArr[0])
         if (buildingValue) {
           getUsersFromRoom(buildingValue.id, newArr[0].id)
+          getUsersWithoutRoom()
         }
       } else {
         setRoomValue(undefined)
@@ -352,6 +351,12 @@ const BuildingsPage = () => {
       toast.success("Комната успешно удалена!");
     } catch {
 
+    } finally {
+      // if (buildingValue?.id && roomValue?.id) {
+      //   setIsUsersLoading(true)
+      //   getUsersFromRoom(buildingValue.id, roomValue.id)
+        
+      // }
     }
   }
 
@@ -438,6 +443,10 @@ const BuildingsPage = () => {
     fetchData();
   }, []);
 
+  React.useEffect(() => {
+
+  }, [])
+
   const handleBuildingFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isCreateBuildingModalOpened) {
@@ -450,7 +459,7 @@ const BuildingsPage = () => {
     setIsEditBuildingModalOpened(false)
   }
 
-  const handleRoomFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleRoomFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isCreateRoomModalOpened) {
       postRoom();
@@ -492,12 +501,13 @@ const BuildingsPage = () => {
       if (selectedRoom && selectedRoom.id !== roomValue?.id) {
         setRoomValue(selectedRoom)
         if (buildingValue) {
-          setIsLoading(true); // Установка состояния загрузки в true перед началом запроса
-          await getUsersFromRoom(buildingValue?.id, Number(eventKey)); // Ожидание завершения запроса
-          setIsLoading(false); // Установка состояния загрузки в false после завершения запроса
+          setIsLoading(true);
+          await getUsersFromRoom(buildingValue?.id, Number(eventKey));
+          setIsLoading(false);
         }
       }
     }
+    
    };
 
   const handlePlaceSelect = (eventKey: string | null) => {
@@ -549,11 +559,6 @@ const BuildingsPage = () => {
     setIsDeletePlaceModalOpened(false)
   }
 
-  // const handleRoomChange = (event: ChangeEvent<HTMLInputElement>) => {
-  //   setNewRoomNumberValue(event.target.value)
-  //   console.log(Number(event.target.value))
-  // }
-
   const handleUserAdd = (id: number) => {
     if (addedUsers.includes(id)) {
       setAddedUsers(addedUsers.filter(userId => userId !== id));
@@ -591,8 +596,6 @@ const BuildingsPage = () => {
     setAddedUsers([])
     setDeletedUsers([])
   }
-
-  
 
   return (
     <div className={styles.settlement__page}>
