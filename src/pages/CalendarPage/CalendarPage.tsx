@@ -24,49 +24,50 @@ import { useCurrentEvent, useIsEventsChanged, useUsersFromEvent, useGroupsFromEv
 import { useUsers, useGroups, setUsersAction, setGroupsAction } from 'slices/GroupsSlice';
 import { toast } from 'react-toastify';
 import {API_URL} from 'components/urls';
+import ColorPalette from "../../components/ColorPalette/ColorPalette";
 
-// const colors = [
-//   {
-//     key: 'blue',
-//     value: '#00BFFF'
-//   },
-//   {
-//     key: 'darkBlue',
-//     value: '#4169e1'
-//   },
-//   {
-//     key: 'red',
-//     value: '#FF0013'
-//   },
-//   {
-//     key: 'orange',
-//     value: '#FF4F00'
-//   },
-//   {
-//     key: 'yellow',
-//     value: '#FFF000'
-//   },
-//   {
-//     key: 'lime',
-//     value: '#00FF00'
-//   },
-//   {
-//     key: 'green',
-//     value: '#008000'
-//   },
-//   {
-//     key: 'purple',
-//     value: '#6F2DA8'
-//   },
-//   {
-//     key: 'pink',
-//     value: '#E4A0F7'
-//   },
-//   {
-//     key: 'gray',
-//     value: '#808080'
-//   },
-// ]
+const colors = [
+  {
+    key: 'blue',
+    value: '#00BFFF'
+  },
+  {
+    key: 'darkBlue',
+    value: '#4169e1'
+  },
+  {
+    key: 'red',
+    value: '#FF0013'
+  },
+  {
+    key: 'orange',
+    value: '#FF4F00'
+  },
+  {
+    key: 'yellow',
+    value: '#FFF000'
+  },
+  {
+    key: 'lime',
+    value: '#00FF00'
+  },
+  {
+    key: 'green',
+    value: '#008000'
+  },
+  {
+    key: 'purple',
+    value: '#6F2DA8'
+  },
+  {
+    key: 'pink',
+    value: '#E4A0F7'
+  },
+  {
+    key: 'gray',
+    value: '#808080'
+  },
+]
 
 const CalendarPage = () => {
   const dispatch = useDispatch()
