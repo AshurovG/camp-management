@@ -115,6 +115,7 @@ const CalendarPage = () => {
     setNewIsNeedWhiteboardValue(false)
     setIsNeedNotification(false)
     setPlaceValue(null)
+    setNewColorValue('#4169e1')
   }
 
   const clearSelectedData = () => {
@@ -170,6 +171,8 @@ const CalendarPage = () => {
             color: response.data.color !== '' ? 'red' : 'blue' 
         }))
 
+        // setCurrentDate(response.data.)
+
         const newUsersArr = response.data.users.map((user: RecUserData) => {
             return {
                 id: user.id,
@@ -200,7 +203,8 @@ const CalendarPage = () => {
           notification: isNeedNotification,
           is_need_screen: newIsNeedScreenValue,
           is_need_computer: newIsNeedComputerValue,
-          is_need_whiteboard: newIsNeedWiteboardValue
+          is_need_whiteboard: newIsNeedWiteboardValue,
+          color: newColorValue
         },
       })
       toast.success('Информация успешно обновлена!')
@@ -219,8 +223,9 @@ const CalendarPage = () => {
           id: placeValue?.id,
         }
       })
-
-      toast.success('Информация успешно обновлена!')
+      if (isModalOpened) {
+        toast.success('Информация успешно обновлена!')
+      }
     } catch (e) {
       throw e
     } finally {
@@ -373,8 +378,9 @@ const CalendarPage = () => {
   }
 
   React.useEffect(() => {
-    if (common ) {
+    if (common) {
       setCurrentDate(common.startDate)
+      console.log('common', common.startDate)
     }
 
     getEvents()
@@ -386,7 +392,21 @@ const CalendarPage = () => {
     
   }, [isEventsChanged])
 
+
+  React.useEffect(() => {
+    if (currentEvent?.color)  {
+      setNewColorValue(currentEvent.color)
+      console.log('current colorn ', currentEvent.color)
+    } else {
+      setNewColorValue('#4169e1')
+    }
+    
+  }, [currentEvent])
+
+
   const handleEditEventButtonClick = () => {
+    const date = moment(newDateValue, 'YYYY-MM-DD');
+    console.log('date', date)
     getPlaces()
     setPlaceValue(currentEvent?.place)
     setEventWindowMode('editEvent')
@@ -428,6 +448,8 @@ const CalendarPage = () => {
   const handleEditEventFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const date = moment(currentEvent?.endTime);
+    console.log('edit')
+    console.log(currentDate)
     if (currentEvent) {
       const startTime = moment(newStartTimeValue, 'HH:mm');
       date.set({
@@ -443,10 +465,6 @@ const CalendarPage = () => {
         second: endTime.second()
        });
        const end = date.format('YYYY-MM-DDTHH:mm:ss')
-      //  if (isPlaceValueChanged) {
-      //   // changePlace()
-      //   setIsPlaceValueChanged(false)
-      //  }
        putEvent(start, end)
     }
   }
@@ -575,9 +593,9 @@ const CalendarPage = () => {
           title: `${raw.notification ? '🔔' : '🔕'} ${raw.title}`,
           start: new Date(raw.startTime),
           end: new Date(raw.endTime),
-          backgroundColor: raw.color, // Добавьте это свойство
+          backgroundColor: raw.color,
         }))}
-         titleFormat={{ // добавьте это свойство
+         titleFormat={{
           month: 'long',
           year: 'numeric',
           day: 'numeric'
@@ -642,6 +660,11 @@ const CalendarPage = () => {
             placeholder="Время завершения*" 
             />
           </div>
+          <div className={styles.form__item}>
+            <p>В какой цвет покрасить?</p>
+            <div style={{backgroundColor: newColorValue}} onClick={() => setIsColorMenuOpened(!isColorMenuOpened)}  className={styles.form__color}></div>
+          </div>
+          {isColorMenuOpened && <ColorPalette className={styles.form__colors} colors={colors} onClick={handleColorValueChange}></ColorPalette>}
           <div className={styles.form__item}>
             <p>Оповещение</p>
             <CheckBox className={styles.form__checkbox} checked={isNeedNotification} onChange={() => setIsNeedNotification(!isNeedNotification)}/>
