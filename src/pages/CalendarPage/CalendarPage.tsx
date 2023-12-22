@@ -145,7 +145,6 @@ const CalendarPage = () => {
           color: raw.color ? raw.color : '#4169e1'
         }
       })
-      console.log(newArr)
       setEvents(newArr)
     } catch(e) {
       throw e
@@ -380,17 +379,16 @@ const CalendarPage = () => {
   }
 
   React.useEffect(() => {
-    if (common) {
-      // setCurrentDate(common.startDate)
-      console.log('common', common.startDate)
-    }
+    // if (common) {
+    //   setCurrentDate(common.startDate)
+    //   console.log('common', common.startDate)
+    // }
 
     getEvents()
     if (users.length === 0) {
       getUsers()
       getGroups()
     }
-    console.log('reload')
     
   }, [isEventsChanged])
 
@@ -398,21 +396,19 @@ const CalendarPage = () => {
   React.useEffect(() => {
     if (currentEvent?.color)  {
       setNewColorValue(currentEvent.color)
-      console.log('current colorn ', currentEvent.color)
     } else {
       setNewColorValue('#4169e1')
     }
-    
   }, [currentEvent])
 
-  React.useEffect(() => {
-    console.log('newDateValue dfdfdfdf', newDateValue)
-  }, [newDateValue])
+  // React.useEffect(() => {
+  //   // setNewDateValue(currentDate)
+  //   setNewDateValue(currentDate)
+  // }, [currentDate])
 
 
   const handleEditEventButtonClick = () => {
     const date = moment(newDateValue, 'YYYY-MM-DD');
-    console.log('date', date)
     getPlaces()
     setPlaceValue(currentEvent?.place)
     setEventWindowMode('editEvent')
@@ -437,7 +433,7 @@ const CalendarPage = () => {
   const handleCreateEventFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const date = moment(newDateValue, 'YYYY-MM-DD');
-    setCurrentDate(newDateValue)
+    // setCurrentDate(newDateValue)
     const startTime = moment(newStartTimeValue, 'HH:mm');
     date.hour(startTime.hour());
     date.minute(startTime.minute());
@@ -458,8 +454,6 @@ const CalendarPage = () => {
   const handleEditEventFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const date = moment(currentEvent?.endTime);
-    console.log('edit')
-    console.log(currentDate)
     if (currentEvent) {
       const startTime = moment(newStartTimeValue, 'HH:mm');
       date.set({
@@ -580,6 +574,8 @@ const CalendarPage = () => {
     setIsColorMenuOpened(false)
   }
 
+  // React.useEffect(())
+
   return (
     <div className={styles.events__page}>
      <div className={styles['events__page-wrapper']}>
@@ -624,7 +620,6 @@ const CalendarPage = () => {
               click: function() {
                 setIsCreateEventModalOpened(true)
                 setIsCurrentEventLoading(true)
-                setNewDateValue(new Date(currentDate).toLocaleDateString('ru-RU'))
                 getPlaces()
                 clearData()
               }
@@ -640,10 +635,19 @@ const CalendarPage = () => {
            }}
            allDaySlot={false}
            datesSet={(dateInfo) => {
-            const formattedStartDate = dateInfo.start.toLocaleDateString('ru-RU'); // Преобразование даты в строку формата "день.месяц.год"
-            // setNewDateValue(formattedStartDate);
-            console.log('formattedStartDate', formattedStartDate)
+            const parts = dateInfo.start.toLocaleDateString('ru-RU').split('.');
+            const current = new Date(Date.UTC(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0])));
+            let formattedDate;
+            if (!isNaN(Date.parse(current.toString()))) {
+            formattedDate = current.toISOString().substring(0,10);
+            console.log('currentDate isss', current);
+            setNewDateValue(formattedDate);
+            setCurrentDate(formattedDate)
+            } else {
+            console.log('Invalid date: ', current);
+            }
            }}
+           
         />}
        </div>}
      </div>
