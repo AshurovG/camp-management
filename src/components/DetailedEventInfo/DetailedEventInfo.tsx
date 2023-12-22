@@ -40,7 +40,8 @@ const DetailedEventInfo: React.FC<DetailedInfoProps> = ({id, handleEditEventButt
                 notification: response.data.notification,
                 isNeedScreen: response.data.is_need_screen,
                 isNeedComputer: response.data.is_need_computer,
-                isNeedWhiteboard: response.data.is_need_whiteboard
+                isNeedWhiteboard: response.data.is_need_whiteboard,
+                color: response.data.color
             }))
 
             const newUsersArr = response.data.users.map((user: RecUserData) => {

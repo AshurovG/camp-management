@@ -20,54 +20,53 @@ import Loader from 'components/Loader';
 import SearchList from 'components/SearchList';
 import ArrowIcon from 'components/Icons/ArrowIcon';
 import ArrowDownIcon from 'components/Icons/ArrowDownIcon'
-import ColorPalette from 'components/ColorPalette';
 import { useCurrentEvent, useIsEventsChanged, useUsersFromEvent, useGroupsFromEvent, setIsEventsChangedAction, setCurrentEventAction, setUsersFromEventAction, setGroupsFromEventAction} from 'slices/EventsSlice';
 import { useUsers, useGroups, setUsersAction, setGroupsAction } from 'slices/GroupsSlice';
 import { toast } from 'react-toastify';
 import {API_URL} from 'components/urls';
 
-const colors = [
-  {
-    key: 'blue',
-    value: '#00BFFF'
-  },
-  {
-    key: 'darkBlue',
-    value: '#4169e1'
-  },
-  {
-    key: 'red',
-    value: '#FF0013'
-  },
-  {
-    key: 'orange',
-    value: '#FF4F00'
-  },
-  {
-    key: 'yellow',
-    value: '#FFF000'
-  },
-  {
-    key: 'lime',
-    value: '#00FF00'
-  },
-  {
-    key: 'green',
-    value: '#008000'
-  },
-  {
-    key: 'purple',
-    value: '#6F2DA8'
-  },
-  {
-    key: 'pink',
-    value: '#E4A0F7'
-  },
-  {
-    key: 'gray',
-    value: '#808080'
-  },
-]
+// const colors = [
+//   {
+//     key: 'blue',
+//     value: '#00BFFF'
+//   },
+//   {
+//     key: 'darkBlue',
+//     value: '#4169e1'
+//   },
+//   {
+//     key: 'red',
+//     value: '#FF0013'
+//   },
+//   {
+//     key: 'orange',
+//     value: '#FF4F00'
+//   },
+//   {
+//     key: 'yellow',
+//     value: '#FFF000'
+//   },
+//   {
+//     key: 'lime',
+//     value: '#00FF00'
+//   },
+//   {
+//     key: 'green',
+//     value: '#008000'
+//   },
+//   {
+//     key: 'purple',
+//     value: '#6F2DA8'
+//   },
+//   {
+//     key: 'pink',
+//     value: '#E4A0F7'
+//   },
+//   {
+//     key: 'gray',
+//     value: '#808080'
+//   },
+// ]
 
 const CalendarPage = () => {
   const dispatch = useDispatch()
