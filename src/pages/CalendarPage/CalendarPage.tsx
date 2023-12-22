@@ -100,6 +100,7 @@ const CalendarPage = () => {
   const [isDetailedEventLoading, setIsDetailedEventLoading] = useState(false)
   const [isCurrentEventLoading, setIsCurrentEventLoading] = useState(false)
   const [isColorMenuOpened, setIsColorMenuOpened] = useState(false)
+  const [isDeleteEventButtonClicked, setIsDeleteEventButtonClicked] = useState(false)
   const [addedUsers, setAddedUsers] = useState<number[]>([])
   const [deletedUsers, setDeletedUsers] = useState<number[]>([])
   const [addedGroups, setAddedGroups] = useState<number[]>([])
@@ -275,6 +276,7 @@ const CalendarPage = () => {
         throw e
     } finally {
       setIsModalOpened(false)
+      setIsDeleteEventButtonClicked(false)
       getEvents()
     }
   }
@@ -443,6 +445,10 @@ const CalendarPage = () => {
     const end = date.format('YYYY-MM-DDTHH:mm:ss');
     
     postEvent(start, end)
+  }
+
+  const handleDeleteEventButtonClick = () => {
+    setIsDeleteEventButtonClicked(true)
   }
 
   const handleEditEventFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -635,7 +641,7 @@ const CalendarPage = () => {
         {eventWindowMode === 'showEvent' && isModalOpened && isCurrentEventLoading ? <div className={styles.bloader__wrapper}>
               <Loader className={styles.bloader} size='l' />
           </div>
-         : eventWindowMode === 'showEvent' && isModalOpened ? <DetailedEventInfo handleDeleteEventButtonClick={() => deleteEvent() } id={selectedEvent} handleEditEventButtonClick={handleEditEventButtonClick} handleShowUsersButtonClick={() => setEventWindowMode('showUsers')} handleEditPlaceButtonClick={handleEditPlaceButtonClick}/>
+         : eventWindowMode === 'showEvent' && isModalOpened ? <DetailedEventInfo handleDeleteEventButtonClick={() => handleDeleteEventButtonClick() } id={selectedEvent} handleEditEventButtonClick={handleEditEventButtonClick} handleShowUsersButtonClick={() => setEventWindowMode('showUsers')} handleEditPlaceButtonClick={handleEditPlaceButtonClick}/>
         : eventWindowMode === 'editEvent' && isModalOpened ? <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleEditEventFormSubmit(event)}
         className={styles['form']}>
           <h3 className={styles.modal__title}>Заполните данные</h3>
@@ -697,7 +703,7 @@ const CalendarPage = () => {
             <div>
               <SearchList withActionBlock members={users} subgroups={groups}
               onMemberClick={handleUserAdd} onSubgroupClick={handleGroupAdd} activeMembers={addedUsers} activeSubgroups={addedGroups}><p>Доступные участники и группы</p></SearchList>
-              <p>Выбрано: {addedGroups.length + addedUsers.length}</p>
+              <p> брано: {addedGroups.length + addedUsers.length}</p>
             </div>
               <div className={styles['modal__groups-btns']}>
                   <Button onClick={handleAddArrowClick} className={styles['modal__groups-common']}><ArrowIcon/></Button>
@@ -828,6 +834,14 @@ const CalendarPage = () => {
           </div>
         </Form>
         {/* <SearchList onMemberClick={(id) => {setSelectedUser(id); setUsersWindowMode('detailed')}} allUsers/> */}
+      </ModalWindow>
+
+      <ModalWindow handleBackdropClick={() => setIsDeleteEventButtonClicked(false)} active={isDeleteEventButtonClicked} className={styles.modal}>
+        <h3 className={styles.modal__title}>Вы уверены, что хотите удалить данное событие?</h3>
+        <div className={styles['modal__delete-btns']}>
+          <Button onClick={() => deleteEvent()} className={styles.modal__btn}>Подтвердить</Button>
+          <Button onClick={() => setIsDeleteEventButtonClicked(false)} className={styles.modal__btn}>Закрыть</Button>
+        </div>
       </ModalWindow>
    </div>
   )
