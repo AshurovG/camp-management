@@ -1,9 +1,9 @@
 import {HashRouter, Routes, Route, Navigate, useNavigate} from 'react-router-dom'
 import { ToastContainer } from 'react-toastify';
 import { useDispatch } from 'react-redux';
-import {setCommonAction, setUserInfoAction, setIsUserInfoLoadingAction, useUserInfo} from 'slices/MainSlice';
+import {setCommonAction, setUserInfoAction, setIsUserInfoLoadingAction, useUserInfo, useIsUserInfoLoading} from 'slices/MainSlice';
 import 'react-toastify/dist/ReactToastify.css';
-// import styles from './App.module.scss'
+import styles from './App.module.scss'
 import Header from 'components/Header'
 import GroupsPage from 'pages/GroupsPage'
 import CalendarPage from 'pages/CalendarPage'
@@ -14,7 +14,7 @@ import axios, {AxiosHeaders} from 'axios';
 import React from 'react';
 import {API_URL} from 'components/urls';
 import {getCookie} from "../components/get_cookie";
-// import Loader from 'components/Loader';
+import Loader from 'components/Loader';
 
 function CommonInfo (): React.ReactNode {
     const navigate = useNavigate();
@@ -98,17 +98,18 @@ function CommonInfo (): React.ReactNode {
 
 function App() {
   const userInfo = useUserInfo();
+  const isUserInfoLoading = useIsUserInfoLoading()
 
   return (
     <div className='app'>
       <HashRouter>
         <CommonInfo />
-        <>
-        {userInfo && <Header></Header>}
-        {/* {isUserInfoLoading ? <div className={styles.loader__wrapper}>
+        {isUserInfoLoading ? <div className={styles.loader__wrapper}>
               <Loader className={styles.loader} size='l' />
           </div>
-          : <div className={styles.content}> */}
+          :
+        <>
+        {userInfo && <Header></Header>}
           <Routes >
            {!userInfo ? <>
               <Route path='/login' element={<LoginPage/>}></Route>
@@ -124,6 +125,7 @@ function App() {
             }
           </Routes>
           </>
+        }
         {/* </div>} */}
       </HashRouter>
       <ToastContainer autoClose={1000} pauseOnHover={false} />
