@@ -20,7 +20,8 @@ import Loader from 'components/Loader';
 import SearchList from 'components/SearchList';
 import ArrowIcon from 'components/Icons/ArrowIcon';
 import ArrowDownIcon from 'components/Icons/ArrowDownIcon'
-import { useCurrentEvent, useIsEventsChanged, useUsersFromEvent, useGroupsFromEvent, setIsEventsChangedAction, setCurrentEventAction, setUsersFromEventAction, setGroupsFromEventAction} from 'slices/EventsSlice';
+import ColorPalette from 'components/ColorPalette';
+import { useCurrentEvent, useIsEventsChanged, useUsersFromEvent, useGroupsFromEvent, useIsEventLoading, setIsEventLoadingAction, setIsEventsChangedAction, setCurrentEventAction, setUsersFromEventAction, setGroupsFromEventAction} from 'slices/EventsSlice';
 import { useUsers, useGroups, setUsersAction, setGroupsAction } from 'slices/GroupsSlice';
 import { toast } from 'react-toastify';
 import {API_URL} from 'components/urls';
@@ -92,7 +93,7 @@ const CalendarPage = () => {
   const [newTitleValue, setNewTitleValue] = useState('')
   const [newIsNeedScreenValue, setNewIsNeedScreenValue] = useState(false)
   const [newIsNeedComputerValue, setNewIsNeedComputerValue] = useState(false)
-  const [isNeedNotification, setIsNeedNotification] = useState(false)
+  const [isNeedNotification, setIsNeedNotification] = useState(true)
   const [newIsNeedWiteboardValue, setNewIsNeedWhiteboardValue] = useState(false)
   const [newDateValue, setNewDateValue] = useState('')
   const [newColorValue, setNewColorValue] = useState('#4169e1')
@@ -100,11 +101,13 @@ const CalendarPage = () => {
   const [isDetailedEventLoading, setIsDetailedEventLoading] = useState(false)
   const [isCurrentEventLoading, setIsCurrentEventLoading] = useState(false)
   const [isColorMenuOpened, setIsColorMenuOpened] = useState(false)
+  const [isDeleteEventButtonClicked, setIsDeleteEventButtonClicked] = useState(false)
   const [addedUsers, setAddedUsers] = useState<number[]>([])
   const [deletedUsers, setDeletedUsers] = useState<number[]>([])
   const [addedGroups, setAddedGroups] = useState<number[]>([])
   const [deletedGroups, setDeletedGroups] = useState<number[]>([])
   const [currentDate, setCurrentDate] = useState<string>('')
+  const isEventLoading = useIsEventLoading()
 
   const clearData = () => {
     setNewTitleValue('')
@@ -113,7 +116,7 @@ const CalendarPage = () => {
     setNewIsNeedComputerValue(false)
     setNewIsNeedScreenValue(false)
     setNewIsNeedWhiteboardValue(false)
-    setIsNeedNotification(false)
+    setIsNeedNotification(true)
     setPlaceValue(null)
     setNewColorValue('#4169e1')
   }
@@ -144,7 +147,6 @@ const CalendarPage = () => {
           color: raw.color ? raw.color : '#4169e1'
         }
       })
-      console.log(newArr)
       setEvents(newArr)
     } catch(e) {
       throw e
@@ -152,9 +154,9 @@ const CalendarPage = () => {
       setIsEventsLoading(false)
     }
   }
-  const getDetailedEvent = async() => {
+  const getDetailedEvent = async(id: number) => {
     try {
-        const response = await axios(API_URL + `events/${currentEvent?.id}/detailed`, {
+        const response = await axios(API_URL + `events/${id}/detailed`, {
             method: 'GET'
         })
         dispatch(setCurrentEventAction({
@@ -212,6 +214,10 @@ const CalendarPage = () => {
       throw e
     } finally {
         setEventWindowMode('showEvent')
+        if (currentEvent) {
+          setIsDetailedEventLoading(true)
+          getDetailedEvent(currentEvent.id)
+        }
     }
   }
 
@@ -229,7 +235,10 @@ const CalendarPage = () => {
     } catch (e) {
       throw e
     } finally {
-      getDetailedEvent()
+      if (currentEvent){
+      setIsDetailedEventLoading(true)
+      getDetailedEvent(currentEvent.id)
+    }
     }
   }
 
@@ -275,6 +284,7 @@ const CalendarPage = () => {
         throw e
     } finally {
       setIsModalOpened(false)
+      setIsDeleteEventButtonClicked(false)
       getEvents()
     }
   }
@@ -334,7 +344,8 @@ const CalendarPage = () => {
     } catch {
 
     } finally {
-      await getDetailedEvent()
+      if (currentEvent)
+      await getDetailedEvent(currentEvent.id)
     }
   }
 
@@ -347,7 +358,8 @@ const CalendarPage = () => {
     } catch {
 
     } finally {
-      await getDetailedEvent()
+      if (currentEvent)
+      await getDetailedEvent(currentEvent.id)
     }
   }
 
@@ -360,7 +372,8 @@ const CalendarPage = () => {
     } catch {
 
     } finally {
-      await getDetailedEvent()
+      if (currentEvent)
+      await getDetailedEvent(currentEvent.id)
     }
   }
 
@@ -373,22 +386,22 @@ const CalendarPage = () => {
     } catch {
 
     } finally {
-      await getDetailedEvent()
+      if (currentEvent)
+      await getDetailedEvent(currentEvent.id)
     }
   }
 
   React.useEffect(() => {
-    if (common) {
-      setCurrentDate(common.startDate)
-      console.log('common', common.startDate)
-    }
+    // if (common) {
+    //   setCurrentDate(common.startDate)
+    //   console.log('common', common.startDate)
+    // }
 
     getEvents()
     if (users.length === 0) {
       getUsers()
       getGroups()
     }
-    console.log('reload')
     
   }, [isEventsChanged])
 
@@ -396,17 +409,14 @@ const CalendarPage = () => {
   React.useEffect(() => {
     if (currentEvent?.color)  {
       setNewColorValue(currentEvent.color)
-      console.log('current colorn ', currentEvent.color)
     } else {
       setNewColorValue('#4169e1')
     }
-    
   }, [currentEvent])
 
 
   const handleEditEventButtonClick = () => {
     const date = moment(newDateValue, 'YYYY-MM-DD');
-    console.log('date', date)
     getPlaces()
     setPlaceValue(currentEvent?.place)
     setEventWindowMode('editEvent')
@@ -431,7 +441,7 @@ const CalendarPage = () => {
   const handleCreateEventFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const date = moment(newDateValue, 'YYYY-MM-DD');
-    setCurrentDate(newDateValue)
+    console.log(newDateValue)
     const startTime = moment(newStartTimeValue, 'HH:mm');
     date.hour(startTime.hour());
     date.minute(startTime.minute());
@@ -445,11 +455,13 @@ const CalendarPage = () => {
     postEvent(start, end)
   }
 
+  const handleDeleteEventButtonClick = () => {
+    setIsDeleteEventButtonClicked(true)
+  }
+
   const handleEditEventFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const date = moment(currentEvent?.endTime);
-    console.log('edit')
-    console.log(currentDate)
     if (currentEvent) {
       const startTime = moment(newStartTimeValue, 'HH:mm');
       date.set({
@@ -570,6 +582,8 @@ const CalendarPage = () => {
     setIsColorMenuOpened(false)
   }
 
+  // React.useEffect(())
+
   return (
     <div className={styles.events__page}>
      <div className={styles['events__page-wrapper']}>
@@ -578,7 +592,7 @@ const CalendarPage = () => {
               <Loader className={styles.loader} size='l' />
           </div>
         : <div className={styles['events__page-content']}>
-       {common && events && <FullCalendar
+       {common && events && !isDetailedEventLoading && <FullCalendar
         height={600}
         plugins={[ dayGridPlugin, timeGridPlugin ]}
         initialView="timeGridDay"
@@ -613,29 +627,49 @@ const CalendarPage = () => {
               text: 'Создать',
               click: function() {
                 setIsCreateEventModalOpened(true)
+                setNewDateValue(currentDate)
                 setIsCurrentEventLoading(true)
                 getPlaces()
                 clearData()
               }
             }
            }}
-           eventClick={(info) => {
+           eventClick={async (info) => {
+            setSelectedEvent(Number(info.event.id))
             setIsModalOpened(true)
             setEventWindowMode('showEvent')
-            setSelectedEvent(Number(info.event.id))
+            // dispatch(setIsEventLoadingAction(true))
+            setIsDetailedEventLoading(true)
+            console.log('info us', Number(info.event.id))
+            getDetailedEvent(Number(info.event.id))
            }}
            eventContent={(currentEvent) => {
             return { html: currentEvent.event.title };
            }}
            allDaySlot={false}
+           datesSet={(dateInfo) => {
+            const parts = dateInfo.start.toLocaleDateString('ru-RU').split('.');
+            const current = new Date(Date.UTC(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0])));
+            let formattedDate;
+            if (!isNaN(Date.parse(current.toString()))) {
+            formattedDate = current.toISOString().substring(0,10);
+            console.log('currentDate isss', current);
+            // setNewDateValue(formattedDate);
+            setCurrentDate(formattedDate)
+            } else {
+            console.log('Invalid date: ', current);
+            }
+           }}
+           
         />}
        </div>}
      </div>
-     <ModalWindow className={styles.modal} handleBackdropClick={handleBackClick} active={isModalOpened}>
-        {eventWindowMode === 'showEvent' && isModalOpened && isCurrentEventLoading ? <div className={styles.bloader__wrapper}>
+     {isDetailedEventLoading ? <div className={styles.bloader__wrapper}>
               <Loader className={styles.bloader} size='l' />
           </div>
-         : eventWindowMode === 'showEvent' && isModalOpened ? <DetailedEventInfo handleDeleteEventButtonClick={() => deleteEvent() } id={selectedEvent} handleEditEventButtonClick={handleEditEventButtonClick} handleShowUsersButtonClick={() => setEventWindowMode('showUsers')} handleEditPlaceButtonClick={handleEditPlaceButtonClick}/>
+         :
+     <ModalWindow className={styles.modal} handleBackdropClick={handleBackClick} active={isModalOpened}>
+         {eventWindowMode === 'showEvent' && isModalOpened ? <DetailedEventInfo handleDeleteEventButtonClick={() => handleDeleteEventButtonClick() } id={selectedEvent} handleEditEventButtonClick={handleEditEventButtonClick} handleShowUsersButtonClick={() => setEventWindowMode('showUsers')} handleEditPlaceButtonClick={handleEditPlaceButtonClick}/>
         : eventWindowMode === 'editEvent' && isModalOpened ? <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleEditEventFormSubmit(event)}
         className={styles['form']}>
           <h3 className={styles.modal__title}>Заполните данные</h3>
@@ -697,7 +731,7 @@ const CalendarPage = () => {
             <div>
               <SearchList withActionBlock members={users} subgroups={groups}
               onMemberClick={handleUserAdd} onSubgroupClick={handleGroupAdd} activeMembers={addedUsers} activeSubgroups={addedGroups}><p>Доступные участники и группы</p></SearchList>
-              <p>Выбрано: {addedGroups.length + addedUsers.length}</p>
+              <p> брано: {addedGroups.length + addedUsers.length}</p>
             </div>
               <div className={styles['modal__groups-btns']}>
                   <Button onClick={handleAddArrowClick} className={styles['modal__groups-common']}><ArrowIcon/></Button>
@@ -742,7 +776,7 @@ const CalendarPage = () => {
             </Form>
         </div>
         }
-     </ModalWindow>
+     </ModalWindow>}
 
       <ModalWindow className={styles.modal} handleBackdropClick={() => setIsCreateEventModalOpened(false)} active={isCreateEventModalOpened}>
       <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleCreateEventFormSubmit(event)}
@@ -828,6 +862,14 @@ const CalendarPage = () => {
           </div>
         </Form>
         {/* <SearchList onMemberClick={(id) => {setSelectedUser(id); setUsersWindowMode('detailed')}} allUsers/> */}
+      </ModalWindow>
+
+      <ModalWindow handleBackdropClick={() => setIsDeleteEventButtonClicked(false)} active={isDeleteEventButtonClicked} className={styles.modal}>
+        <h3 className={styles.modal__title}>Вы уверены, что хотите удалить данное событие?</h3>
+        <div className={styles['modal__delete-btns']}>
+          <Button onClick={() => deleteEvent()} className={styles.modal__btn}>Подтвердить</Button>
+          <Button onClick={() => setIsDeleteEventButtonClicked(false)} className={styles.modal__btn}>Закрыть</Button>
+        </div>
       </ModalWindow>
    </div>
   )

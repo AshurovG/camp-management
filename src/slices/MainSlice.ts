@@ -13,16 +13,17 @@ const dataSlice = createSlice({
   initialState: {
     common: null,
     userInfo: null,
-    isUserInfoLoading: true
+    isUserInfoLoading: true,
+    authChecking: true
   } as DataState,
   reducers: {
     setCommon(state, action: PayloadAction<CommonData>) {
       state.common = action.payload;
     },
-    setUserInfo(state, action: PayloadAction<UserInfoData>) {
+    setUserInfo(state, action: PayloadAction<UserInfoData | null>) {
       state.userInfo = action.payload;
     },
-    setUserInfoNull(state) {
+    setUserInfoNull(state, action) {
       state.userInfo = null;
     },
     setIsUserInfoLoading(state, action: PayloadAction<boolean>) {

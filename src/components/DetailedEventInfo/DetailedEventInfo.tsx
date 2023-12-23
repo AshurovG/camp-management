@@ -9,7 +9,7 @@ import EditIcon from 'components/Icons/EditIcon';
 import BasketIcon from 'components/Icons/BasketIcon';
 import Button from 'components/Button';
 import { useDispatch } from 'react-redux';
-import { useCurrentEvent, setCurrentEventAction, setUsersFromEventAction, setGroupsFromEventAction } from 'slices/EventsSlice';
+import { useCurrentEvent, setCurrentEventAction, setUsersFromEventAction, setGroupsFromEventAction, setIsEventLoadingAction } from 'slices/EventsSlice';
 import {API_URL} from 'components/urls';
 
 export type DetailedInfoProps = {
@@ -26,41 +26,42 @@ const DetailedEventInfo: React.FC<DetailedInfoProps> = ({id, handleEditEventButt
     // const [currentEvent, setCurrentEvent] = useState<EventsData>()
     const [necessaryEquipment, setNecessaryEquipment] = useState('')
 
-    const getDetailedEvent = async() => {
-        try {
-            const response = await axios(API_URL + `events/${id}/detailed`, {
-                method: 'GET'
-            })
-            dispatch(setCurrentEventAction({
-                id: response.data.id,
-                title: response.data.title,
-                startTime: response.data.start_time,
-                endTime: response.data.end_time,
-                place: response.data.place,
-                notification: response.data.notification,
-                isNeedScreen: response.data.is_need_screen,
-                isNeedComputer: response.data.is_need_computer,
-                isNeedWhiteboard: response.data.is_need_whiteboard,
-                color: response.data.color
-            }))
-            console.log('color is   s s  s', response.data.color)
+    // const getDetailedEvent = async() => {
+    //     try {
+    //         const response = await axios(API_URL + `events/${id}/detailed`, {
+    //             method: 'GET'
+    //         })
+    //         dispatch(setCurrentEventAction({
+    //             id: response.data.id,
+    //             title: response.data.title,
+    //             startTime: response.data.start_time,
+    //             endTime: response.data.end_time,
+    //             place: response.data.place,
+    //             notification: response.data.notification,
+    //             isNeedScreen: response.data.is_need_screen,
+    //             isNeedComputer: response.data.is_need_computer,
+    //             isNeedWhiteboard: response.data.is_need_whiteboard,
+    //             color: response.data.color
+    //         }))
 
-            const newUsersArr = response.data.users.map((user: RecUserData) => {
-                return {
-                    id: user.id,
-                    firstName: user.first_name,
-                    lastName: user.last_name
-                }
-            })
-            dispatch(setUsersFromEventAction(newUsersArr))
+    //         const newUsersArr = response.data.users.map((user: RecUserData) => {
+    //             return {
+    //                 id: user.id,
+    //                 firstName: user.first_name,
+    //                 lastName: user.last_name
+    //             }
+    //         })
+    //         dispatch(setUsersFromEventAction(newUsersArr))
 
-            dispatch(setGroupsFromEventAction(response.data.groups))
+    //         dispatch(setGroupsFromEventAction(response.data.groups))
 
-            getNecessaryRquipment(response.data.is_need_screen, response.data.is_need_computer, response.data.is_need_whiteboard)
-        } catch(e) {
-            throw e
-        }
-    }
+    //         getNecessaryRquipment(response.data.is_need_screen, response.data.is_need_computer, response.data.is_need_whiteboard)
+    //     } catch(e) {
+    //         throw e
+    //     } finally {
+    //         dispatch(setIsEventLoadingAction(false)) 
+    //     }
+    // }
     
     const getNecessaryRquipment = (isNeedScreen: boolean, isNeedComputer: boolean, isNeedWhiteboard: boolean) => {
         const items = [];
@@ -74,12 +75,13 @@ const DetailedEventInfo: React.FC<DetailedInfoProps> = ({id, handleEditEventButt
             items.push('доска');
           }
           const res = items.join(', ');
-          setNecessaryEquipment(res);
+          return res
     }
 
-    React.useEffect(() => {
-        getDetailedEvent();
-      }, [])
+    // React.useEffect(() => {
+    //     if (currentEvent)
+    //     setNecessaryEquipment(getNecessaryRquipment(currentEvent.isNeedScreen, currentEvent.isNeedComputer, currentEvent.isNeedWhiteboard))
+    //   }, [currentEvent])
 
     return (
         <div className={styles.detailed}>
@@ -91,7 +93,7 @@ const DetailedEventInfo: React.FC<DetailedInfoProps> = ({id, handleEditEventButt
                 <Button onClick={handleShowUsersButtonClick}>Участники</Button>
             </div>
             <ul className={styles.detailed__list}>
-               {(currentEvent?.isNeedComputer || currentEvent?.isNeedScreen || currentEvent?.isNeedWhiteboard) && <li>Необходимое оборудование: {necessaryEquipment}</li>}
+               {(currentEvent?.isNeedComputer || currentEvent?.isNeedScreen || currentEvent?.isNeedWhiteboard) && <li>Необходимое оборудование: {getNecessaryRquipment(currentEvent.isNeedScreen, currentEvent.isNeedComputer, currentEvent.isNeedWhiteboard)}</li>}
                { currentEvent?.place ? <li className={styles['detailed__list-item-action']}><span>Место проведения: {currentEvent?.place.name} {currentEvent?.place.building.name}</span> <EditIcon onClick={handleEditPlaceButtonClick}/></li>
                : <li className={styles['detailed__list-item-action']}><span>Место проведения: не установлено</span> <EditIcon onClick={handleEditPlaceButtonClick}/></li>
                }

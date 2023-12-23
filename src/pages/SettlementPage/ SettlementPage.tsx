@@ -78,6 +78,7 @@ const BuildingsPage = () => {
       })
 
       if (response.data.length > 0) {
+        // setIsUsersLoading(true)
         getUsersFromRoom(id, response.data[0].id)
         setCurrentRooms(response.data)
         setRoomValue(response.data[0])
@@ -113,7 +114,6 @@ const BuildingsPage = () => {
   }
 
   const getUsersWithoutRoom = async () => {
-    // setIsLoading(true)
     try {
       const response = await axios(API_URL + `users/without_rooms`, {
         method: 'GET'
@@ -148,6 +148,8 @@ const BuildingsPage = () => {
         }
       })
 
+      console.log('запрос пользователей из комнат', newArr)
+
       setUsersFromRoom(newArr)
 
     } catch (e){
@@ -168,10 +170,6 @@ const BuildingsPage = () => {
 
     } finally {
         toast.success("Информация о комнате успешно обновлена!");
-        // getUsersWithoutRoom()
-        // if (buildingValue && roomValue) {
-        //   getUsersFromRoom(buildingValue.id, roomValue.id)
-        // }
         await Promise.all([
           getUsersWithoutRoom(),
           buildingValue && roomValue ? getUsersFromRoom(buildingValue.id, roomValue.id) : null
@@ -269,6 +267,8 @@ const BuildingsPage = () => {
       toast.success("Здание успешно удалено!");
       if (newArr.length > 0) {
         setBuildingValue(newArr[0])
+        setIsRoomsLoading(true)
+        setIsPlacesLoading(true)
         getRoomsFromBuilding(newArr[0].id)
         getPlacesFromBuilding(newArr[0].id)
       }
@@ -289,8 +289,9 @@ const BuildingsPage = () => {
 
       setRoomValue(response.data)
       if (buildingValue) {
-        console.log('if building value...')
+        setIsUsersLoading(true)
         getUsersFromRoom(buildingValue?.id, response.data.id)
+        getUsersWithoutRoom()
       }
       toast.success("Комната успешно добавлена!");
       if (currentRooms) {
@@ -343,8 +344,10 @@ const BuildingsPage = () => {
       setCurrentRooms(newArr)
       if (newArr?.length !== 0 && newArr) {
         setRoomValue(newArr[0])
-        if (buildingValue) {
+        if (buildingValue && roomValue) {
+          setIsUsersLoading(true)
           getUsersFromRoom(buildingValue.id, newArr[0].id)
+          // getUsersFromRoom(buildingValue.id, roomValue.id)
         }
       } else {
         setRoomValue(undefined)
@@ -352,6 +355,11 @@ const BuildingsPage = () => {
       toast.success("Комната успешно удалена!");
     } catch {
 
+    } finally {
+      // if (buildingValue?.id && roomValue?.id) {
+      //   setIsUsersLoading(true)
+      //   getUsersFromRoom(buildingValue.id, roomValue.id)
+      // }
     }
   }
 
@@ -431,12 +439,17 @@ const BuildingsPage = () => {
       } catch (e) {
         throw e
       } finally {
+        // setIsUsersLoading(true)
         setIsLoading(false);
       }
     };
   
     fetchData();
   }, []);
+
+  React.useEffect(() => {
+
+  }, [])
 
   const handleBuildingFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -450,7 +463,7 @@ const BuildingsPage = () => {
     setIsEditBuildingModalOpened(false)
   }
 
-  const handleRoomFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleRoomFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isCreateRoomModalOpened) {
       postRoom();
@@ -480,6 +493,8 @@ const BuildingsPage = () => {
       const selectedBuilding = buildings.find(building => building.id === parseInt(eventKey, 10));
       if (selectedBuilding && selectedBuilding.id !== buildingValue?.id) {
         setBuildingValue(selectedBuilding)
+        setIsRoomsLoading(true)
+        setIsPlacesLoading(true)
         getRoomsFromBuilding(selectedBuilding.id)
         getPlacesFromBuilding(selectedBuilding.id)
       }
@@ -492,12 +507,13 @@ const BuildingsPage = () => {
       if (selectedRoom && selectedRoom.id !== roomValue?.id) {
         setRoomValue(selectedRoom)
         if (buildingValue) {
-          setIsLoading(true); // Установка состояния загрузки в true перед началом запроса
-          await getUsersFromRoom(buildingValue?.id, Number(eventKey)); // Ожидание завершения запроса
-          setIsLoading(false); // Установка состояния загрузки в false после завершения запроса
+          setIsLoading(true);
+          await getUsersFromRoom(buildingValue?.id, Number(eventKey));
+          setIsLoading(false);
         }
       }
     }
+    
    };
 
   const handlePlaceSelect = (eventKey: string | null) => {
@@ -549,11 +565,6 @@ const BuildingsPage = () => {
     setIsDeletePlaceModalOpened(false)
   }
 
-  // const handleRoomChange = (event: ChangeEvent<HTMLInputElement>) => {
-  //   setNewRoomNumberValue(event.target.value)
-  //   console.log(Number(event.target.value))
-  // }
-
   const handleUserAdd = (id: number) => {
     if (addedUsers.includes(id)) {
       setAddedUsers(addedUsers.filter(userId => userId !== id));
@@ -592,13 +603,11 @@ const BuildingsPage = () => {
     setDeletedUsers([])
   }
 
-  
-
   return (
     <div className={styles.settlement__page}>
         <div className={styles['settlement__page-wrapper']}>
           <h1 className={styles['settlement__page-title']}>Помещения и расселение</h1>
-          {isLoading ? <div className={styles.loader__wrapper}>
+          {(isLoading || isRoomsLoding || isPlacesLoading || isUsersLoading) ? <div className={styles.loader__wrapper}>
               <Loader className={styles.loader} size='l' />
           </div>
           : <div className={styles['settlement__page-content']}>
