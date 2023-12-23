@@ -23,7 +23,7 @@ const dataSlice = createSlice({
     setUserInfo(state, action: PayloadAction<UserInfoData | null>) {
       state.userInfo = action.payload;
     },
-    setUserInfoNull(state, action) {
+    setUserInfoNull(state) {
       state.userInfo = null;
     },
     setIsUserInfoLoading(state, action: PayloadAction<boolean>) {

@@ -20,8 +20,8 @@ import Loader from 'components/Loader';
 import SearchList from 'components/SearchList';
 import ArrowIcon from 'components/Icons/ArrowIcon';
 import ArrowDownIcon from 'components/Icons/ArrowDownIcon'
-import ColorPalette from 'components/ColorPalette';
-import { useCurrentEvent, useIsEventsChanged, useUsersFromEvent, useGroupsFromEvent, useIsEventLoading, setIsEventLoadingAction, setIsEventsChangedAction, setCurrentEventAction, setUsersFromEventAction, setGroupsFromEventAction} from 'slices/EventsSlice';
+// import ColorPalette from 'components/ColorPalette';
+import { useCurrentEvent, useIsEventsChanged, useUsersFromEvent, useGroupsFromEvent, setIsEventsChangedAction, setCurrentEventAction, setUsersFromEventAction, setGroupsFromEventAction} from 'slices/EventsSlice';
 import { useUsers, useGroups, setUsersAction, setGroupsAction } from 'slices/GroupsSlice';
 import { toast } from 'react-toastify';
 import {API_URL} from 'components/urls';
@@ -99,7 +99,7 @@ const CalendarPage = () => {
   const [newColorValue, setNewColorValue] = useState('#4169e1')
   const [isEventsLoading, setIsEventsLoading] = useState(true)
   const [isDetailedEventLoading, setIsDetailedEventLoading] = useState(false)
-  const [isCurrentEventLoading, setIsCurrentEventLoading] = useState(false)
+  // const [isCurrentEventLoading, setIsCurrentEventLoading] = useState(false)
   const [isColorMenuOpened, setIsColorMenuOpened] = useState(false)
   const [isDeleteEventButtonClicked, setIsDeleteEventButtonClicked] = useState(false)
   const [addedUsers, setAddedUsers] = useState<number[]>([])
@@ -107,7 +107,7 @@ const CalendarPage = () => {
   const [addedGroups, setAddedGroups] = useState<number[]>([])
   const [deletedGroups, setDeletedGroups] = useState<number[]>([])
   const [currentDate, setCurrentDate] = useState<string>('')
-  const isEventLoading = useIsEventLoading()
+  // const isEventLoading = useIsEventLoading()
 
   const clearData = () => {
     setNewTitleValue('')
@@ -331,7 +331,7 @@ const CalendarPage = () => {
     } catch (e)  {
       throw e
     } finally {
-      setIsCurrentEventLoading(false)
+      // setIsCurrentEventLoading(false)
     }
   }
 
@@ -416,7 +416,7 @@ const CalendarPage = () => {
 
 
   const handleEditEventButtonClick = () => {
-    const date = moment(newDateValue, 'YYYY-MM-DD');
+    // const date = moment(newDateValue, 'YYYY-MM-DD');
     getPlaces()
     setPlaceValue(currentEvent?.place)
     setEventWindowMode('editEvent')
@@ -628,7 +628,7 @@ const CalendarPage = () => {
               click: function() {
                 setIsCreateEventModalOpened(true)
                 setNewDateValue(currentDate)
-                setIsCurrentEventLoading(true)
+                // setIsCurrentEventLoading(true)
                 getPlaces()
                 clearData()
               }
