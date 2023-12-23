@@ -111,56 +111,59 @@ const DetailedInfo: React.FC<DetailedInfoProps> = ({id, onBackButtonClick, onDel
   }
 
   return (
-    <div className={styles.detailed}>
+    <>
       {isUserDataLoading ? <div className={styles.loader__wrapper}>
-                <Loader className={styles.loader} size='l' />
-            </div>
-      : <>
-        {!isEditFormOpened ? <>
-          <h4 className={styles.detailed__title}>Информация об участнике</h4>
-          <ul className={styles.detailed__list}>
-            <li className={styles['detailed__list-item']}>
-              Имя: {currentUser?.firstName}
-            </li>
-            <li className={styles['detailed__list-item']}>
-              Фамилия: {currentUser?.lastName}
-            </li>
-            {/* {currentUser?.room &&  */}
-              {currentUser.room && <li className={styles['detailed__list-item']}>Комната: № {currentUser.room?.number}</li>}
-            {currentUser?.appGroups.length !== 0 && (
-            <li>
-              Группа: {currentUser?.appGroups.map((group, index) => (
-                <React.Fragment key={group.id}>
-                  {group.name}
-                  {index !== currentUser.appGroups.length - 1 && ', '}
-                </React.Fragment>
-              ))}
-            </li>
-            )}
-          </ul>
-          <div className={styles.detailed__btns}>
-          <div className={styles.detailed__icons}>
-            <EditIcon onClick={() => setIsEditFormOpened(true)}/>
-            <BasketIcon onClick={() => deleteUser()}/>
-          </div>
-          <Button onClick={onBackButtonClick} className={styles.detailed__btn}>Назад</Button>
-        </div>
-        </>
-        : <>
-            <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleFormSubmit(event)} className={styles['form']}>
-              <h3 className={styles.modal__title}>Заполните данные</h3>
-              <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => setFirstNameValue(event.target.value)} value={firstNameValue} type="text" placeholder="Имя*" className={`${styles.form__input} ${styles.form__item}`} />
-
-              <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => setLastNameValue(event.target.value)} value={lastNameValue} type="text" placeholder="Фамилия*" className={`${styles.form__input} ${styles.form__item}`} />
-              <div style={{display: 'flex', justifyContent: 'space-between'}}>
-                <Button className={styles.modal__btn} disabled={firstNameValue && lastNameValue ? false : true} type='submit'>Сохранить</Button>
-                <Button className={styles.modal__btn} onClick={handleBackButtonClick}>Назад</Button>
+                  <Loader className={styles.loader} size='l' />
               </div>
-            </Form>
-          </>  
-      }
-      </>}
-    </div>
+        :
+      <div className={styles.detailed}>
+       <>
+          {!isEditFormOpened ? <>
+            <h4 className={styles.detailed__title}>Информация об участнике</h4>
+            <ul className={styles.detailed__list}>
+              <li className={styles['detailed__list-item']}>
+                Имя: {currentUser?.firstName}
+              </li>
+              <li className={styles['detailed__list-item']}>
+                Фамилия: {currentUser?.lastName}
+              </li>
+              {/* {currentUser?.room &&  */}
+                {currentUser.room && <li className={styles['detailed__list-item']}>Комната: № {currentUser.room?.number}</li>}
+              {currentUser?.appGroups.length !== 0 && (
+              <li>
+                Группа: {currentUser?.appGroups.map((group, index) => (
+                  <React.Fragment key={group.id}>
+                    {group.name}
+                    {index !== currentUser.appGroups.length - 1 && ', '}
+                  </React.Fragment>
+                ))}
+              </li>
+              )}
+            </ul>
+            <div className={styles.detailed__btns}>
+            <div className={styles.detailed__icons}>
+              <EditIcon onClick={() => setIsEditFormOpened(true)}/>
+              <BasketIcon onClick={() => deleteUser()}/>
+            </div>
+            <Button onClick={onBackButtonClick} className={styles.detailed__btn}>Назад</Button>
+          </div>
+          </>
+          : <>
+              <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleFormSubmit(event)} className={styles['form']}>
+                <h3 className={styles.modal__title}>Заполните данные</h3>
+                <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => setFirstNameValue(event.target.value)} value={firstNameValue} type="text" placeholder="Имя*" className={`${styles.form__input} ${styles.form__item}`} />
+
+                <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => setLastNameValue(event.target.value)} value={lastNameValue} type="text" placeholder="Фамилия*" className={`${styles.form__input} ${styles.form__item}`} />
+                <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                  <Button className={styles.modal__btn} disabled={firstNameValue && lastNameValue ? false : true} type='submit'>Сохранить</Button>
+                  <Button className={styles.modal__btn} onClick={handleBackButtonClick}>Назад</Button>
+                </div>
+              </Form>
+            </>  
+        }
+        </>
+      </div>}
+    </>
   )
 }
 

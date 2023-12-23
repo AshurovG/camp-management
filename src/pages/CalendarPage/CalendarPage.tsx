@@ -21,7 +21,7 @@ import SearchList from 'components/SearchList';
 import ArrowIcon from 'components/Icons/ArrowIcon';
 import ArrowDownIcon from 'components/Icons/ArrowDownIcon'
 import ColorPalette from 'components/ColorPalette';
-import { useCurrentEvent, useIsEventsChanged, useUsersFromEvent, useGroupsFromEvent, setIsEventsChangedAction, setCurrentEventAction, setUsersFromEventAction, setGroupsFromEventAction} from 'slices/EventsSlice';
+import { useCurrentEvent, useIsEventsChanged, useUsersFromEvent, useGroupsFromEvent, useIsEventLoading, setIsEventLoadingAction, setIsEventsChangedAction, setCurrentEventAction, setUsersFromEventAction, setGroupsFromEventAction} from 'slices/EventsSlice';
 import { useUsers, useGroups, setUsersAction, setGroupsAction } from 'slices/GroupsSlice';
 import { toast } from 'react-toastify';
 import {API_URL} from 'components/urls';
@@ -106,6 +106,7 @@ const CalendarPage = () => {
   const [addedGroups, setAddedGroups] = useState<number[]>([])
   const [deletedGroups, setDeletedGroups] = useState<number[]>([])
   const [currentDate, setCurrentDate] = useState<string>('')
+  const isEventLoading = useIsEventLoading()
 
   const clearData = () => {
     setNewTitleValue('')
@@ -152,9 +153,9 @@ const CalendarPage = () => {
       setIsEventsLoading(false)
     }
   }
-  const getDetailedEvent = async() => {
+  const getDetailedEvent = async(id: number) => {
     try {
-        const response = await axios(API_URL + `events/${currentEvent?.id}/detailed`, {
+        const response = await axios(API_URL + `events/${id}/detailed`, {
             method: 'GET'
         })
         dispatch(setCurrentEventAction({
@@ -212,6 +213,10 @@ const CalendarPage = () => {
       throw e
     } finally {
         setEventWindowMode('showEvent')
+        if (currentEvent) {
+          setIsDetailedEventLoading(true)
+          getDetailedEvent(currentEvent.id)
+        }
     }
   }
 
@@ -229,7 +234,10 @@ const CalendarPage = () => {
     } catch (e) {
       throw e
     } finally {
-      getDetailedEvent()
+      if (currentEvent){
+      setIsDetailedEventLoading(true)
+      getDetailedEvent(currentEvent.id)
+    }
     }
   }
 
@@ -335,7 +343,8 @@ const CalendarPage = () => {
     } catch {
 
     } finally {
-      await getDetailedEvent()
+      if (currentEvent)
+      await getDetailedEvent(currentEvent.id)
     }
   }
 
@@ -348,7 +357,8 @@ const CalendarPage = () => {
     } catch {
 
     } finally {
-      await getDetailedEvent()
+      if (currentEvent)
+      await getDetailedEvent(currentEvent.id)
     }
   }
 
@@ -361,7 +371,8 @@ const CalendarPage = () => {
     } catch {
 
     } finally {
-      await getDetailedEvent()
+      if (currentEvent)
+      await getDetailedEvent(currentEvent.id)
     }
   }
 
@@ -374,7 +385,8 @@ const CalendarPage = () => {
     } catch {
 
     } finally {
-      await getDetailedEvent()
+      if (currentEvent)
+      await getDetailedEvent(currentEvent.id)
     }
   }
 
@@ -579,7 +591,7 @@ const CalendarPage = () => {
               <Loader className={styles.loader} size='l' />
           </div>
         : <div className={styles['events__page-content']}>
-       {common && events && <FullCalendar
+       {common && events && !isDetailedEventLoading && <FullCalendar
         height={600}
         plugins={[ dayGridPlugin, timeGridPlugin ]}
         initialView="timeGridDay"
@@ -621,10 +633,14 @@ const CalendarPage = () => {
               }
             }
            }}
-           eventClick={(info) => {
+           eventClick={async (info) => {
+            setSelectedEvent(Number(info.event.id))
             setIsModalOpened(true)
             setEventWindowMode('showEvent')
-            setSelectedEvent(Number(info.event.id))
+            // dispatch(setIsEventLoadingAction(true))
+            setIsDetailedEventLoading(true)
+            console.log('info us', Number(info.event.id))
+            getDetailedEvent(Number(info.event.id))
            }}
            eventContent={(currentEvent) => {
             return { html: currentEvent.event.title };
@@ -647,11 +663,12 @@ const CalendarPage = () => {
         />}
        </div>}
      </div>
-     <ModalWindow className={styles.modal} handleBackdropClick={handleBackClick} active={isModalOpened}>
-        {eventWindowMode === 'showEvent' && isModalOpened && isCurrentEventLoading ? <div className={styles.bloader__wrapper}>
+     {isDetailedEventLoading ? <div className={styles.bloader__wrapper}>
               <Loader className={styles.bloader} size='l' />
           </div>
-         : eventWindowMode === 'showEvent' && isModalOpened ? <DetailedEventInfo handleDeleteEventButtonClick={() => handleDeleteEventButtonClick() } id={selectedEvent} handleEditEventButtonClick={handleEditEventButtonClick} handleShowUsersButtonClick={() => setEventWindowMode('showUsers')} handleEditPlaceButtonClick={handleEditPlaceButtonClick}/>
+         :
+     <ModalWindow className={styles.modal} handleBackdropClick={handleBackClick} active={isModalOpened}>
+         {eventWindowMode === 'showEvent' && isModalOpened ? <DetailedEventInfo handleDeleteEventButtonClick={() => handleDeleteEventButtonClick() } id={selectedEvent} handleEditEventButtonClick={handleEditEventButtonClick} handleShowUsersButtonClick={() => setEventWindowMode('showUsers')} handleEditPlaceButtonClick={handleEditPlaceButtonClick}/>
         : eventWindowMode === 'editEvent' && isModalOpened ? <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleEditEventFormSubmit(event)}
         className={styles['form']}>
           <h3 className={styles.modal__title}>Заполните данные</h3>
@@ -758,7 +775,7 @@ const CalendarPage = () => {
             </Form>
         </div>
         }
-     </ModalWindow>
+     </ModalWindow>}
 
       <ModalWindow className={styles.modal} handleBackdropClick={() => setIsCreateEventModalOpened(false)} active={isCreateEventModalOpened}>
       <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleCreateEventFormSubmit(event)}

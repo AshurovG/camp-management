@@ -78,6 +78,7 @@ const BuildingsPage = () => {
       })
 
       if (response.data.length > 0) {
+        // setIsUsersLoading(true)
         getUsersFromRoom(id, response.data[0].id)
         setCurrentRooms(response.data)
         setRoomValue(response.data[0])
@@ -266,6 +267,8 @@ const BuildingsPage = () => {
       toast.success("Здание успешно удалено!");
       if (newArr.length > 0) {
         setBuildingValue(newArr[0])
+        setIsRoomsLoading(true)
+        setIsPlacesLoading(true)
         getRoomsFromBuilding(newArr[0].id)
         getPlacesFromBuilding(newArr[0].id)
       }
@@ -436,6 +439,7 @@ const BuildingsPage = () => {
       } catch (e) {
         throw e
       } finally {
+        // setIsUsersLoading(true)
         setIsLoading(false);
       }
     };
@@ -489,6 +493,8 @@ const BuildingsPage = () => {
       const selectedBuilding = buildings.find(building => building.id === parseInt(eventKey, 10));
       if (selectedBuilding && selectedBuilding.id !== buildingValue?.id) {
         setBuildingValue(selectedBuilding)
+        setIsRoomsLoading(true)
+        setIsPlacesLoading(true)
         getRoomsFromBuilding(selectedBuilding.id)
         getPlacesFromBuilding(selectedBuilding.id)
       }
@@ -601,7 +607,7 @@ const BuildingsPage = () => {
     <div className={styles.settlement__page}>
         <div className={styles['settlement__page-wrapper']}>
           <h1 className={styles['settlement__page-title']}>Помещения и расселение</h1>
-          {isLoading ? <div className={styles.loader__wrapper}>
+          {(isLoading || isRoomsLoding || isPlacesLoading || isUsersLoading) ? <div className={styles.loader__wrapper}>
               <Loader className={styles.loader} size='l' />
           </div>
           : <div className={styles['settlement__page-content']}>

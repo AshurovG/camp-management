@@ -40,7 +40,7 @@ const GroupsPage = () => {
   const [isFilteredUsersLoading, setIsFilteredUsersLoading] = useState(false)
   const [isDeleteModalWindowOpened, setIsDeleteModalWindowOpened] = useState(false)
   const [isUsersModalWindowOpened, setIsUsersModalWindowOpened] = useState(false)
-  const [usersWindowMode, setUsersWindowMode] = useState<'create' | 'edit' | 'show' |'detailed'>('show')
+  const [usersWindowMode, setUsersWindowMode] = useState<'create' | 'edit' | 'show' | 'detailed'>('show')
   const [newUserFirstName, setNewUserFirstName] = useState('')
   const [newUserLastName, setNewUserLastName] = useState('')
   const isUserChanged = useIsUserChanged()
@@ -511,20 +511,20 @@ const GroupsPage = () => {
           <Button onClick={() => setIsDeleteModalWindowOpened(false)} className={styles.modal__btn}>Закрыть</Button>
         </div>
       </ModalWindow>
-
+      {isUsersLoading ? <div className={styles.bloader__wrapper}>
+              <Loader className={styles.bloader} size='l' />
+          </div>
+          :
       <ModalWindow handleBackdropClick={handleCloseUsersWindow} active={isUsersModalWindowOpened}>
         <div className={styles.modal__users}>
           {usersWindowMode === 'show' ? <><h3 className={styles.modal__title}>Список всех участников</h3>
-          {isUsersLoading ? <div className={styles.bloader__wrapper}>
-              <Loader className={styles.bloader} size='l' />
-          </div>
-          : <div className={styles['modal__users-list']}>
+           <div className={styles['modal__users-list']}>
             <div className={styles.modal__btns}>
               <AddButton onClick={() => setUsersWindowMode('create')}/>
             </div>
             <SearchList onMemberClick={(id) => {setSelectedUser(id); setUsersWindowMode('detailed')}} allUsers/>
 
-          </div>}</>
+          </div></>
           : usersWindowMode === 'create' ? <Form onSubmit={(event: React.FormEvent<HTMLFormElement>) => handleUserFormSubmit(event)} className={styles['form']}>
           <h3 className={styles.modal__title}>Заполните данные</h3>
           <Form.Control onChange={(event: ChangeEvent<HTMLInputElement>) => setNewUserFirstName(event.target.value)} value={newUserFirstName} type="text" placeholder="Имя*" className={`${styles.form__input} ${styles.form__item}`} />
@@ -541,6 +541,7 @@ const GroupsPage = () => {
         </div>
         
       </ModalWindow>
+}
     </div>
   )
 }

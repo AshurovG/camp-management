@@ -21,25 +21,6 @@ const Header: React.FC = () => {
     const [isProfileButtonClicked, setIsProfileButtonClicked] = useState(false)
     const [isBurgerMenuOpened, setIsBurgerMenuOpened] = useState(false)
 
-    const getUserInfo = async () => {
-        try {
-            const response = await axios(API_URL + `self`, {
-                method: 'GET'
-            })
-
-            dispatch(setUserInfoAction({
-                id: response.data.id,
-                firstName: response.data.first_name,
-                lastName: response.data.last_name
-            }))
-        } catch {
-
-        } finally {
-            dispatch(setIsUserInfoLoadingAction(false))
-            navigate('/login')
-        }
-    }
-
     const logout = async () => {
         try {
             await axios(API_URL + `logout`, {
