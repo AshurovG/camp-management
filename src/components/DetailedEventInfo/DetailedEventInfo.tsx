@@ -1,16 +1,12 @@
-import React, { useState } from 'react'
-import axios from 'axios';
+import React from 'react'
 import moment from 'moment';
 import 'moment/dist/locale/ru';
 // import { toast } from 'react-toastify';
 import styles from './DetailedEventInfo.module.scss'
-import { RecUserData } from '../../../types';
 import EditIcon from 'components/Icons/EditIcon';
 import BasketIcon from 'components/Icons/BasketIcon';
 import Button from 'components/Button';
-import { useDispatch } from 'react-redux';
-import { useCurrentEvent, setCurrentEventAction, setUsersFromEventAction, setGroupsFromEventAction, setIsEventLoadingAction } from 'slices/EventsSlice';
-import {API_URL} from 'components/urls';
+import { useCurrentEvent } from 'slices/EventsSlice';
 
 export type DetailedInfoProps = {
     id: number;
@@ -20,11 +16,10 @@ export type DetailedInfoProps = {
     handleEditPlaceButtonClick?: () => void;
 };
 
-const DetailedEventInfo: React.FC<DetailedInfoProps> = ({id, handleEditEventButtonClick, handleDeleteEventButtonClick, handleShowUsersButtonClick, handleEditPlaceButtonClick}) => {
-    const dispatch = useDispatch()
+const DetailedEventInfo: React.FC<DetailedInfoProps> = ({handleEditEventButtonClick, handleDeleteEventButtonClick, handleShowUsersButtonClick, handleEditPlaceButtonClick}) => {
     const currentEvent = useCurrentEvent()
     // const [currentEvent, setCurrentEvent] = useState<EventsData>()
-    const [necessaryEquipment, setNecessaryEquipment] = useState('')
+    // const [necessaryEquipment, setNecessaryEquipment] = useState('')
 
     // const getDetailedEvent = async() => {
     //     try {
