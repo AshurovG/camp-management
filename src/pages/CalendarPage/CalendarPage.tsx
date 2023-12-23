@@ -25,6 +25,7 @@ import { useCurrentEvent, useIsEventsChanged, useUsersFromEvent, useGroupsFromEv
 import { useUsers, useGroups, setUsersAction, setGroupsAction } from 'slices/GroupsSlice';
 import { toast } from 'react-toastify';
 import {API_URL} from 'components/urls';
+import ColorPalette from "../../components/ColorPalette/ColorPalette";
 
 const colors = [
   {
